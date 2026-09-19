@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // ESM-режим Nest 12: свои файлы импортируются с расширением .js
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    // без метаданных декораторов Nest не соберёт зависимости в конструкторах
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // свойства класса заполняет внедрение зависимостей, а не конструктор
+    "strictPropertyInitialization": false,
+    // каждый файл должен компилироваться отдельно: так его собирает Vitest
+    "isolatedModules": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    // describe/it/expect доступны глобально (globals: true в vitest.config.ts)
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["src", "test", "vitest.config.ts"]
+}

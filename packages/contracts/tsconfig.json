@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    // тот же режим, что у apps/api: относительные импорты с расширением .js
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "dist",
-    // tsup подставляет устаревший baseUrl; без этого TS 6 роняет сборку .d.ts
-    "ignoreDeprecations": "6.0"
+    "rootDir": "src"
   },
-  "include": ["src", "tsup.config.ts"]
+  "include": ["src"]
 }
