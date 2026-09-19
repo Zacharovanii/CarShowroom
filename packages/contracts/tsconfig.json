@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist",
+    "rootDir": "src",
+    // tsup подставляет устаревший baseUrl; без этого TS 6 роняет сборку .d.ts
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src"]
+}

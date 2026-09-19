@@ -1,0 +1,5 @@
+dist/
+node_modules/
+package-lock.json
+# markdown в docs/ и README свёрстан руками — переносы строк осмысленные
+*.md
