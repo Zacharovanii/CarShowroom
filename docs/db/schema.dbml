@@ -26,6 +26,7 @@ Table sessions {
   expires_at timestamptz [not null]
   ip_address text
   user_agent text
+  impersonated_by uuid [ref: > users.id, note: 'admin-плагин: кто вошёл под клиентом']
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
 }
@@ -36,6 +37,12 @@ Table accounts {
   provider_id text [not null]
   account_id text [not null]
   password text [note: 'хеш; только provider_id = credential']
+  access_token text [note: 'OAuth; всегда null — соцвход выключен']
+  refresh_token text
+  id_token text
+  access_token_expires_at timestamptz
+  refresh_token_expires_at timestamptz
+  scope text
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
 

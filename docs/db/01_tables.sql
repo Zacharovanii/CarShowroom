@@ -43,28 +43,39 @@ create table users (
 );
 
 create table sessions (
-    id          uuid        not null default gen_random_uuid(),
-    user_id     uuid        not null,
-    token       text        not null,
-    expires_at  timestamptz not null,
-    ip_address  text,
-    user_agent  text,
-    created_at  timestamptz not null default now(),
-    updated_at  timestamptz not null default now(),
+    id               uuid        not null default gen_random_uuid(),
+    user_id          uuid        not null,
+    token            text        not null,
+    expires_at       timestamptz not null,
+    ip_address       text,
+    user_agent       text,
+    impersonated_by  uuid,                 -- admin-плагин: кто из админов вошёл под этим пользователем
+    created_at       timestamptz not null default now(),
+    updated_at       timestamptz not null default now(),
 
-    constraint sessions_pk       primary key (id),
-    constraint sessions_token_uq unique (token),
-    constraint sessions_user_fk  foreign key (user_id) references users (id) on delete cascade
+    constraint sessions_pk                 primary key (id),
+    constraint sessions_token_uq           unique (token),
+    constraint sessions_user_fk            foreign key (user_id)          references users (id) on delete cascade,
+    constraint sessions_impersonated_by_fk foreign key (impersonated_by) references users (id) on delete restrict
 );
 
+-- OAuth-колонки (access_token…scope) сейчас всегда null: соцвход выключен (D7),
+-- но это часть базовой модели account в Better Auth — колонки нужны структурно,
+-- иначе валидация схемы при старте не проходит (npx auth generate, spike S2).
 create table accounts (
-    id           uuid        not null default gen_random_uuid(),
-    user_id      uuid        not null,
-    provider_id  text        not null,   -- способ входа; у нас всегда 'credential'
-    account_id   text        not null,   -- идентификатор на стороне способа входа
-    password     text,                   -- хеш пароля
-    created_at   timestamptz not null default now(),
-    updated_at   timestamptz not null default now(),
+    id                        uuid        not null default gen_random_uuid(),
+    user_id                   uuid        not null,
+    provider_id               text        not null,   -- способ входа; у нас всегда 'credential'
+    account_id                text        not null,   -- идентификатор на стороне способа входа
+    password                  text,                   -- хеш пароля
+    access_token              text,
+    refresh_token             text,
+    id_token                  text,
+    access_token_expires_at   timestamptz,
+    refresh_token_expires_at  timestamptz,
+    scope                     text,
+    created_at                timestamptz not null default now(),
+    updated_at                timestamptz not null default now(),
 
     constraint accounts_pk          primary key (id),
     constraint accounts_provider_uq unique (provider_id, account_id),
