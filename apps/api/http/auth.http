@@ -1,0 +1,78 @@
+### CarShowroom — Better Auth.
+### Cookie сессии сохраняются между запросами в пределах файла (VS Code REST Client
+### и встроенный HTTP-клиент JetBrains делают это сами) — сценарий «вход → запрос»
+### работает без ручной передачи cookie.
+###
+### Перед прогоном: apps/api запущен (`npm run dev -w @carshowroom/api`),
+### БД поднята и накатана (docker/compose.yml + docs/db/*.sql).
+
+@baseUrl = http://localhost:3000
+@email = client@example.com
+@password = SuperSecret123!
+@phone = +79991234567
+
+# Better Auth проверяет Origin на изменяющих запросах (CSRF-защита) — из браузера
+# через прокси Vite (D14) он подставляется сам, здесь выставляем руками.
+@origin = http://localhost:3000
+
+
+### 1. Регистрация — создаёт users + accounts (provider_id = credential).
+# autoSignIn по умолчанию true, поэтому сразу приходит cookie сессии.
+POST {{baseUrl}}/api/auth/sign-up/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": "Иван Клиент",
+  "phone": "{{phone}}"
+}
+
+
+### 2. Get session сразу после регистрации — должен вернуть user/session,
+# роль по умолчанию "user" (defaultRole в admin-плагине).
+GET {{baseUrl}}/api/auth/get-session
+
+
+### 3. Выход — инвалидирует текущую сессию (сравнить get-session до/после, см. #6).
+POST {{baseUrl}}/api/auth/sign-out
+Origin: {{origin}}
+
+
+### 4. Повторный вход тем же паролем — новая cookie сессии.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+
+### 5. Защищённый эндпоинт без роли manager — должен вернуть 403 Forbidden
+# (@Roles(["manager"]) в AppController, роль сейчас "user").
+GET {{baseUrl}}/spike-manager-only
+
+
+### 6. Get session после sign-out из #3 — должен вернуть null/401 на пустую сессию,
+# если выполнить этот запрос ДО повторного входа в #4.
+GET {{baseUrl}}/api/auth/get-session
+
+
+### ---------------------------------------------------------------------
+### Проверка роли manager (D16, п.4 задания).
+### Роль в интерфейсе не назначается (D16: «через UI роль admin не назначается»,
+### то же верно для manager на этом этапе — нет админки). На spike выставляем
+### руками прямо в БД между запросами #4 и #7:
+###
+###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
+###     -c "update users set role = 'manager' where email = 'client@example.com';"
+###
+### Сессия из #4 продолжает действовать — Better Auth читает role из users
+### при каждом getSession, отдельной пересадки сессии не нужно.
+### ---------------------------------------------------------------------
+
+### 7. Тот же эндпоинт после смены роли на manager — теперь 200.
+GET {{baseUrl}}/spike-manager-only
