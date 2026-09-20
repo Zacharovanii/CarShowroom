@@ -1,6 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
 import { AllowAnonymous, Roles, Session, type UserSession } from "@thallesp/nestjs-better-auth";
-import { apiErrorSchema, type ApiError } from "@carshowroom/contracts";
 import { AppService } from "./app.service.js";
 
 @Controller()
@@ -11,14 +10,6 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
-  }
-
-  /** Временная проверка: контракт виден в Nest и по типам, и в рантайме. */
-  @AllowAnonymous()
-  @Get("contracts-check")
-  contractsCheck(): { valid: boolean; sample: ApiError } {
-    const sample: ApiError = { error: { code: "NOT_FOUND", message: "нет такой страницы" } };
-    return { valid: apiErrorSchema.safeParse(sample).success, sample };
   }
 
   /**
