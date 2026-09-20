@@ -17,9 +17,12 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "db:up": "docker compose -f docker/compose.yml up -d",
-    "db:down": "docker compose -f docker/compose.yml down"
+    "db:down": "docker compose -f docker/compose.yml down",
+    "db:migrate": "dbmate --env-file apps/api/.env --migrations-dir apps/api/db/migrations --schema-file apps/api/db/schema.sql up",
+    "db:seed": "node apps/api/db/seed/run.mjs"
   },
   "devDependencies": {
+    "dbmate": "^2.36.0",
     "eslint": "^10.11.0",
     "prettier": "^3.9.8",
     "typescript": "^6.0.3",

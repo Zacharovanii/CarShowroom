@@ -10,13 +10,21 @@
 схема, а не как её история. Отдельными миграциями остаётся только то, что появится
 позже.
 
+Перенос в первую миграцию сделан: [apps/api/db/migrations](../../apps/api/db/migrations).
+Файлы в этой папке остаются как документация схемы по слоям — при следующих
+изменениях редактируются они, а в код превращается уже итоговая правка.
+
 | Файл | Что внутри | Куда |
 |---|---|---|
 | [01_tables.sql](01_tables.sql) | таблицы: PK, FK, UNIQUE, NOT NULL, DEFAULT | БД, миграция |
 | [02_rules.sql](02_rules.sql) | CHECK, индексы, триггер `updated_at`, представление каталога | БД, миграция |
 | [03_reference_data.sql](03_reference_data.sql) | серии, кузова, типы двигателя | БД, миграция |
-| [04_smoke_test.sql](04_smoke_test.sql) | проверка ограничений в транзакции с откатом | прогон после изменений |
 | [schema.dbml](schema.dbml) | схема в DBML — только таблицы и связи | dbdiagram.io, черновая картинка |
+
+Проверка ограничений в транзакции с откатом переехала в
+[apps/api/test/db-smoke.sql](../../apps/api/test/db-smoke.sql): она гоняется поверх
+seed-а (apps/api/db/seed), а не поверх пустых таблиц, поэтому теперь адресуется
+к своим строкам по email/slug, а не по числовому `id`.
 
 ---
 
@@ -29,8 +37,7 @@
 
 ```bash
 docker run -d --rm --name cs-pg -p 5432:5432 -e POSTGRES_PASSWORD=pg postgres:17-alpine
-cat 0[123]_*.sql      | docker exec -i cs-pg psql -U postgres -v ON_ERROR_STOP=1
-cat 04_smoke_test.sql | docker exec -i cs-pg psql -U postgres -v ON_ERROR_STOP=1
+cat 0[123]_*.sql | docker exec -i cs-pg psql -U postgres -v ON_ERROR_STOP=1
 docker stop cs-pg
 ```
 
