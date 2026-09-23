@@ -1,0 +1,130 @@
+### CarShowroom — экраны сотрудников (UC-M1, UC-M2, UC-A1, UC-A2).
+### Перед прогоном: apps/api запущен (`npm run dev:api`), БД накатана
+### (`npm run db:migrate && npm run db:seed`). Cookie сессии REST-клиент
+### хранит сам, поэтому после входа запросы идут от этого сотрудника.
+###
+### Админ через API не создаётся (UC-A2) — в проекте его заводит seed.
+### Для прогона вручную:
+###
+###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
+###     -c "update users set role = 'admin' where email = 'admin@example.com';"
+
+@baseUrl = http://localhost:3000
+@origin = http://localhost:3000
+@adminEmail = admin@example.com
+@managerEmail = manager@example.com
+@password = SuperSecret123!
+### день, на который смотрит менеджер, и id записи из #5
+@date = 2026-10-03
+@testDriveId = 1
+
+
+### 1. Вход админом.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{password}}"
+}
+
+
+### 2. Список пользователей: поиск по имени и email, фильтр по роли, страницы.
+GET {{baseUrl}}/api/admin/users?q=manager&role=manager&page=1
+
+
+### 3. Создание менеджера — 201. Пароль временный, админ передаёт его сам.
+POST {{baseUrl}}/api/admin/users
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "name": "Пётр Менеджер",
+  "email": "{{managerEmail}}",
+  "phone": "+79991110022",
+  "password": "{{password}}"
+}
+
+
+### 4. Тот же email второй раз — 409 EMAIL_TAKEN.
+POST {{baseUrl}}/api/admin/users
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "name": "Пётр Менеджер",
+  "email": "{{managerEmail}}",
+  "phone": "+79991110022",
+  "password": "{{password}}"
+}
+
+
+### 5. Вход созданным менеджером — пароль завёл Better Auth, вход работает.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{managerEmail}}",
+  "password": "{{password}}"
+}
+
+
+### 6. Список пользователей менеджером — 403: экран только для админа.
+GET {{baseUrl}}/api/admin/users
+
+
+### 7. Записи выбранного дня: время, автомобиль, клиент (имя, телефон, email),
+# статус, комментарий, когда создана. День — по поясу салона.
+GET {{baseUrl}}/api/manager/test-drives?date={{date}}
+
+
+### 8. Те же записи с фильтрами по автомобилю и статусу.
+GET {{baseUrl}}/api/manager/test-drives?date={{date}}&carId=9&status=scheduled
+
+
+### 9. Результат визита до начала слота — 422 SLOT_NOT_STARTED.
+PATCH {{baseUrl}}/api/manager/test-drives/{{testDriveId}}
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "status": "completed"
+}
+
+
+### 10. Отмена будущей записи менеджером — причина обязательна, клиент её увидит.
+PATCH {{baseUrl}}/api/manager/test-drives/{{testDriveId}}
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "status": "cancelled",
+  "cancelReason": "Автомобиль на сервисе"
+}
+
+
+### 11. Повторное закрытие той же записи — 409 ALREADY_CLOSED (TD-9).
+PATCH {{baseUrl}}/api/manager/test-drives/{{testDriveId}}
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "status": "no_show"
+}
+
+
+### 12. Отмена без причины — 400 VALIDATION_FAILED.
+PATCH {{baseUrl}}/api/manager/test-drives/{{testDriveId}}
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "status": "cancelled"
+}
+
+
+### 13. Гость на экране менеджера — 401.
+# Выполнять после sign-out (apps/api/http/auth.http, #3).
+GET {{baseUrl}}/api/manager/test-drives?date={{date}}

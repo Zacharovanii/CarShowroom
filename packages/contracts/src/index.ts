@@ -64,3 +64,13 @@ export type {
   ManagerTestDrivesQuery,
   TestDriveClient,
 } from "./manager.js";
+
+export {
+  USERS_PAGE_SIZE,
+  createManagerSchema,
+  userRoles,
+  userSchema,
+  usersQuerySchema,
+  usersResponseSchema,
+} from "./admin.js";
+export type { CreateManager, User, UserRole, UsersQuery, UsersResponse } from "./admin.js";
