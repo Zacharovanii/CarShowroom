@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { instantSchema, phoneSchema } from "./common.js";
+import {
+  emailSchema,
+  instantSchema,
+  passwordSchema,
+  personNameSchema,
+  phoneSchema,
+} from "./common.js";
 
 /** Роли (use-cases.md, «Роли»); те же значения, что в CHECK users_role_ck. */
 export const userRoles = ["user", "manager", "admin"] as const;
@@ -52,10 +58,10 @@ export type UsersResponse = z.infer<typeof usersResponseSchema>;
  * Пароль временный — админ передаёт его сотруднику сам, писем не шлём.
  */
 export const createManagerSchema = z.object({
-  name: z.string().trim().min(1).max(100),
-  email: z.string().trim().toLowerCase().pipe(z.email("некорректный email")),
+  name: personNameSchema,
+  email: emailSchema,
   phone: phoneSchema,
-  password: z.string().min(8, "пароль не короче 8 символов").max(128),
+  password: passwordSchema,
 });
 
 export type CreateManager = z.infer<typeof createManagerSchema>;

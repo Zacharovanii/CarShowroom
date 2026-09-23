@@ -20,3 +20,18 @@ export const instantSchema = z.iso.datetime({ offset: true });
 
 /** Время начала в поясе салона, «10:00» — подпись в сетке и в списке записей. */
 export const timeLabelSchema = z.string().regex(/^\d{2}:\d{2}$/);
+
+/** Имя человека — тот же диапазон, что и CHECK users_name_ck. */
+export const personNameSchema = z.string().trim().min(1, "укажите имя").max(100);
+
+/**
+ * Email. `toLowerCase` — не украшение: в БД CHECK требует нижний регистр
+ * (users_email_ck), а уникальность email считается по точному значению.
+ */
+export const emailSchema = z.string().trim().toLowerCase().pipe(z.email("некорректный email"));
+
+/** Пароль. Нижняя граница — из UC-G5, верхняя — предел bcrypt-совместимых хешей. */
+export const passwordSchema = z
+  .string()
+  .min(8, "пароль не короче 8 символов")
+  .max(128, "пароль не длиннее 128 символов");

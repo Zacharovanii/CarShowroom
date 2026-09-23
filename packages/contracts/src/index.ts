@@ -27,6 +27,23 @@ export type {
   FilterOption,
 } from "./catalog.js";
 
+export {
+  changePasswordFormSchema,
+  changePasswordSchema,
+  signInSchema,
+  signUpFormSchema,
+  signUpSchema,
+  updateProfileSchema,
+} from "./auth.js";
+export type {
+  ChangePassword,
+  ChangePasswordForm,
+  SignIn,
+  SignUp,
+  SignUpForm,
+  UpdateProfile,
+} from "./auth.js";
+
 export { SALON_TIME_ZONE } from "./common.js";
 
 export {

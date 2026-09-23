@@ -3,6 +3,10 @@ import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins/admin";
 import { createAccessControl } from "better-auth/plugins/access";
 import { adminAc, defaultStatements } from "better-auth/plugins/admin/access";
+import { APIError, createAuthMiddleware } from "better-auth/api";
+import { signUpSchema, updateProfileSchema } from "@carshowroom/contracts";
+import type { BetterAuthOptions } from "better-auth";
+import type { ZodType } from "zod";
 
 // Отдельный пул для Better Auth (D7.1): postgres.js — для остального кода,
 // сюда наружу из модуля auth не выходит. max=5, явно — чтобы число было
@@ -16,6 +20,46 @@ export const authPool = new Pool({
 // пользователей), admin — полный набор defaultStatements. Сами права
 // (test_drives и т.д.) не отсюда — у @Roles() в наших контроллерах.
 const ac = createAccessControl(defaultStatements);
+
+/**
+ * Маршруты Better Auth — не наши контроллеры: они поднимаются как raw
+ * middleware в обход роутера Nest, поэтому ZodValidationPipe на них не
+ * навесить. Валидация схемами контракта делается единственным доступным
+ * способом — before-хуком самого Better Auth.
+ *
+ * Проверяются поля, у которых в БД есть CHECK (`phone`, `name`, `email`):
+ * без этого некорректный телефон доходил бы до Postgres и возвращался
+ * ошибкой драйвера. Вход и смена пароля не проверяются: формат пароля там
+ * сверять нечего (UC-G6 требует общего сообщения), а длину нового пароля
+ * Better Auth проверяет сам тем же правилом «не короче 8».
+ */
+const bodyRules: Record<string, ZodType> = {
+  "/sign-up/email": signUpSchema.loose(),
+  // update-user частичный: форма UC-U2 шлёт только изменённые поля
+  "/update-user": updateProfileSchema.partial().loose(),
+};
+
+// Тип возвращается явным: инференс createAuthMiddleware тянет за собой
+// внутренние типы @better-auth/core, которые tsc не может назвать (TS2883).
+type BeforeHook = NonNullable<NonNullable<BetterAuthOptions["hooks"]>["before"]>;
+
+const validateBody: BeforeHook = createAuthMiddleware(async (ctx) => {
+  const schema = bodyRules[ctx.path];
+  if (!schema) return;
+
+  const result = schema.safeParse(ctx.body ?? {});
+  if (!result.success) {
+    throw new APIError("BAD_REQUEST", {
+      code: "VALIDATION_FAILED",
+      message: "Некорректные данные запроса",
+      issues: result.error.issues,
+    });
+  }
+
+  // дальше идёт нормализованное тело: email в нижнем регистре (того же
+  // требует CHECK users_email_ck), имя без крайних пробелов
+  return { context: { ...ctx, body: result.data as Record<string, unknown> } };
+});
 
 const managerRole = ac.newRole({
   user: ["list", "get"],
@@ -35,6 +79,10 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+  },
+
+  hooks: {
+    before: validateBody,
   },
 
   // Email-подтверждение и OAuth выключены (D7) — соцпровайдеров нет,
