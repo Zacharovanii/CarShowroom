@@ -1,0 +1,358 @@
+/* =====================================================================
+   Токены дизайн-системы CarShowroom (D10).
+
+   Два уровня:
+     1) ПРИМИТИВЫ — шкалы. Значения в них не имеют смысла в интерфейсе,
+        на них нельзя ссылаться из CSS-модулей компонентов.
+     2) СЕМАНТИКА — роли. Компоненты пользуются только ими, поэтому
+        тема меняется переопределением семантики, а не правкой модулей.
+
+   Тёмная тема — основная и живёт в :root. Светлая добавляется блоком
+   [data-theme="light"] в конце файла (черновик, D21).
+
+   Все цветовые пары проверены по WCAG 2.1 AA: текст ≥ 4.5:1,
+   границы и фокус ≥ 3:1. Числа — в docs/design-system.md.
+
+   БРЕЙКПОИНТЫ (кастомных media-переменных в CSS пока нет, поэтому
+   значения живут здесь комментарием и повторяются в @media руками):
+     --bp-sm:  640px   телефон → планшет
+     --bp-md: 1024px   планшет → десктоп
+     --bp-lg: 1280px   десктоп → широкий
+   ===================================================================== */
+
+:root {
+  /* ===================================================================
+     1. ПРИМИТИВЫ
+     =================================================================== */
+
+  /* --- Нейтральная шкала (тёмная тема). 1 — самый тёмный ------------ */
+  --gray-1: #0a0b0d;   /* фон страницы                                  */
+  --gray-2: #101216;   /* фон чередующейся секции                       */
+  --gray-3: #16181c;   /* поверхность: карточка, панель, поле ввода     */
+  --gray-4: #1c1f24;   /* поверхность выше по слою, hover карточки      */
+  --gray-5: #23262c;   /* нажатое состояние                             */
+  --gray-6: #2b2f36;   /* тихая граница, разделитель                    */
+  --gray-7: #3a404a;   /* граница в hover                               */
+  --gray-8: #666e7c;   /* граница интерактивного контрола (3.8:1);
+                          он же цвет выключенного текста                */
+  --gray-9: #888f9d;   /* текст третьего уровня (5.1:1)                 */
+  --gray-10: #a8b0bd;  /* текст второго уровня (7.6:1)                  */
+  --gray-11: #c9cfd8;  /* текст второго уровня в hover, иконки на фото  */
+  --gray-12: #eef1f5;  /* основной текст (14.6:1)                       */
+
+  /* --- Акцент: синий. Не «фирменный BMW», а служебный цвет действия -- */
+  --accent-1: #06101c;
+  --accent-2: #0a1929;
+  --accent-3: #0d2740;  /* тонировка бейджа и выбранного фильтра        */
+  --accent-4: #103255;  /* её hover                                     */
+  --accent-5: #143d69;  /* её нажатое состояние                         */
+  --accent-6: #1a4b80;  /* тихая акцентная граница                      */
+  --accent-7: #1d5ba3;  /* ТОЛЬКО заливка hover — как граница не проходит 3:1 */
+  --accent-8: #2573c9;  /* сплошная заливка, белый текст поверх (4.8:1) */
+  --accent-9: #17497f;  /* нажатая заливка                              */
+  --accent-10: #3d8ee6; /* декоративный, без текста поверх              */
+  --accent-11: #4da2ff; /* акцентный ТЕКСТ и кольцо фокуса (7.4:1)      */
+  --accent-12: #cfe4ff; /* акцентный текст на акцентной тонировке       */
+
+  /* --- Статусные цвета. Пара «текст + тонировка» на каждый статус ---- */
+  --success-fg: #58dba4;
+  --success-bg: #0b2a1e;
+  --warning-fg: #f3c455;
+  --warning-bg: #2e2209;
+  --danger-fg: #ff8b8b;   /* текст ошибки на тёмном фоне                */
+  --danger-bg: #2e1213;   /* тонировка плашки ошибки                    */
+  --danger-solid: #b3261e;/* заливка разрушающей кнопки, белый текст    */
+
+  /* --- Шкала отступов, база 4px ------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+  --space-13: 128px;
+
+  /* --- Радиусы. Проект без скруглений: по умолчанию 0 ---------------- */
+  --radius-none: 0px;
+  --radius-xs: 2px;    /* только там, где 0 даёт заметный «зуб»         */
+  --radius-full: 9999px; /* только точка статуса и индикатор прогресса  */
+
+  /* --- Типографика --------------------------------------------------- */
+  --font-sans: "Inter", "Inter Variable", system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --font-size-1: 12px;
+  --font-size-2: 14px;
+  --font-size-3: 16px;   /* база */
+  --font-size-4: 18px;
+  --font-size-5: 20px;
+  --font-size-6: 24px;
+  --font-size-7: 32px;
+  --font-size-8: 44px;
+  --font-size-9: clamp(40px, 7vw, 72px);  /* только заголовок hero */
+
+  --line-height-1: 16px;
+  --line-height-2: 20px;
+  --line-height-3: 24px;
+  --line-height-4: 26px;
+  --line-height-5: 28px;
+  --line-height-6: 32px;
+  --line-height-7: 38px;
+  --line-height-8: 48px;
+  --line-height-9: 1.04;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --letter-spacing-display: -0.022em; /* размеры 7–9: крупный текст «рассыпается» */
+  --letter-spacing-tight: -0.011em;   /* размеры 5–6 */
+  --letter-spacing-normal: 0em;
+  --letter-spacing-caps: 0.08em;      /* надзаголовки и подписи капсом */
+
+  /* --- Тени. На тёмном фоне почти не читаются, поэтому только для
+         слоёв, оторванных от страницы: диалог, выпадающий список ------ */
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-3: 0 24px 64px rgb(0 0 0 / 0.6);
+
+  /* --- Движение ------------------------------------------------------ */
+  --duration-1: 120ms;  /* мгновенный отклик: hover, фокус, нажатие     */
+  --duration-2: 200ms;  /* раскрытие кнопки, смена вкладки, тултип      */
+  --duration-3: 320ms;  /* появление диалога, тоста, содержимого        */
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);      /* появление         */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);   /* перемещение       */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);   /* всё остальное     */
+
+  /* --- Слои ---------------------------------------------------------- */
+  --z-header: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-dialog: 310;
+  --z-toast: 400;
+
+  /* --- Сетка и контейнер --------------------------------------------- */
+  --container-max: 1280px;
+  --container-gutter: var(--space-4);   /* < 640px  */
+  --grid-columns: 12;
+  --grid-gap: var(--space-6);
+
+  /* ===================================================================
+     2. СЕМАНТИКА — единственный уровень, доступный CSS-модулям
+     =================================================================== */
+
+  /* --- Фон и поверхности --------------------------------------------- */
+  --color-bg: var(--gray-1);
+  --color-bg-alt: var(--gray-2);
+  --color-surface: var(--gray-3);
+  --color-surface-hover: var(--gray-4);
+  --color-surface-active: var(--gray-5);
+  --color-overlay: rgb(0 0 0 / 0.72);      /* подложка диалога          */
+
+  /* --- Текст ---------------------------------------------------------- */
+  --color-fg: var(--gray-12);
+  --color-fg-muted: var(--gray-10);
+  --color-fg-subtle: var(--gray-9);
+  --color-fg-disabled: var(--gray-8);
+  --color-fg-on-accent: #ffffff;
+
+  /* --- Границы -------------------------------------------------------- */
+  --color-border: var(--gray-6);           /* разделитель, тихая рамка   */
+  --color-border-hover: var(--gray-7);
+  --color-border-control: var(--gray-8);   /* поле ввода, чекбокс: 3:1   */
+
+  /* --- Первичное действие: светлая заливка, тёмный текст (референс A) -- */
+  --color-primary: var(--gray-12);
+  --color-primary-hover: #ffffff;
+  --color-primary-active: var(--gray-11);
+  --color-primary-fg: var(--gray-1);
+
+  /* --- Акцент: ссылки, выбранное, фокус ------------------------------- */
+  --color-accent: var(--accent-11);        /* акцентный текст и ссылки   */
+  --color-accent-solid: var(--accent-8);   /* заливка выбранного слота   */
+  --color-accent-solid-hover: var(--accent-7);
+  --color-accent-solid-active: var(--accent-9);
+  --color-accent-fg: #ffffff;
+  --color-accent-tint: var(--accent-3);    /* фон активного фильтра      */
+  --color-accent-tint-hover: var(--accent-4);
+  --color-accent-border: var(--accent-8);
+
+  /* --- Статусы. `*-fg` — текст, `*-bg` — тонировка под ним ------------ */
+  --color-success: var(--success-fg);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning-fg);
+  --color-warning-bg: var(--warning-bg);
+  --color-danger: var(--danger-fg);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-solid: var(--danger-solid);
+  --color-danger-fg: #ffffff;
+  --color-info: var(--accent-11);
+  --color-info-bg: var(--accent-3);
+
+  /* --- Фокус. Кольцо ВСЕГДА со смещением наружу: тогда его контраст
+         считается по фону под контролом, а не по заливке контрола.
+         Без смещения синее кольцо на светлой кнопке даёт 2.3:1. ------- */
+  --color-focus-ring: var(--accent-11);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring: var(--focus-ring-width) solid var(--color-focus-ring);
+
+  /* --- Радиусы по роли. Снять «без скруглений» = поменять эти три ----- */
+  --radius-control: var(--radius-none);   /* кнопка, поле, чекбокс      */
+  --radius-surface: var(--radius-none);   /* карточка, диалог, панель   */
+  --radius-pill: var(--radius-full);      /* точка статуса, прогресс    */
+
+  /* --- Типографика по роли ------------------------------------------- */
+  --text-display: var(--font-weight-bold) var(--font-size-9) / var(--line-height-9) var(--font-sans);
+  --text-h1: var(--font-weight-semibold) var(--font-size-8) / var(--line-height-8) var(--font-sans);
+  --text-h2: var(--font-weight-semibold) var(--font-size-7) / var(--line-height-7) var(--font-sans);
+  --text-h3: var(--font-weight-semibold) var(--font-size-6) / var(--line-height-6) var(--font-sans);
+  --text-h4: var(--font-weight-medium) var(--font-size-5) / var(--line-height-5) var(--font-sans);
+  --text-body: var(--font-weight-regular) var(--font-size-3) / var(--line-height-3) var(--font-sans);
+  --text-body-sm: var(--font-weight-regular) var(--font-size-2) / var(--line-height-2) var(--font-sans);
+  --text-caption: var(--font-weight-medium) var(--font-size-1) / var(--line-height-1) var(--font-sans);
+
+  /* --- Размеры контролов. 40px — десктоп, 44px — минимум для пальца --- */
+  --control-height: 40px;
+  --control-height-sm: 32px;
+  --control-height-lg: 48px;
+  --tap-target-min: 44px;
+
+  /* --- Шапка ---------------------------------------------------------- */
+  --header-height: 64px;
+
+  /* --- Иконки. Один размер на весь интерфейс, толщина линии одна:
+         иначе набор из разных источников сразу выдаёт себя. --------- */
+  --icon-size: 20px;
+  --icon-size-sm: 16px;
+  --icon-stroke: 2;
+  --icon-stroke-bold: 2.5;  /* только стрелка в кнопке карточки */
+
+  /* --- Обработка фото в карточке. Демо-снимки разношёрстные; когда
+         фотографии заменят на подобранные, обработка снимается
+         одной строкой: --photo-filter: none (D22). ------------------- */
+  --photo-filter: saturate(0.85) contrast(1.06) brightness(0.9);
+
+  /* Размытие нижней части снимка. Маска гасит его к верхней границе,
+     поэтому блюр «поднимается» снизу вверх и обрывается не линией. */
+  --photo-blur: 16px;
+  --photo-blur-mask: linear-gradient(
+    to top,
+    rgb(0 0 0 / 1) 0%,
+    rgb(0 0 0 / 1) 32%,
+    rgb(0 0 0 / 0.45) 56%,
+    rgb(0 0 0 / 0) 78%
+  );
+
+  /* Затемнение поверх блюра — именно оно отвечает за контраст текста.
+     Плотность 96% посчитана по худшему случаю: белый кузов прямо под
+     подписью. Тогда основной текст даёт 14.2:1, подпись капсом — 5.0:1.
+     Блюр сам по себе ничего не гарантирует: размытое белое остаётся белым. */
+  --photo-scrim: linear-gradient(
+    to top,
+    rgb(22 24 28 / 0.96) 0%,
+    rgb(22 24 28 / 0.93) 30%,
+    rgb(22 24 28 / 0.6) 55%,
+    rgb(22 24 28 / 0) 88%
+  );
+}
+
+/* --- Ширина полей контейнера по брейкпоинтам ------------------------- */
+@media (min-width: 640px) {
+  :root { --container-gutter: var(--space-6); }
+}
+@media (min-width: 1024px) {
+  :root { --container-gutter: var(--space-7); }
+}
+
+/* =====================================================================
+   Уважение к prefers-reduced-motion.
+   Длительности гасим до 1ms — анимации на transform исчезают, а переходы
+   цвета и прозрачности остаются мгновенными. Так ни один компонент
+   не приходится переписывать: он уже ссылается на --duration-*.
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-1: 1ms;
+    --duration-2: 1ms;
+    --duration-3: 1ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =====================================================================
+   СВЕТЛАЯ ТЕМА — черновик (D21).
+   Переопределяются только примитивные шкалы и те семантические токены,
+   у которых при инверсии меняется роль (тени, подложка, тонировки).
+   Остальная семантика наследуется, потому что ссылается на шкалу.
+   Контраст проверен: fg 19.2:1, fg-muted 6.1:1, accent 5.8:1.
+   ===================================================================== */
+[data-theme="light"] {
+  --gray-1: #ffffff;
+  --gray-2: #f7f8f9;
+  --gray-3: #f4f5f7;
+  --gray-4: #eceef1;
+  --gray-5: #e2e5e9;
+  --gray-6: #d8dbe0;
+  --gray-7: #c3c8d0;
+  --gray-8: #8b929d;
+  --gray-9: #79818f;
+  --gray-10: #5b6370;
+  --gray-11: #333a45;
+  --gray-12: #0d0f12;
+
+  --accent-3: #e7f0fb;
+  --accent-4: #d7e6f8;
+  --accent-5: #c4d9f3;
+  --accent-7: #0a58b0;
+  --accent-8: #0b63c5;
+  --accent-9: #084e9c;
+  --accent-11: #0b63c5;
+  --accent-12: #083b77;
+
+  --success-fg: #0f7a4f;
+  --success-bg: #e4f4ec;
+  --warning-fg: #8a5a00;
+  --warning-bg: #fbf0d9;
+  --danger-fg: #c0322b;
+  --danger-bg: #fbe9e8;
+  --danger-solid: #b3261e;
+
+  /* В светлой теме первичная кнопка не может быть светлой заливкой —
+     она сливается с фоном. Первичное действие становится тёмным. */
+  --color-primary: var(--gray-12);
+  --color-primary-hover: #23262c;
+  --color-primary-active: #33383f;
+  --color-primary-fg: #ffffff;
+
+  --color-overlay: rgb(13 15 18 / 0.48);
+
+  --shadow-1: 0 1px 2px rgb(13 15 18 / 0.08);
+  --shadow-2: 0 8px 24px rgb(13 15 18 / 0.12);
+  --shadow-3: 0 24px 64px rgb(13 15 18 / 0.16);
+
+  /* Затемнение под текстом карточки уводится в светлую поверхность */
+  --photo-scrim: linear-gradient(
+    to top,
+    rgb(244 245 247 / 0.97) 0%,
+    rgb(244 245 247 / 0.94) 30%,
+    rgb(244 245 247 / 0.62) 55%,
+    rgb(244 245 247 / 0) 88%
+  );
+}
