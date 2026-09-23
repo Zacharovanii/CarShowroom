@@ -120,3 +120,16 @@ export function isClosed(status: TestDriveStatus): boolean {
 export function isCancellable(status: TestDriveStatus, startsAt: Date, now: Date): boolean {
   return !isClosed(status) && startsAt.getTime() > now.getTime();
 }
+
+/**
+ * Границы календарных суток пояса салона: [начало дня, начало следующего).
+ * Нужны списку записей дня у менеджера (UC-M1) — день там считается так же,
+ * как сетка слотов, по поясу салона, а не по поясу сервера.
+ */
+export function salonDayRange(date: string): { from: Date; to: Date } {
+  const from = slotInstant(date, 0);
+  // следующий день берём по календарю пояса, а не «+24 часа»: в сутки
+  // перевода стрелок их не 24. 36 часов заведомо попадают в следующий день.
+  const to = slotInstant(salonDay(new Date(from.getTime() + 36 * 60 * MINUTE_MS)), 0);
+  return { from, to };
+}

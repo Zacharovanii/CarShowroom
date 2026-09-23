@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+  SALON_TIME_ZONE,
+  daySchema,
+  instantSchema,
+  phoneSchema,
+  timeLabelSchema,
+} from "./common.js";
 
 /**
  * Статусы записи (TD-9): открытая `scheduled` → результат визита от менеджера
@@ -7,18 +14,6 @@ import { z } from "zod";
 export const testDriveStatuses = ["scheduled", "completed", "no_show", "cancelled"] as const;
 
 export type TestDriveStatus = (typeof testDriveStatuses)[number];
-
-/** Часовой пояс салона (TD-3) — один на весь проект, второго не будет. */
-export const SALON_TIME_ZONE = "Europe/Moscow";
-
-/** День в сетке слотов и в фильтрах — календарная дата пояса салона, без времени. */
-const daySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "дата в формате YYYY-MM-DD");
-
-/** Телефон в формате РФ — тот же CHECK, что и в схеме БД. */
-const phoneSchema = z.string().regex(/^\+7\d{10}$/, "телефон в формате +7XXXXXXXXXX");
-
-/** Момент начала слота — ISO-строка с временной зоной (даты на проводе — строки). */
-const instantSchema = z.iso.datetime({ offset: true });
 
 // ---------------------------------------------------------------------
 // GET /api/cars/:slug/slots?date=YYYY-MM-DD
@@ -38,7 +33,7 @@ export type SlotsQuery = z.infer<typeof slotsQuerySchema>;
 export const slotSchema = z.object({
   startsAt: instantSchema,
   /** Время начала в поясе салона, «10:00» — подпись кнопки в сетке. */
-  time: z.string().regex(/^\d{2}:\d{2}$/),
+  time: timeLabelSchema,
   free: z.boolean(),
   bookable: z.boolean(),
 });

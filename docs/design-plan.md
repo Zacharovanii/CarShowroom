@@ -60,8 +60,12 @@
 | POST | `/api/admin/users` | админ | `name`, `email`, `phone`, `password` → менеджер |
 
 Коды ошибок: `SLOT_TAKEN` (409), `TOO_MANY_ACTIVE`, `SLOT_OUT_OF_RANGE`,
-`SLOT_NOT_ON_GRID`, `ALREADY_CLOSED`, `TOO_LATE_TO_CANCEL`, `EMAIL_TAKEN`, `NOT_FOUND`,
-`FORBIDDEN`, `VALIDATION_FAILED`.
+`SLOT_NOT_ON_GRID`, `ALREADY_CLOSED`, `TOO_LATE_TO_CANCEL`, `SLOT_NOT_STARTED`, `EMAIL_TAKEN`,
+`NOT_FOUND`, `FORBIDDEN`, `VALIDATION_FAILED`.
+
+`SLOT_NOT_STARTED` (422) добавлен при реализации менеджера: результат визита
+(`completed` / `no_show`) отмечается только после начала слота, а отмена — только до
+(UC-M2). Для второй половины правила код уже был — `TOO_LATE_TO_CANCEL`.
 
 **Открыто:** пагинация страницами или «показать ещё» (курсор)? Черновик: `page` + `pageSize`, данных мало.
 

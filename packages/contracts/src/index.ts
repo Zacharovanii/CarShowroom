@@ -27,8 +27,9 @@ export type {
   FilterOption,
 } from "./catalog.js";
 
+export { SALON_TIME_ZONE } from "./common.js";
+
 export {
-  SALON_TIME_ZONE,
   createTestDriveSchema,
   myTestDrivesSchema,
   slotSchema,
@@ -48,3 +49,18 @@ export type {
   TestDriveCar,
   TestDriveStatus,
 } from "./test-drives.js";
+
+export {
+  closeTestDriveSchema,
+  managerTestDriveSchema,
+  managerTestDrivesQuerySchema,
+  managerTestDrivesSchema,
+  testDriveClientSchema,
+} from "./manager.js";
+export type {
+  CloseTestDrive,
+  ManagerTestDrive,
+  ManagerTestDrives,
+  ManagerTestDrivesQuery,
+  TestDriveClient,
+} from "./manager.js";

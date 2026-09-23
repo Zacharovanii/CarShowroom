@@ -13,6 +13,7 @@ export const errorCodes = [
   "SLOT_NOT_ON_GRID",
   "ALREADY_CLOSED",
   "TOO_LATE_TO_CANCEL",
+  "SLOT_NOT_STARTED",
   "EMAIL_TAKEN",
   "NOT_FOUND",
   "FORBIDDEN",
