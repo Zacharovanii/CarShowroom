@@ -76,3 +76,86 @@ GET {{baseUrl}}/api/auth/get-session
 
 ### 7. Тот же эндпоинт после смены роли на manager — теперь 200.
 GET {{baseUrl}}/spike-manager-only
+
+
+### ---------------------------------------------------------------------
+### UC-U2. Контактные данные и пароль.
+### Прогонять подряд с #1 (регистрация) — нужна cookie сессии.
+### ---------------------------------------------------------------------
+
+@newPassword = BrandNewPass456!
+
+### 8. Смена имени и телефона. Ответ — {"status": true}.
+POST {{baseUrl}}/api/auth/update-user
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "name": "Пётр Клиентов",
+  "phone": "+79990000042"
+}
+
+
+### 9. Перечитать сессию — name и phone уже новые.
+# Проверка в БД (phone — additionalFields, отдельная колонка users.phone):
+#   docker exec -it cs-db psql -U carshowroom -d carshowroom \
+#     -c "select name, phone from users where email = 'client@example.com';"
+GET {{baseUrl}}/api/auth/get-session
+
+
+### 10. Телефон не в формате РФ — 400 VALIDATION_FAILED.
+# Валидация схемами контракта висит before-хуком Better Auth (auth.ts):
+# его маршруты идут в обход роутера Nest, пайп на них не навесить.
+POST {{baseUrl}}/api/auth/update-user
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "phone": "88005553535"
+}
+
+
+### 11. Смена пароля.
+POST {{baseUrl}}/api/auth/change-password
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "currentPassword": "{{password}}",
+  "newPassword": "{{newPassword}}"
+}
+
+
+### 12. Вход старым паролем после #11 — 401.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+
+### 13. Вход новым паролем — 200.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{email}}",
+  "password": "{{newPassword}}"
+}
+
+
+### 14. Регистрация с кривым телефоном — 400 VALIDATION_FAILED, issues из zod.
+POST {{baseUrl}}/api/auth/sign-up/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "bad-phone@example.com",
+  "password": "{{password}}",
+  "name": "Кривой Телефон",
+  "phone": "12345"
+}
