@@ -26,3 +26,25 @@ export type {
   DriveType,
   FilterOption,
 } from "./catalog.js";
+
+export {
+  SALON_TIME_ZONE,
+  createTestDriveSchema,
+  myTestDrivesSchema,
+  slotSchema,
+  slotsQuerySchema,
+  slotsResponseSchema,
+  testDriveCarSchema,
+  testDriveSchema,
+  testDriveStatuses,
+} from "./test-drives.js";
+export type {
+  CreateTestDrive,
+  MyTestDrives,
+  Slot,
+  SlotsQuery,
+  SlotsResponse,
+  TestDrive,
+  TestDriveCar,
+  TestDriveStatus,
+} from "./test-drives.js";

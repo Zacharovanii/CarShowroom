@@ -1,0 +1,169 @@
+### CarShowroom — тест-драйвы (UC-G4, UC-U3, UC-U4).
+### Перед прогоном: apps/api запущен (`npm run dev:api`), БД накатана
+### (`npm run db:migrate && npm run db:seed`). Cookie сессии REST-клиент
+### хранит сам, поэтому после #1 остальные запросы идут от этого клиента.
+###
+### Даты внутри файла — фиксированные: перед прогоном подставьте день
+### внутри окна записи TD-5 (от «через 2 часа» до +30 дней).
+
+@baseUrl = http://localhost:3000
+@origin = http://localhost:3000
+@slug = x5-xdrive40i
+@carId = 9
+@date = 2026-10-03
+### 14:00 по Москве = 11:00 UTC того же дня (TD-3, пояс салона +03:00)
+@slot = 2026-10-03T11:00:00.000Z
+
+
+### 1. Клиент для сценария (роль user по умолчанию).
+POST {{baseUrl}}/api/auth/sign-up/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "td-demo1@example.com",
+  "password": "SuperSecret123!",
+  "name": "Демо Клиент",
+  "phone": "+79991110011"
+}
+
+
+### 2. Сетка слотов дня — доступна гостю. 9 слотов 10:00…18:00,
+# у каждого free (никто не занял) и bookable (ещё и попадает в окно TD-5).
+GET {{baseUrl}}/api/cars/{{slug}}/slots?date={{date}}
+
+
+### 3. Запись на тест-драйв — 201 и запись в статусе scheduled.
+POST {{baseUrl}}/api/me/test-drives
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "carId": {{carId}},
+  "startsAt": "{{slot}}",
+  "phone": "+79991110011",
+  "comment": "Права категории B с собой"
+}
+
+
+### 4. Та же сетка — слот 14:00 стал free: false, bookable: false.
+GET {{baseUrl}}/api/cars/{{slug}}/slots?date={{date}}
+
+
+### 5. Второй клиент — понадобится для гонки на слоте и чужой записи.
+POST {{baseUrl}}/api/auth/sign-up/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "td-demo2@example.com",
+  "password": "SuperSecret123!",
+  "name": "Демо Сосед",
+  "phone": "+79991110022"
+}
+
+
+### 6. Он же на занятый слот — 409 SLOT_TAKEN.
+# Занятость не проверяется select-ом: 23505 от частичного уникального индекса
+# test_drives_car_slot_uq переводит в код ошибки глобальный фильтр.
+POST {{baseUrl}}/api/me/test-drives
+Content-Type: application/json
+Origin: {{origin}}
+
+{ "carId": {{carId}}, "startsAt": "{{slot}}", "phone": "+79991110022" }
+
+
+### 7. Время не на сетке (14:30) — 422 SLOT_NOT_ON_GRID.
+POST {{baseUrl}}/api/me/test-drives
+Content-Type: application/json
+Origin: {{origin}}
+
+{ "carId": {{carId}}, "startsAt": "2026-10-03T11:30:00.000Z", "phone": "+79991110022" }
+
+
+### 8. Дальше 30 дней — 422 SLOT_OUT_OF_RANGE (TD-5).
+POST {{baseUrl}}/api/me/test-drives
+Content-Type: application/json
+Origin: {{origin}}
+
+{ "carId": {{carId}}, "startsAt": "2026-11-22T11:00:00.000Z", "phone": "+79991110022" }
+
+
+### 9. Две активные записи есть → третья даёт 422 TOO_MANY_ACTIVE (TD-6).
+# Выполнить дважды подряд: первый раз 201, второй — ошибка лимита.
+POST {{baseUrl}}/api/me/test-drives
+Content-Type: application/json
+Origin: {{origin}}
+
+{ "carId": {{carId}}, "startsAt": "2026-10-03T12:00:00.000Z", "phone": "+79991110022" }
+
+
+### 10. Мои записи: upcoming (ближайшая сверху) и history.
+GET {{baseUrl}}/api/me/test-drives
+
+
+### ---------------------------------------------------------------------
+### Дальше нужен id записи из #3 — подставьте его вместо 1.
+### ---------------------------------------------------------------------
+@testDriveId = 1
+
+### 11. Отмена чужой записи — 404 NOT_FOUND, а не 403:
+# существование чужой записи не подсказываем. Выполняется от второго клиента,
+# то есть после #5 и без повторного входа первым.
+POST {{baseUrl}}/api/me/test-drives/{{testDriveId}}/cancel
+Origin: {{origin}}
+
+
+### 12. Вернуться первым клиентом и отменить свою запись — статус cancelled.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{ "email": "td-demo1@example.com", "password": "SuperSecret123!" }
+
+### 13. Отмена своей будущей записи (TD-7).
+POST {{baseUrl}}/api/me/test-drives/{{testDriveId}}/cancel
+Origin: {{origin}}
+
+
+### 14. Повторная отмена — 409 ALREADY_CLOSED (TD-9).
+POST {{baseUrl}}/api/me/test-drives/{{testDriveId}}/cancel
+Origin: {{origin}}
+
+
+### 15. Слот снова свободен: free: true.
+GET {{baseUrl}}/api/cars/{{slug}}/slots?date={{date}}
+
+
+### ---------------------------------------------------------------------
+### Права. Сотрудники на тест-драйвы не записываются (UC-M2): @Roles(["user"])
+### сверяет роль буквально. Роль меняется руками — админки ещё нет:
+###
+###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
+###     -c "update users set role = 'manager' where email = 'td-demo2@example.com';"
+### ---------------------------------------------------------------------
+
+### 16. Запись менеджером — 403 FORBIDDEN.
+POST {{baseUrl}}/api/me/test-drives
+Content-Type: application/json
+Origin: {{origin}}
+
+{ "carId": {{carId}}, "startsAt": "2026-10-03T13:00:00.000Z", "phone": "+79991110022" }
+
+
+### 17. Гость в «моих записях» — 401 с кодом FORBIDDEN (нужен выход, см. auth.http #3).
+GET {{baseUrl}}/api/me/test-drives
+
+
+### 18. Некорректный date — 400 VALIDATION_FAILED с issues из zod.
+GET {{baseUrl}}/api/cars/{{slug}}/slots?date=03.10.2026
+
+
+### ---------------------------------------------------------------------
+### Убрать за собой:
+###   docker exec -it cs-db psql -U carshowroom -d carshowroom -c "
+###     delete from test_drives where user_id in (select id from users where email like 'td-demo%');
+###     delete from sessions   where user_id in (select id from users where email like 'td-demo%');
+###     delete from accounts   where user_id in (select id from users where email like 'td-demo%');
+###     delete from users where email like 'td-demo%';"
+### ---------------------------------------------------------------------
