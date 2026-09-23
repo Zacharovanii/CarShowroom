@@ -15,3 +15,6 @@ Thumbs.db
 !.vscode/extensions.json
 
 docs/nest-guide.md
+
+# Локальный проброс портов при конфликте с другим сервисом на машине.
+docker/compose.override.yml
