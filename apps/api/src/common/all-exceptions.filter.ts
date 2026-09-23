@@ -56,7 +56,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof AppError) {
       return {
         status: exception.status,
-        body: { error: { code: exception.code, message: exception.message, details: exception.details } },
+        body: {
+          error: { code: exception.code, message: exception.message, details: exception.details },
+        },
       };
     }
 
