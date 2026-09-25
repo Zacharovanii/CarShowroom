@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { CarDetails } from "@carshowroom/contracts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
 import { CarViewer } from "@/features/car-viewer";
@@ -7,6 +7,8 @@ import styles from "./CarMedia.module.css";
 
 export interface CarMediaProps {
   car: CarDetails;
+  /** Слева от вкладок, в одной строке с ними — кнопка «В каталог». */
+  leading?: ReactNode;
 }
 
 /**
@@ -18,7 +20,7 @@ export interface CarMediaProps {
  * Вкладки управляемые: запасной вид 3D уводит кнопкой «К фотографиям»,
  * а значит, переключать их умеет не только пользователь.
  */
-export function CarMedia({ car }: CarMediaProps) {
+export function CarMedia({ car, leading }: CarMediaProps) {
   const has3d = car.model3dPath !== null;
   const [tab, setTab] = useState("photo");
 
@@ -28,10 +30,13 @@ export function CarMedia({ car }: CarMediaProps) {
 
   return (
     <Tabs value={value} onValueChange={setTab} className={styles.media}>
-      <TabsList label="Медиа автомобиля">
-        <TabsTrigger value="photo">Фото</TabsTrigger>
-        {has3d && <TabsTrigger value="model">3D</TabsTrigger>}
-      </TabsList>
+      <div className={styles.bar}>
+        {leading}
+        <TabsList label="Медиа автомобиля" className={styles.tabs}>
+          <TabsTrigger value="photo">Фото</TabsTrigger>
+          {has3d && <TabsTrigger value="model">3D</TabsTrigger>}
+        </TabsList>
+      </div>
 
       <TabsContent value="photo">
         {/* key — по автомобилю: у новой машины галерея начинается

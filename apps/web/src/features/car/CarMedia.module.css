@@ -3,3 +3,17 @@
   /* Вкладки и кадр стоят плотнее, чем разделы страницы */
   gap: var(--space-4);
 }
+
+/* Строка над кадром: «В каталог» слева, вкладки за ней. Линия-разделитель
+   идёт под всей строкой, а не только под вкладками. */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* .bar в селекторе — чтобы перебить линию .list из Tabs.module.css */
+.bar .tabs {
+  border-bottom: none;
+}

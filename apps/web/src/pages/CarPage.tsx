@@ -60,17 +60,19 @@ export default function CarPage() {
       ) : (
         <>
           <div className={styles.top}>
-            <LinkButton
-              to="/catalog"
-              variant="ghost"
-              size="sm"
-              iconStart={<ArrowLeft aria-hidden="true" />}
-              className={styles.back}
-            >
-              В каталог
-            </LinkButton>
-
-            <CarMedia car={car.data} />
+            <CarMedia
+              car={car.data}
+              leading={
+                <LinkButton
+                  to="/catalog"
+                  variant="ghost"
+                  size="sm"
+                  iconStart={<ArrowLeft aria-hidden="true" />}
+                >
+                  В каталог
+                </LinkButton>
+              }
+            />
 
             <div className={styles.head}>
               <h1 className={styles.name}>{car.data.name}</h1>

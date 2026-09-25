@@ -5,6 +5,12 @@
   padding-bottom: var(--space-2);
   /* Карточка дня не должна обрезаться на краю прокрутки */
   scroll-padding: var(--space-3);
+  /* Горизонтальный свайп тачпада на краю ленты не уходит странице
+     и не включает жест «назад» в браузере */
+  overscroll-behavior-x: contain;
+  /* Тонкая полоса в тон интерфейсу вместо белой системной */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-hover) transparent;
 }
 
 /* position: relative — якорь для скрытой радиокнопки: без него она

@@ -41,6 +41,47 @@ export function DayStrip({ days, value, onChange }: DayStripProps) {
     container.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
   }, [value]);
 
+  // Колесо над лентой целиком принадлежит ей — и на краях тоже: если
+  // отдавать остаток странице, инерция тачпада после края дёргает её.
+  // Слушатель нативный: у React wheel пассивный, preventDefault в нём
+  // не работает.
+  //
+  // Щелчки колеса копятся в одну цель и едут плавно: мгновенный шаг
+  // в ~100px на щелчок выглядит рывком, а несколько плавных прокруток
+  // подряд без общей цели съедают друг друга.
+  useEffect(() => {
+    const container = strip.current;
+    if (!container) return;
+    let target: number | null = null;
+    let settle: ReturnType<typeof setTimeout> | undefined;
+
+    function onWheel(event: WheelEvent) {
+      if (!container) return;
+      // Горизонтальный жест тачпада лента прокрутит сама
+      if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      const max = container.scrollWidth - container.clientWidth;
+      if (max <= 0) return;
+
+      event.preventDefault();
+      // deltaMode 1 — строки (Firefox), а не пиксели
+      const step = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+      target = Math.min(Math.max((target ?? container.scrollLeft) + step, 0), max);
+      container.scrollTo({ left: target, behavior: "smooth" });
+
+      // Жест кончился — следующий считается от того места, где лента стоит
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        target = null;
+      }, 400);
+    }
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      container.removeEventListener("wheel", onWheel);
+      clearTimeout(settle);
+    };
+  }, []);
+
   const today = toSalonDay();
 
   return (

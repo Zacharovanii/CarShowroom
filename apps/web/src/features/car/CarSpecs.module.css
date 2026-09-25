@@ -1,9 +1,9 @@
-/* Полоса характеристик: значение крупно, подпись капсом под ним (§9).
-   На телефоне — две колонки (раздел 4 wireframes.md). */
+/* Полоса характеристик: значение крупно, подпись капсом под ним.
+   На телефоне — две колонки. */
 .specs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6) var(--space-7);
+  gap: var(--space-4) var(--space-5);
   margin: 0;
 }
 
@@ -30,8 +30,12 @@
   letter-spacing: var(--letter-spacing-caps);
 }
 
+/* Шире телефона — плотный ряд: каждая характеристика по ширине своего
+   значения, а не растянутая колонка на четверть контейнера */
 @media (min-width: 640px) {
   .specs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5) var(--space-9);
   }
 }
