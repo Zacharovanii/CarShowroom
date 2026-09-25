@@ -1,12 +1,6 @@
 import { Suspense, useCallback, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import {
-  CameraControls,
-  ContactShadows,
-  Environment,
-  Lightformer,
-  useProgress,
-} from "@react-three/drei";
+import { CameraControls, ContactShadows, useProgress } from "@react-three/drei";
 import {
   Box3,
   DoubleSide,
@@ -17,8 +11,10 @@ import {
   type Group,
 } from "three";
 import { RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Button, Spinner } from "@/components/ui";
 import { CAR_LENGTH, CarModel } from "./CarModel";
+import { PanoramaEnvironment, StudioEnvironment } from "./SceneEnvironment";
+import { SCENE_IDS, SCENES, STUDIO_EXPOSURE, type SceneId } from "./scenes";
 import { ViewerProgress } from "./ViewerProgress";
 import styles from "./CarViewer.module.css";
 
@@ -64,10 +60,8 @@ function showShadowFromAbove(group: Group | null) {
  * Модуль грузится только через `React.lazy` из CarViewer (D11): открыл
  * вкладку «3D» — поехал чанк; не открыл — на странице нет ни байта three.js.
  *
- * Свет — студия из светящихся панелей (`Lightformer`), собранная в карту
- * окружения прямо в браузере: краска и стёкла отражают «софтбоксы», как во
- * вьюере Sketchfab. HDRI-файл не нужен, внешних запросов нет. Фон — не сцена,
- * а CSS рамки: канва прозрачная.
+ * Окружение выбирается переключателем: стенд (студия без файлов) или
+ * панорама города / улицы — см. SceneEnvironment.
  *
  * Управление — CameraControls: колесо приближает к курсору, а не к центру;
  * правая кнопка (два пальца) сдвигает точку взгляда в пределах машины;
@@ -119,6 +113,13 @@ export default function CarScene({
     void controls.current?.setLookAt(...HOME_POSITION, ...HOME_TARGET, true);
   }
 
+  const [sceneId, setSceneId] = useState<SceneId>("studio");
+  // Какая панорама уже стоит в сцене: пока выбранная не догрузилась,
+  // на её кнопке крутится спиннер
+  const [loadedScene, setLoadedScene] = useState<SceneId>("studio");
+  const markSceneLoaded = useCallback(() => setLoadedScene(sceneId), [sceneId]);
+  const sceneLoading = sceneId !== "studio" && loadedScene !== sceneId;
+
   return (
     <>
       <Canvas
@@ -134,50 +135,21 @@ export default function CarScene({
           // Neutral передаёт цвет краски честнее ACES, который уводит
           // насыщенные цвета в жёлтый и пережимает светлые
           gl.toneMapping = NeutralToneMapping;
-          gl.toneMappingExposure = 1.05;
+          gl.toneMappingExposure = STUDIO_EXPOSURE;
         }}
       >
-        <Environment resolution={256} frames={1}>
-          {/* Светлая студия: верхний софтбокс, два боковых, мягкий свет
-              спереди и сзади. Интенсивности подобраны на глаз по моделям. */}
-          <Lightformer
-            form="rect"
-            intensity={3}
-            position={[0, 6, 0]}
-            rotation-x={Math.PI / 2}
-            scale={[12, 6, 1]}
-          />
-          <Lightformer
-            form="rect"
-            intensity={1.6}
-            position={[-7, 2.5, 0]}
-            rotation-y={Math.PI / 2}
-            scale={[14, 2.5, 1]}
-          />
-          <Lightformer
-            form="rect"
-            intensity={1.6}
-            position={[7, 2.5, 0]}
-            rotation-y={-Math.PI / 2}
-            scale={[14, 2.5, 1]}
-          />
-          <Lightformer form="rect" intensity={1} position={[0, 2, 9]} scale={[10, 4, 1]} />
-          <Lightformer
-            form="rect"
-            intensity={0.8}
-            position={[0, 2, -9]}
-            rotation-y={Math.PI}
-            scale={[10, 4, 1]}
-          />
-          {/* Пол студии: снизу в кузове отражается светлое, а не пустота */}
-          <Lightformer
-            form="rect"
-            intensity={0.35}
-            position={[0, -1, 0]}
-            rotation-x={-Math.PI / 2}
-            scale={[30, 30, 1]}
-          />
-        </Environment>
+        {sceneId === "studio" ? (
+          <StudioEnvironment />
+        ) : (
+          // Пока панорама едет, вокруг машины остаётся стенд
+          <Suspense fallback={<StudioEnvironment />}>
+            <PanoramaEnvironment
+              key={sceneId}
+              scene={SCENES[sceneId]}
+              onReady={markSceneLoaded}
+            />
+          </Suspense>
+        )}
 
         <Suspense fallback={null}>
           <CarModel
@@ -214,6 +186,24 @@ export default function CarScene({
           draggingSmoothTime={0.08}
         />
       </Canvas>
+
+      {ready && (
+        <div className={styles.scenes} role="group" aria-label="Сцена">
+          {SCENE_IDS.map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={styles.sceneButton}
+              aria-pressed={id === sceneId}
+              aria-busy={(id === sceneId && sceneLoading) || undefined}
+              onClick={() => setSceneId(id)}
+            >
+              {SCENES[id].label}
+              {id === sceneId && sceneLoading && <Spinner size="sm" label={null} />}
+            </button>
+          ))}
+        </div>
+      )}
 
       {ready && (
         <Button

@@ -19,6 +19,8 @@
 | --- | --- | --- | --- | --- |
 | `placeholder-car.glb` | низкополигональный седан (`NormalCar1`), материал краски переименован в `CarPaint` | Quaternius | CC0 | [Poly Pizza](https://poly.pizza/m/Cz6yDaUcM9) |
 | `placeholder-car.webp` | картинка «Фото не установлено», сгенерирована для проекта | — | CC0 | — |
+| `hdri/canary_wharf_2k.hdr` | панорама для сцены «Город» в 3D, 2k | Andreas Mischok | CC0 | [Poly Haven](https://polyhaven.com/a/canary_wharf) |
+| `hdri/urban_street_01_2k.hdr` | панорама для сцены «Улица» в 3D, 2k | Andreas Mischok | CC0 | [Poly Haven](https://polyhaven.com/a/urban_street_01) |
 
 Nest отдаёт их вместо любого отсутствующего `/assets/models/*` и `/assets/cars/*`.
 
