@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signInSchema } from "@carshowroom/contracts";
-import { Alert, Button, Field, Input } from "@/components/ui";
+import { Alert, Button, Field, Input, PasswordInput } from "@/components/ui";
 import { fieldErrors, type FieldErrors } from "@/shared/form";
 import { signIn } from "./authClient";
 import { homeRouteForRole, toUserRole } from "./authContext";
@@ -88,9 +88,8 @@ export function LoginForm() {
 
         <Field label="Пароль" error={errors.password}>
           {(control) => (
-            <Input
+            <PasswordInput
               {...control}
-              type="password"
               name="password"
               autoComplete="current-password"
               value={password}

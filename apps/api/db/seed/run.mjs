@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+import { seedTestDrives } from "./test-drives.mjs";
 import { seedUsers } from "./users.mjs";
 
 // Тот же приём, что в src/env.ts: .env нужен для локальной разработки,
@@ -29,6 +30,9 @@ try {
 
   console.log("Пользователи:");
   await seedUsers(client);
+
+  console.log("Тест-драйвы:");
+  await seedTestDrives(client);
 
   await client.query("commit");
   console.log("Seed OK");

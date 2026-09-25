@@ -16,6 +16,7 @@ describe("Схемы форм авторизации", () => {
     phone: "+79991234567",
     password: "SuperSecret123!",
     confirmPassword: "SuperSecret123!",
+    consent: true,
   };
 
   it("принимает корректную регистрацию и нормализует email и имя", () => {
@@ -34,6 +35,13 @@ describe("Схемы форм авторизации", () => {
 
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.path).toEqual(["confirmPassword"]);
+  });
+
+  it("без согласия на обработку данных не пропускает — ошибка у галочки", () => {
+    const result = signUpFormSchema.safeParse({ ...validSignUp, consent: false });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["consent"]);
   });
 
   it.each(["88005553535", "+7999123456", "+7 999 123 45 67", ""])(

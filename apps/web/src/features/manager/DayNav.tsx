@@ -1,5 +1,6 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button, IconButton, Input } from "@/components/ui";
+import { useRef } from "react";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button, IconButton } from "@/components/ui";
 import { formatDateWithYear, shiftDay, toSalonDay } from "@/shared/format";
 import styles from "./DayNav.module.css";
 
@@ -13,9 +14,24 @@ export interface DayNavProps {
  * Навигация по дням (UC-M1). Даты считаются только через `shiftDay` и
  * `toSalonDay`: арифметика на `Date` съехала бы в пояс браузера, и менеджер
  * во Владивостоке увидел бы «сегодня» на день вперёд.
+ *
+ * Выбор даты — кнопка с текущим днём словами; календарь по клику —
+ * браузерный, от спрятанного под кнопкой поля даты (`showPicker`).
  */
 export function DayNav({ date, onChange }: DayNavProps) {
   const today = toSalonDay();
+  const picker = useRef<HTMLInputElement>(null);
+
+  function openCalendar() {
+    const input = picker.current;
+    if (!input) return;
+    try {
+      input.showPicker();
+    } catch {
+      // Браузер без showPicker для даты — фокус на поле, календарь по Alt+↓
+      input.focus();
+    }
+  }
 
   return (
     <div className={styles.nav}>
@@ -39,19 +55,28 @@ export function DayNav({ date, onChange }: DayNavProps) {
         />
       </div>
 
-      {/* Подпись и поле выбора — одно целое: по клику открывается календарь,
-          а читается всё равно «25 сентября 2026», а не «25.09.2026». */}
       <div className={styles.picker}>
-        <span aria-hidden="true" className={styles.label}>
+        <Button
+          variant="ghost"
+          iconStart={<CalendarDays aria-hidden="true" />}
+          className={styles.dateButton}
+          aria-label={`${formatDateWithYear(date)}, выбрать другую дату`}
+          onClick={openCalendar}
+        >
           {formatDateWithYear(date)}
-        </span>
-        <Input
+        </Button>
+        {/* Поле нужно только как источник календаря браузера: скрыто под
+            кнопкой, чтобы календарь открывался у неё, и из табуляции убрано —
+            с клавиатуры дату выбирают той же кнопкой */}
+        <input
+          ref={picker}
           type="date"
           value={date}
-          aria-label="Дата"
+          tabIndex={-1}
+          aria-hidden="true"
           className={styles.input}
           onChange={(event) => {
-            // Пустое поле — промежуточное состояние набора, день не меняем
+            // Пустое значение — промежуточное состояние набора, день не меняем
             if (event.target.value) onChange(event.target.value);
           }}
         />

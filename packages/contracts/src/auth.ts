@@ -24,8 +24,12 @@ export const signUpSchema = z.object({
 export type SignUp = z.infer<typeof signUpSchema>;
 
 /** Пароли совпадают — проверка на уровне схемы, ошибка у поля подтверждения. */
+// confirmPassword и consent — правила формы, на провод они не уходят
 export const signUpFormSchema = signUpSchema
-  .extend({ confirmPassword: z.string() })
+  .extend({
+    confirmPassword: z.string(),
+    consent: z.literal(true, { error: "нужно согласие на обработку персональных данных" }),
+  })
   .refine((form) => form.password === form.confirmPassword, {
     message: "пароли не совпадают",
     path: ["confirmPassword"],

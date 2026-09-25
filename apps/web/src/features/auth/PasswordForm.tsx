@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { changePasswordFormSchema } from "@carshowroom/contracts";
-import { Alert, Button, Card, Field, Input, useToast } from "@/components/ui";
+import { Alert, Button, Card, Field, PasswordInput, useToast } from "@/components/ui";
 import { fieldErrors, type FieldErrors } from "@/shared/form";
 import { changePassword } from "./authClient";
 import { isWrongCurrentPassword, REQUEST_FAILED } from "./authErrors";
@@ -65,9 +65,8 @@ export function PasswordForm() {
 
         <Field label="Текущий пароль" error={errors.currentPassword}>
           {(control) => (
-            <Input
+            <PasswordInput
               {...control}
-              type="password"
               name="current-password"
               autoComplete="current-password"
               value={currentPassword}
@@ -78,9 +77,8 @@ export function PasswordForm() {
 
         <Field label="Новый пароль" error={errors.newPassword} hint="Не короче 8 символов">
           {(control) => (
-            <Input
+            <PasswordInput
               {...control}
-              type="password"
               name="new-password"
               autoComplete="new-password"
               value={newPassword}
@@ -91,9 +89,8 @@ export function PasswordForm() {
 
         <Field label="Подтверждение" error={errors.confirmPassword}>
           {(control) => (
-            <Input
+            <PasswordInput
               {...control}
-              type="password"
               name="confirm-password"
               autoComplete="new-password"
               value={confirmPassword}
