@@ -9,6 +9,13 @@ export const envSchema = z.object({
   DATABASE_URL: z.url("должен быть валидным postgres:// URL"),
   BETTER_AUTH_SECRET: z.string().min(1, "не должен быть пустым"),
   BETTER_AUTH_URL: z.url(),
+  /**
+   * Origin фронта в dev. Vite отдаёт SPA со своего порта и проксирует /api,
+   * поэтому браузер шлёт Origin этого порта, а не BETTER_AUTH_URL. Better Auth
+   * сверяет Origin со списком доверенных и иначе отвечает 403 INVALID_ORIGIN.
+   * В проде Nest раздаёт фронт и API с одного origin — переменная не нужна.
+   */
+  WEB_ORIGIN: z.url().optional(),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

@@ -70,6 +70,15 @@ export const auth = betterAuth({
   database: authPool,
   basePath: "/api/auth",
 
+  // В dev фронт живёт на своём порту (Vite) и проксирует /api сюда, поэтому
+  // браузер присылает Origin этого порта. По умолчанию Better Auth доверяет
+  // только baseURL и отвечает 403 INVALID_ORIGIN — вход в браузере не работает
+  // вовсе, хотя curl с подставленным Origin проходит. В проде фронт и API
+  // на одном origin, WEB_ORIGIN не задаётся и список сводится к baseURL.
+  trustedOrigins: [process.env.BETTER_AUTH_URL, process.env.WEB_ORIGIN].filter(
+    (origin): origin is string => Boolean(origin),
+  ),
+
   // generateId: "uuid" → Postgres gen_random_uuid(), как у прикладных таблиц (D19).
   advanced: {
     database: {
