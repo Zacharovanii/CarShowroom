@@ -69,7 +69,10 @@ describe("Каталог", () => {
       expect(byFuel.total).toBeGreaterThan(byFuelAndBody.total);
       expect(byFuelAndBody.total).toBeGreaterThan(withDrive.total);
 
-      expect(withDrive.items.map((car) => car.slug)).toEqual(["760i-sedan"]);
+      expect(withDrive.items.map((car) => car.slug).sort()).toEqual([
+        "750li-xdrive",
+        "m340i-xdrive",
+      ]);
       for (const car of withDrive.items) {
         expect(car.fuelTypeName).toBe("Бензин");
         expect(car.bodyTypeName).toBe("Седан");
@@ -112,15 +115,19 @@ describe("Каталог", () => {
 
     it("режет выборку на страницы, не повторяя и не теряя автомобили", async () => {
       const first = await catalog.getCars(query({ sort: "price-asc", page: 1 }));
-      const second = await catalog.getCars(query({ sort: "price-asc", page: 2 }));
 
       expect(first.pageSize).toBe(CARS_PAGE_SIZE);
       expect(first.items).toHaveLength(CARS_PAGE_SIZE);
-      expect(first.total).toBe(second.total);
       expect(first.totalPages).toBe(Math.ceil(first.total / CARS_PAGE_SIZE));
-      expect(second.items).toHaveLength(first.total - CARS_PAGE_SIZE);
+      expect(first.totalPages).toBeGreaterThan(1);
 
-      const slugs = [...first.items, ...second.items].map((car) => car.slug);
+      const slugs = first.items.map((car) => car.slug);
+      for (let page = 2; page <= first.totalPages; page++) {
+        const next = await catalog.getCars(query({ sort: "price-asc", page }));
+        expect(next.total).toBe(first.total);
+        slugs.push(...next.items.map((car) => car.slug));
+      }
+      expect(slugs).toHaveLength(first.total);
       expect(new Set(slugs).size).toBe(first.total);
 
       // страница за последней — пустая, но общее число известно
@@ -139,7 +146,7 @@ describe("Каталог", () => {
       // деньги и дробные характеристики — строки (инвариант контракта)
       expect(typeof car.price).toBe("string");
       expect(typeof car.accelerationS).toBe("string");
-      expect(car.model3dPath).toBe("/assets/models/x5.glb");
+      expect(car.model3dPath).toBe("/assets/models/x5-xdrive40i.glb");
       expect(car.paintMaterial).toBe("CarPaint");
       expect(car.colors.length).toBeGreaterThan(0);
 

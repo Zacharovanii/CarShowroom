@@ -19,9 +19,17 @@ async function bootstrap() {
   // процесс, не дав пулам закрыться.
   app.enableShutdownHooks();
 
-  // Фото и .glb лежат в репозитории (D15) и раздаёт их сам Nest — одинаково
-  // в dev и в проде. Путь от dist/main.js: dist/ → apps/api/ → public/.
-  app.useStaticAssets(join(import.meta.dirname, "..", "public"));
+  // Фото и .glb раздаёт сам Nest — одинаково в dev и в проде (D15.1).
+  // Лицензированные ассеты лежат вне гита в licensed-assets/ (D25); на чистом
+  // клоне их нет, и вместо них отдаются заглушки из public/ — сайт не ломается.
+  // Путь от dist/main.js: dist/ → apps/api/.
+  const root = join(import.meta.dirname, "..");
+  app.useStaticAssets(join(root, "licensed-assets"), { prefix: "/assets/" });
+  app.useStaticAssets(join(root, "public"));
+  const placeholder = (file: string) => (_req: unknown, res: { sendFile(path: string): void }) =>
+    res.sendFile(join(root, "public", "assets", file));
+  app.use("/assets/cars", placeholder("placeholder-car.webp"));
+  app.use("/assets/models", placeholder("placeholder-car.glb"));
 
   await app.listen(process.env.PORT ?? 3000);
 }

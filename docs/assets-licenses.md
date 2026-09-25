@@ -1,102 +1,90 @@
-# Лицензии демо-ассетов
+# Лицензии ассетов
 
-Учебный проект, не официальный сайт BMW. Все файлы в `apps/api/public/assets/` взяты из
-источников со свободной лицензией и лежат в репозитории (D15.1). Пресс-фото BMW, снимки
-с сайтов дилеров и картинки из поиска не используются.
+Учебный некоммерческий проект, не официальный сайт BMW. Права на товарный знак и дизайн
+кузовов принадлежат BMW AG; пометка об этом стоит в подвале сайта (D1).
 
-Для CC BY и CC BY-SA атрибуция обязательна: автор и лицензия указаны в таблицах ниже,
-в интерфейсе они показываются в подвале / на странице автомобиля.
+Ассеты делятся на две части (D25):
+
+- **В репозитории** — только CC0-заглушки в `apps/api/public/assets/`.
+- **Вне репозитория** — настоящие модели и фото в `apps/api/licensed-assets/`
+  (в `.gitignore`). Они используются по лицензиям, **допускающим некоммерческое учебное
+  использование**, или с неустановленной лицензией. Ни то ни другое не является
+  свободной лицензией, поэтому в публичный гит эти файлы не кладутся.
 
 ---
 
-## Фотографии — `apps/api/public/assets/cars/`
+## Заглушки в репозитории — `apps/api/public/assets/`
 
-Все файлы: WebP, 1600×1067 (3:2), ≤ 300 КБ. Суффикс `-1` — вид спереди (обложка
-каталога), `-2` — вид сзади. Исходники — Wikimedia Commons, приведены к общему размеру
-(масштабирование и кадрирование; у панорамных кадров пустое поле заполнено размытой
-копией снимка, чтобы автомобиль не обрезался).
-
-| Файл | Что изображено | Автор | Лицензия | Источник |
+| Файл | Что это | Автор | Лицензия | Источник |
 | --- | --- | --- | --- | --- |
-| `118i-hatchback-1.webp` | BMW 118i M Sport (F40), спереди | Vauxford | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:2019_BMW_118i_M_Sport_1.5_Front.jpg) |
-| `118i-hatchback-2.webp` | BMW 118i M Sport (F40), сзади | Vauxford | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:2019_BMW_118i_M_Sport_1.5_Rear.jpg) |
-| `230i-cabrio-1.webp` | BMW 2 серии Cabrio (F23), спереди — **модификация не 230i** | Dinkun Chen | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_2_SERIES_CONVERTIBLE_(F23)_China_(4).jpg) |
-| `230i-cabrio-2.webp` | BMW 230i Cabrio (F23), сзади | Retired electrician | CC0 | [Commons](https://commons.wikimedia.org/wiki/File:Moscow,_BMW_230i_convertible,_Aug_2025_01.jpg) |
-| `320i-sedan-1.webp` | BMW 320i M Sport (G20), спереди | Tokumeigakarinoaoshima | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_320i_M_Sport_(G20)_front.jpg) |
-| `320i-sedan-2.webp` | BMW 320i M Sport (G20), сзади | Tokumeigakarinoaoshima | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_320i_M_Sport_(G20)_rear.jpg) |
-| `320d-touring-1.webp` | BMW 320d Touring (G21), спереди | Damian B Oh | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_G21_320d_Touring_Alpine_White_(2).jpg) |
-| `320d-touring-2.webp` | BMW 320d Touring (G21), сзади-сбоку | Damian B Oh | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_G21_320d_Touring_Alpine_White_(3).jpg) |
-| `430i-gran-coupe-1.webp` | BMW 430i Gran Coupé (G26), спереди сверху | OWS Photography | CC BY 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_430i_Gran_Coupe_(G26)_Washington_DC_Metro_Area,_USA.jpg) |
-| `430i-gran-coupe-2.webp` | BMW **420i** Gran Coupé (G26), сзади — другая модификация | Tokumeigakarinoaoshima | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_420i_GranCoupé_(G26)_rear.jpg) |
-| `550e-sedan-1.webp` | BMW 550e xDrive (G60), спереди | Alexander-93 | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_G60_550e_1X7A1829.jpg) |
-| `550e-sedan-2.webp` | BMW 550e xDrive (G60), сзади | Alexander-93 | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_G60_550e_1X7A1828.jpg) |
-| `760i-sedan-1.webp` | BMW 760i xDrive (G70), спереди | Ethan Llamas | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_760i_G70_XDrive_M_Sport_Package_Pro_Black_Sapphire_-_front.jpg) |
-| `760i-sedan-2.webp` | BMW 760i xDrive (G70), сзади | Ethan Llamas | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_760i_G70_XDrive_M_Sport_Package_Pro_Black_Sapphire_-_rear.jpg) |
-| `m850i-coupe-1.webp` | BMW M850i xDrive Coupé (G15), спереди | Tokumeigakarinoaoshima | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_M850i_xDrive_(G15)_front.jpg) |
-| `m850i-coupe-2.webp` | BMW M850i xDrive Coupé (G15), сзади | Tokumeigakarinoaoshima | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_M850i_xDrive_(G15)_rear.jpg) |
-| `x5-xdrive40i-1.webp` | BMW X5 xDrive40i M Sport (G05), спереди | Damian B Oh | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_G05_X5_xDrive40i_M_Sport_Mineral_White_Metallic_(2).jpg) |
-| `x5-xdrive40i-2.webp` | BMW X5 xDrive40i M Sport (G05), сзади | Damian B Oh | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_G05_X5_xDrive40i_M_Sport_Mineral_White_Metallic_(5).jpg) |
-| `ix3-suv-1.webp` | BMW iX3 (G08), спереди | Dinkun Chen | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_iX3_(G08)_China_(5).jpg) |
-| `ix3-suv-2.webp` | BMW iX3 (G08, рестайлинг), сзади | Alexander Migl | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:BMW_iX3_G08_FL_DSC_9320.jpg) |
+| `placeholder-car.glb` | низкополигональный седан (`NormalCar1`), материал краски переименован в `CarPaint` | Quaternius | CC0 | [Poly Pizza](https://poly.pizza/m/Cz6yDaUcM9) |
+| `placeholder-car.webp` | картинка «Фото не установлено», сгенерирована для проекта | — | CC0 | — |
 
-### Честные оговорки по фотографиям
-
-- **`230i-cabrio-1.webp`** — под свободной лицензией не нашлось снимка именно 230i Cabrio
-  спереди. Взят кабриолет 2 серии того же поколения (F23) без опознавательного шильдика
-  модификации. Вид сзади (`-2`) — настоящий 230i.
-- **`430i-gran-coupe-2.webp`** — вид сзади у 430i Gran Coupé не нашёлся; взят **420i**
-  Gran Coupé того же кузова G26 (сзади отличается только шильдик и патрубки).
-- **`ix3-suv-2.webp`** — вид сзади у дорестайлингового iX3 не нашёлся; взят iX3 G08
-  после рестайлинга (другие фонари).
-- Остальные 17 файлов — ровно та модификация, что записана в `catalog.sql`.
-- Год выпуска на фото не совпадает с `model_year` в seed почти везде: в каталоге стоят
-  2025–2026, а свободные снимки сделаны в 2019–2025. Для учебного каталога это допустимо.
+Nest отдаёт их вместо любого отсутствующего `/assets/models/*` и `/assets/cars/*`.
 
 ---
 
-## 3D-модели — `apps/api/public/assets/models/`
+## 3D-модели — `apps/api/licensed-assets/models/`
 
-**Это заглушки, а не модели соответствующих BMW.** Под свободной лицензией моделей
-конкретных BMW найти не удалось: на Sketchfab CC-BY модели BMW есть, но скачивание там
-требует авторизованного аккаунта (`GET /v3/models/{uid}/download` → `401`), а без входа
-получить файл нельзя. Брать модель в обход лицензии или выдавать чужую за свободную
-нельзя, поэтому вместо них взяты **низкополигональные CC0-автомобили Quaternius**
-подходящего типа кузова.
+Все 18 моделей — автор **[Ddiaz Design](https://sketchfab.com/ddiaz-design)** (Sketchfab),
+лицензия — **только некоммерческое использование** (Creative Commons с условием NC;
+точный вариант — BY-NC или BY-NC-SA — указан на странице каждой модели). Скачаны
+владельцем проекта под своим аккаунтом Sketchfab 25.09.2026.
 
-| Файл | Автомобиль в каталоге | Что на самом деле | Автор | Лицензия | Источник |
-| --- | --- | --- | --- | --- | --- |
-| `x5.glb` | BMW X5 xDrive40i | низкополигональный SUV | Quaternius | CC0 | [Poly Pizza](https://poly.pizza/m/xsMtZhBkxL) |
-| `550e.glb` | BMW 550e xDrive | низкополигональный седан (`NormalCar1`) | Quaternius | CC0 | [Poly Pizza](https://poly.pizza/m/Cz6yDaUcM9) |
-| `m850i.glb` | BMW M850i xDrive | низкополигональное купе (`SportsCar2`) | Quaternius | CC0 | [Poly Pizza](https://poly.pizza/m/1mkmFkAz5v) |
+Изменения относительно оригинала: **только имя материала краски** — переименовано в
+`CarPaint` (у моделей с обвесом — несколько материалов). Геометрия и текстуры не
+тронуты, сжатие не применялось. Если лицензия модели BY-NC-SA, файл с переименованным
+материалом — адаптация и распространяется на тех же условиях; на код проекта это не
+распространяется.
 
-CC0 атрибуции не требует, но авторство указано.
-
-### Что внутри GLB и что было исправлено
-
-Во всех трёх моделях материал краски кузова назывался по цвету (`White`, `Blue`).
-В `catalog.sql` у этих автомобилей `paint_material = 'CarPaint'`, поэтому материал
-**переименован в GLB** в `CarPaint` — seed не трогали. Заодно базовому цвету задан
-нейтральный светлый тон, металличность 0.25 и шероховатость 0.35: реальный цвет
-подставляет фронт (D11).
-
-| Файл | Размер | Материалы (треугольников) | Текстуры |
+| Файл | Модель на Sketchfab | Исходный материал краски | Размер |
 | --- | --- | --- | --- |
-| `x5.glb` | 177 КБ | `CarPaint` (1004), `Grey` (1138), `Black` (1028), `Windows` (72), `TailLights` (42), `Headlights` (10) | нет |
-| `550e.glb` | 161 КБ | `CarPaint` (1148), `Grey` (1136), `Black` (590), `Windows` (62), `Headlights` (12), `TailLights` (6) | нет |
-| `m850i.glb` | 171 КБ | `CarPaint` (1250), `Grey` (1252), `Black` (552), `Windows` (62), `TailLights` (22), `Headlights` (10) | нет |
+| `m2-zacoe-widebody.glb` | 2024 BMW G87 M2 ZACOE WideBody — SEMA Build | `adroBMW_M2G87TNR1_2023PaintTNR_Material_008` | 16 МБ |
+| `m2-vorsteiner.glb` | 2024 Vorsteiner BMW G87 M2 VRS Aero Body Kit | `vorsBMW_M2G87TNR2_2023PaintTNR_Material_004` | 16 МБ |
+| `m140i.glb` | 2018 BMW M140i | `iBody1` | 3.6 МБ |
+| `750li-xdrive.glb` | 2020 BMW 750Li xDrive | `Kuzov_Main` | 9.5 МБ |
+| `z4-sdrive35is.glb` | 2014 BMW Z4 sDrive35is | `z4MI_1008030001_004` | 18 МБ |
+| `x5-xdrive40i.glb` | 2024 BMW X5 xDrive40i | `CARPAINT` | 22 МБ |
+| `m340i-xdrive.glb` | 2020 BMW M340i xDrive | `Kuzov_Main_color` | 16 МБ |
+| `m3-f80.glb` | 2015 BMW M3 (F80) | `m3phong5SG1` | 4.3 МБ |
+| `m4-competition.glb` | 2025 BMW M4 Competition | `m4car_body1`, `m4car_bodykit1`, `m4car_hood1` | 11 МБ |
+| `m4-md4-duke-dynamics.glb` | 2014 BMW M4 Based MD4 by Duke Dynamics | `bM_CarPaint_Max1` | 7.8 МБ |
+| `m4-lb-works.glb` | 2014 LB★WORKS BMW 4 Series Body Kit (F82) | `bM_CarPaint_Max1` | 6.8 МБ |
+| `x6-xdrive40i.glb` | 2020 BMW X6 xDrive40i | `CarPaint` | 12 МБ |
+| `i8-3d-design.glb` | 2018 3D Design Body Kit for BMW i8 (I12) | `baseM_CarPaint_Max1`, `baseM_CarPaintNormal_Max1` | 11 МБ |
+| `m440i-gran-coupe.glb` | 2022 BMW M440i xDrive Gran Coupé | `carpaint` | 21 МБ |
+| `m3-e46-widebody.glb` | 2018 DTM FiberWerkz BMW M3 E46 WideBody Kit | `bM_CarPaint_Max1`, `bM_CarPaintNormal_Max1` | 6.3 МБ |
+| `z4-m-coupe.glb` | 2006 Custom BMW Z4 M Coupe | `BBMW_Z4MCoupeCrew_2006Paint_Material1` | 7.0 МБ |
+| `m4-cabrio.glb` | 2018 BMW M4 Convertible (F83) | `CabrioM_CarPaint_Max1` | 6.0 МБ |
+| `i8-lb-works.glb` | 2019 LB★WORKS BMW i8 ver.2 | `bBMW_LBi8RewardRecycled_2017Paint_Material1` | 15 МБ |
 
-Геометрия без текстур, кузов и колёса разнесены по отдельным мешам. Бюджет D11 (≤ 8 МБ)
-соблюдён с огромным запасом, сжатие Draco/Meshopt не понадобилось. `gltf-transform
-validate` — без ошибок и предупреждений.
+**Осталось дописать:** прямую ссылку на страницу каждой модели и точный вариант
+лицензии (BY-NC или BY-NC-SA) — атрибуция CC обязательна.
 
-**Что стоит сделать дальше:** заменить заглушки на CC-BY модели BMW со Sketchfab,
-скачав их под своим аккаунтом, и дописать сюда авторов и ссылки. Имя материала краски
-после замены нужно снова привести к `CarPaint` (или поправить `paint_material` в seed).
+### Оговорки по моделям
+
+- **`i8-lb-works.glb`** — краска кузова задана текстурой-ливреей (оранжевый фон с
+  надписями Liberty Walk). Фронт умножает выбранный цвет на текстуру, поэтому на этой
+  модели цвет палитры смешивается с оранжевым.
+- Модели и фото — «пары не прямые»: фото подобраны к модели по смыслу, поколение или
+  обвес на снимках местами отличаются (например, M4 Cabrio: модель F83, на фото G83;
+  X5 и X6: модели обычных версий, на фото — M-версии).
 
 ---
 
-## Чего в репозитории пока нет
+## Фотографии — `apps/api/licensed-assets/cars/`
+
+85 файлов, `{slug}-{n}.webp`, `-1` — обложка. Найдены в интернете (в основном
+Pinterest), **автор и лицензия не установлены**. Приведены к WebP (ширина ≤ 1600 px,
+качество 82), содержимое не менялось. Исходники в основном ~735 px по ширине, поэтому
+на крупных блоках фото заметно мягче.
+
+Для учебного некоммерческого проекта это обычная практика, но это **не** свободные
+изображения: в публичный репозиторий они не кладутся, а при любом коммерческом
+использовании их нужно заменить.
+
+---
+
+## Чего пока нет
 
 - **HDRI для сцены** (D11, Poly Haven, CC0) — ещё не добавлен.
-- **Превью-картинки для 3D-моделей** (D15) — не нужны, пока модели-заглушки; обложкой
-  на странице автомобиля работает фото `-1`.

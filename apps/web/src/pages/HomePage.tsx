@@ -1,11 +1,14 @@
 import { ArrowRight, CreditCard, Repeat, ShieldCheck, Wrench } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { CarCard, CarCardSkeleton, useCars } from "@/features/catalog";
 import { LinkButton } from "@/shared/ui/LinkButton";
 import styles from "./HomePage.module.css";
 
-const HERO_PHOTO = "/assets/cars/ix3-suv-1.webp";
-const TEST_DRIVE_PHOTO = "/assets/cars/x5-xdrive40i-1.webp";
+/** Сколько держится один кадр карусели в hero. */
+const HERO_INTERVAL_MS = 6000;
+
+const TEST_DRIVE_PHOTO = "/assets/cars/m4-cabrio-1.webp";
 
 const STATS = [
   { value: "10+", label: "лет на рынке" },
@@ -50,12 +53,7 @@ export default function HomePage() {
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
-        <img
-          className={styles.heroPhoto}
-          src={HERO_PHOTO}
-          alt="BMW iX3 в движении"
-          fetchPriority="high"
-        />
+        <HeroCarousel photos={data?.items ?? []} />
 
         <div className={styles.heroInner}>
           <div className={styles.heroText}>
@@ -148,4 +146,53 @@ export default function HomePage() {
       </section>
     </div>
   );
+}
+
+interface HeroPhoto {
+  coverPath: string | null;
+  coverAlt: string | null;
+}
+
+/**
+ * Фон hero: обложки автомобилей в случайном порядке, смена наплывом.
+ * Порядок перемешивается один раз на загрузку данных, а не на каждый рендер.
+ * При prefers-reduced-motion кадр не меняется — остаётся первый.
+ */
+function HeroCarousel({ photos }: { photos: HeroPhoto[] }) {
+  const shuffled = useMemo(
+    () => shuffle(photos.filter((photo) => photo.coverPath !== null)),
+    [photos],
+  );
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (shuffled.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setActive((current) => (current + 1) % shuffled.length);
+    }, HERO_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [shuffled]);
+
+  return shuffled.map((photo, index) => (
+    <img
+      key={photo.coverPath}
+      className={styles.heroPhoto}
+      data-active={index === active % shuffled.length}
+      src={photo.coverPath!}
+      alt={index === active % shuffled.length ? (photo.coverAlt ?? "") : ""}
+      aria-hidden={index !== active % shuffled.length}
+      fetchPriority={index === 0 ? "high" : "low"}
+    />
+  ));
+}
+
+/** Перемешивание Фишера — Йетса, возвращает новый массив. */
+function shuffle<T>(items: T[]): T[] {
+  const list = [...items];
+  for (let i = list.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j]!, list[i]!];
+  }
+  return list;
 }

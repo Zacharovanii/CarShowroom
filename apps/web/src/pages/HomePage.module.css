@@ -22,6 +22,12 @@
   object-fit: cover;
   object-position: center;
   filter: var(--photo-filter);
+  opacity: 0;
+  transition: opacity var(--duration-crossfade) var(--ease-in-out);
+}
+
+.heroPhoto[data-active="true"] {
+  opacity: 1;
 }
 
 /* Фото уходит в фон следующей секции и затемняется слева под текст.
