@@ -75,6 +75,10 @@ export default defineConfig({
 
   server: {
     port: 5173,
+    // В этом Windows-окружении dns.lookup("localhost") отдаёт только ::1:
+    // без явного host Vite слушает лишь IPv6-loopback, и подключение по
+    // 127.0.0.1 (в том числе из некоторых браузеров) не проходит.
+    host: "127.0.0.1",
     // Всё, что начинается с /api, уходит в Nest. Это не только удобство:
     // сессия Better Auth — httpOnly cookie, и через прокси фронт и API
     // живут на одном origin, поэтому cookie ходит без CORS и SameSite-плясок.
