@@ -8,11 +8,24 @@
    вкладок не дёргает страницу по высоте. */
 .frame {
   position: relative;
+  width: 100%;
   aspect-ratio: 3 / 2;
   max-height: var(--media-height);
   overflow: hidden;
-  background: var(--color-surface);
+  background: var(--color-scene-bg);
   border-radius: var(--radius-surface);
+}
+
+/* Кнопка «Исходный вид» — в углу сцены, поверх канвы */
+/* .frame в селекторе — чтобы перебить [data-variant] из Button.module.css */
+.frame .reset {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  /* Фон сцены светлый в любой теме — подложка кнопки своя, тёмная */
+  background: var(--color-bg-translucent);
+  border-color: transparent;
+  color: var(--color-fg);
 }
 
 .canvas {

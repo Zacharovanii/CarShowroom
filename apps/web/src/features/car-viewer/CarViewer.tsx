@@ -47,7 +47,10 @@ export function CarViewer({ car, onShowPhotos }: CarViewerProps) {
   // Проверка синхронная и одноразовая: пересчитывать её на каждый рендер
   // незачем, поддержка WebGL внутри вкладки не появляется и не исчезает
   const [webglReady] = useState(isWebglAvailable);
-  const [color, setColor] = useState<CarColor | null>(car.colors[0] ?? null);
+  // null — родной цвет модели: с него 3D и открывается
+  const [color, setColor] = useState<CarColor | null>(null);
+  // Родной цвет известен только после загрузки модели — он в GLB, не в базе
+  const [originalHex, setOriginalHex] = useState<string | null>(null);
 
   const { model3dPath, paintMaterial } = car;
   const backdrop = car.images[0] ?? null;
@@ -74,16 +77,25 @@ export function CarViewer({ car, onShowPhotos }: CarViewerProps) {
               paintMaterial={paintMaterial}
               colorHex={color?.hex ?? null}
               backdrop={backdrop}
+              onModelReady={setOriginalHex}
             />
           </Suspense>
         </div>
 
         <p className={styles.hint}>
           <Rotate3d aria-hidden="true" />
-          Перетащить — повернуть, колесо — приблизить
+          Перетащить — повернуть · правая кнопка или два пальца — сдвинуть · колесо —
+          приблизить к курсору · двойной клик — рассмотреть деталь
         </p>
 
-        {color !== null && <ColorPicker colors={car.colors} selected={color} onSelect={setColor} />}
+        {originalHex !== null && (
+          <ColorPicker
+            colors={car.colors}
+            originalHex={originalHex}
+            selected={color}
+            onSelect={setColor}
+          />
+        )}
       </div>
     </SceneErrorBoundary>
   );

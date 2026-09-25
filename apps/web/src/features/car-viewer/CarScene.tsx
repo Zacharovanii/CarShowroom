@@ -1,7 +1,24 @@
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Bounds, ContactShadows, OrbitControls, useProgress } from "@react-three/drei";
-import { CarModel } from "./CarModel";
+import {
+  CameraControls,
+  ContactShadows,
+  Environment,
+  Lightformer,
+  useProgress,
+} from "@react-three/drei";
+import {
+  Box3,
+  DoubleSide,
+  Material,
+  Mesh,
+  NeutralToneMapping,
+  Vector3,
+  type Group,
+} from "three";
+import { RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui";
+import { CAR_LENGTH, CarModel } from "./CarModel";
 import { ViewerProgress } from "./ViewerProgress";
 import styles from "./CarViewer.module.css";
 
@@ -10,6 +27,35 @@ export interface CarSceneProps {
   paintMaterial: string;
   colorHex: string | null;
   backdrop: { path: string; alt: string } | null;
+  /** Модель загружена; `originalHex` — родной цвет её краски. */
+  onModelReady: (originalHex: string) => void;
+}
+
+// Модель приведена к длине CAR_LENGTH (см. CarModel), поэтому камера
+// и пределы задаются в метрах сцены, одинаково для всех машин.
+const HOME_POSITION = [4.3, 1.6, 4.7] as const;
+const HOME_TARGET = [0, 0.55, 0] as const;
+/** Ближе этого камера не подходит — иначе влетает в кузов. */
+const MIN_DISTANCE = 1.2;
+const MAX_DISTANCE = 12;
+/** Расстояние до детали после двойного клика. */
+const FOCUS_DISTANCE = 1.8;
+/** Точка взгляда не уходит дальше этой рамки вокруг машины. */
+const TARGET_BOUNDS = new Box3(
+  new Vector3(-CAR_LENGTH * 0.6, 0.05, -CAR_LENGTH * 0.45),
+  new Vector3(CAR_LENGTH * 0.6, 1.8, CAR_LENGTH * 0.45),
+);
+
+/**
+ * В связке drei 10.7 + three 0.186 лицевая сторона плоскости ContactShadows
+ * смотрит вниз, и сверху тени не видно вовсе. Камера под пол не опускается
+ * (maxPolarAngle), поэтому плоскость просто делается двусторонней.
+ */
+function showShadowFromAbove(group: Group | null) {
+  const plane = group?.children.find((child) => child instanceof Mesh);
+  if (plane instanceof Mesh && plane.material instanceof Material) {
+    plane.material.side = DoubleSide;
+  }
 }
 
 /**
@@ -17,59 +63,169 @@ export interface CarSceneProps {
  *
  * Модуль грузится только через `React.lazy` из CarViewer (D11): открыл
  * вкладку «3D» — поехал чанк; не открыл — на странице нет ни байта three.js.
- * Поэтому ничего из этого файла не должно импортироваться напрямую.
+ *
+ * Свет — студия из светящихся панелей (`Lightformer`), собранная в карту
+ * окружения прямо в браузере: краска и стёкла отражают «софтбоксы», как во
+ * вьюере Sketchfab. HDRI-файл не нужен, внешних запросов нет. Фон — не сцена,
+ * а CSS рамки: канва прозрачная.
+ *
+ * Управление — CameraControls: колесо приближает к курсору, а не к центру;
+ * правая кнопка (два пальца) сдвигает точку взгляда в пределах машины;
+ * двойной клик по кузову подлетает к этой детали.
  */
-export default function CarScene({ path, paintMaterial, colorHex, backdrop }: CarSceneProps) {
+export default function CarScene({
+  path,
+  paintMaterial,
+  colorHex,
+  backdrop,
+  onModelReady,
+}: CarSceneProps) {
   const { progress } = useProgress();
   const [ready, setReady] = useState(false);
-  const handleReady = useCallback(() => setReady(true), []);
+  const controls = useRef<CameraControls>(null);
+
+  const handleReady = useCallback(
+    (originalHex: string) => {
+      setReady(true);
+      onModelReady(originalHex);
+    },
+    [onModelReady],
+  );
+
+  // Callback ref, а не эффект: контролы создаёт рендерер канвы, и эффект
+  // этого компонента мог бы отработать раньше, чем они появятся
+  const attachControls = useCallback((instance: CameraControls | null) => {
+    if (instance && controls.current !== instance) {
+      instance.setBoundary(TARGET_BOUNDS);
+      void instance.setLookAt(...HOME_POSITION, ...HOME_TARGET, false);
+    }
+    controls.current = instance;
+  }, []);
+
+  const focusOn = useCallback((point: Vector3) => {
+    const camera = controls.current;
+    if (!camera) return;
+    // Угол обзора сохраняется — камера подлетает к детали по той же линии,
+    // по которой на неё сейчас смотрят
+    const direction = camera.camera.position
+      .clone()
+      .sub(camera.getTarget(new Vector3()))
+      .normalize();
+    const position = point.clone().addScaledVector(direction, FOCUS_DISTANCE);
+    void camera.setLookAt(position.x, position.y, position.z, point.x, point.y, point.z, true);
+  }, []);
+
+  function resetView() {
+    void controls.current?.setLookAt(...HOME_POSITION, ...HOME_TARGET, true);
+  }
 
   return (
     <>
       <Canvas
         className={styles.canvas}
-        camera={{ position: [4.5, 2.4, 6], fov: 40 }}
+        camera={{ position: [...HOME_POSITION], fov: 35, near: 0.05, far: 100 }}
         // Не ниже 2: на обычном мониторе сцена рендерится с запасом и
-        // сглаживается при выводе — без этого на кромках кузова видны пиксели
-        dpr={[2, 3]}
-        gl={{ antialias: true }}
+        // сглаживается при выводе — без этого на кромках кузова видны
+        // пиксели. Не выше 2: на 4K-экране втрое больше пикселей
+        // съедает кадры, и вращение начинает дёргаться.
+        dpr={2}
+        gl={{ antialias: true, alpha: true }}
+        onCreated={({ gl }) => {
+          // Neutral передаёт цвет краски честнее ACES, который уводит
+          // насыщенные цвета в жёлтый и пережимает светлые
+          gl.toneMapping = NeutralToneMapping;
+          gl.toneMappingExposure = 1.05;
+        }}
       >
-        {/* Освещение руками, без HDRI. `<Environment preset="…">` из drei
-            качает карту окружения с чужого CDN в рантайме: без интернета
-            вкладка встанет, а проект должен работать из коробки.
-
-            МЕСТО ПОД HDRI: когда модели-заглушки заменят настоящими, сюда
-            встанет <Environment files="/assets/hdri/<файл>.hdr" /> — файл
-            локальный, из репозитория, рядом с моделями (см. assets-licenses.md).
-            Свет ниже тогда останется как подсветка поверх окружения. */}
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 6, 4]} intensity={2.4} />
-        <directionalLight position={[-5, 3, -6]} intensity={1.1} />
+        <Environment resolution={256} frames={1}>
+          {/* Светлая студия: верхний софтбокс, два боковых, мягкий свет
+              спереди и сзади. Интенсивности подобраны на глаз по моделям. */}
+          <Lightformer
+            form="rect"
+            intensity={3}
+            position={[0, 6, 0]}
+            rotation-x={Math.PI / 2}
+            scale={[12, 6, 1]}
+          />
+          <Lightformer
+            form="rect"
+            intensity={1.6}
+            position={[-7, 2.5, 0]}
+            rotation-y={Math.PI / 2}
+            scale={[14, 2.5, 1]}
+          />
+          <Lightformer
+            form="rect"
+            intensity={1.6}
+            position={[7, 2.5, 0]}
+            rotation-y={-Math.PI / 2}
+            scale={[14, 2.5, 1]}
+          />
+          <Lightformer form="rect" intensity={1} position={[0, 2, 9]} scale={[10, 4, 1]} />
+          <Lightformer
+            form="rect"
+            intensity={0.8}
+            position={[0, 2, -9]}
+            rotation-y={Math.PI}
+            scale={[10, 4, 1]}
+          />
+          {/* Пол студии: снизу в кузове отражается светлое, а не пустота */}
+          <Lightformer
+            form="rect"
+            intensity={0.35}
+            position={[0, -1, 0]}
+            rotation-x={-Math.PI / 2}
+            scale={[30, 30, 1]}
+          />
+        </Environment>
 
         <Suspense fallback={null}>
-          {/* Bounds сам подгоняет камеру под габариты модели: заглушки
-              Quaternius и будущие настоящие модели разного размера,
-              а подбирать позицию камеры руками под каждую — тупик */}
-          <Bounds fit clip observe margin={1.25}>
-            <CarModel
-              path={path}
-              paintMaterial={paintMaterial}
-              colorHex={colorHex}
-              onReady={handleReady}
-            />
-          </Bounds>
-          <ContactShadows position={[0, 0, 0]} opacity={0.45} scale={14} blur={2.4} far={4} />
+          <CarModel
+            path={path}
+            paintMaterial={paintMaterial}
+            colorHex={colorHex}
+            onReady={handleReady}
+            onFocusPoint={focusOn}
+          />
+          <ContactShadows
+            ref={showShadowFromAbove}
+            // Строго не выше нуля: drei рисует плоскость размытия в мировом
+            // y = 0 камерой тени, смотрящей вверх из этой точки. Поднять тень
+            // над полом — и размытие получит пустоту и сотрёт тень целиком.
+            position={[0, -0.001, 0]}
+            scale={CAR_LENGTH * 2.4}
+            resolution={1024}
+            opacity={0.9}
+            blur={2}
+            far={1.2}
+          />
         </Suspense>
 
-        <OrbitControls
+        <CameraControls
+          ref={attachControls}
           makeDefault
-          enablePan={false}
+          dollyToCursor
+          minDistance={MIN_DISTANCE}
+          maxDistance={MAX_DISTANCE}
           // Ниже пола камера не уходит: машина стоит на тени, и вид
           // снизу сквозь землю выглядит поломкой, а не ракурсом
-          maxPolarAngle={Math.PI / 2.1}
-          minPolarAngle={0.2}
+          maxPolarAngle={Math.PI / 2 - 0.04}
+          smoothTime={0.2}
+          draggingSmoothTime={0.08}
         />
       </Canvas>
+
+      {ready && (
+        <Button
+          size="sm"
+          variant="secondary"
+          iconStart={<RotateCcw aria-hidden="true" />}
+          className={styles.reset}
+          onClick={resetView}
+        >
+          Исходный вид
+        </Button>
+      )}
 
       {/* Прогресс держится до готовности модели, а не до `active` из drei:
           на второй заход модель берётся из кэша, загрузчик не стартует,
