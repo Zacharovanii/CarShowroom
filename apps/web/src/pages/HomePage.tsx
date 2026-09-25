@@ -1,11 +1,11 @@
+import type { CSSProperties } from "react";
 import { ArrowRight, CreditCard, Repeat, ShieldCheck, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero.jpg";
+import testDrivePhoto from "@/assets/test-drive.jpg";
 import { CarCard, CarCardSkeleton, useCars } from "@/features/catalog";
 import { LinkButton } from "@/shared/ui/LinkButton";
 import styles from "./HomePage.module.css";
-
-const TEST_DRIVE_PHOTO = "/assets/cars/m4-cabrio-1.webp";
 
 const STATS = [
   { value: "10+", label: "лет на рынке" },
@@ -97,7 +97,7 @@ export default function HomePage() {
 
       <section className={styles.sectionAlt}>
         <div className={styles.sectionInner}>
-          <p className={styles.eyebrow}>Почему мы</p>
+          <h2 className={styles.whyTitle}>Почему мы</h2>
 
           <div className={styles.stats}>
             {STATS.map((stat) => (
@@ -120,24 +120,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className={styles.section}>
-        <div className={styles.testDrive}>
-          <img
-            className={styles.testDrivePhoto}
-            src={TEST_DRIVE_PHOTO}
-            alt="BMW X5 в шоуруме дилерского центра"
-            loading="lazy"
-          />
-          <div className={styles.testDriveText}>
-            <p className={styles.eyebrow}>Тест-драйв</p>
-            <h2 className={styles.sectionTitle}>Выберите день и время</h2>
-            <p className={styles.sectionLede}>
-              Остальное сделаем мы: подготовим автомобиль и встретим вас в салоне. Запись занимает
-              минуту и начинается с выбора машины.
-            </p>
-            <LinkButton to="/catalog" variant="primary">
-              Выбрать автомобиль
-            </LinkButton>
+      <section className={styles.testDriveSection}>
+        {/* Родитель — сама картинка (background-image, не <img>): два
+            flex-1 в нём делят ширину поровну. Левый пустой — там читается
+            фото. Правый центрирует блок текста внутри своей половины —
+            так текст физически не может залезть на фото, а не просто
+            визуально не перекрывает его. */}
+        <div
+          className={styles.testDrive}
+          style={{ "--test-drive-photo": `url(${testDrivePhoto})` } as CSSProperties}
+        >
+          <div className={styles.testDriveSpacer} aria-hidden="true" />
+
+          <div className={styles.testDriveTextCol}>
+            <div className={styles.testDriveText}>
+              <p className={styles.eyebrow}>Тест-драйв</p>
+              <h2 className={styles.sectionTitle}>Выберите день и время</h2>
+              <p className={styles.sectionLede}>
+                Остальное сделаем мы: подготовим автомобиль и встретим вас в салоне. Запись
+                занимает минуту и начинается с выбора машины.
+              </p>
+              <LinkButton to="/catalog" variant="primary">
+                Выбрать автомобиль
+              </LinkButton>
+            </div>
           </div>
         </div>
       </section>

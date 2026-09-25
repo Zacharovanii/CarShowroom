@@ -144,6 +144,13 @@
   padding: var(--space-11) var(--container-gutter);
 }
 
+/* У «Почему мы» свой, меньший отступ сверху/снизу — блок плотнее остальных
+   секций главной, по бокам поля общие. */
+.sectionInner {
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-7);
+}
+
 .sectionAlt {
   background: var(--color-bg-alt);
   border-top: 1px solid var(--color-border);
@@ -210,12 +217,17 @@
 
 /* ---- Почему мы ------------------------------------------------------- */
 
+.whyTitle {
+  font: var(--text-h1);
+  letter-spacing: var(--letter-spacing-display);
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-7);
-  margin-top: var(--space-7);
-  padding-bottom: var(--space-9);
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  padding-bottom: var(--space-7);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -225,7 +237,8 @@
 }
 
 .statValue {
-  font: var(--text-h2);
+  font: var(--text-h1);
+  font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-display);
   font-variant-numeric: tabular-nums;
 }
@@ -241,7 +254,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-8);
-  margin-top: var(--space-9);
+  margin-top: var(--space-7);
 }
 
 .advantage {
@@ -258,7 +271,7 @@
 }
 
 .advantageTitle {
-  font: var(--text-h4);
+  font: var(--text-h3);
 }
 
 .advantageText {
@@ -267,25 +280,72 @@
   max-width: 34ch;
 }
 
-/* ---- Тест-драйв ------------------------------------------------------ */
-
-.testDrive {
-  display: grid;
-  gap: var(--space-7);
-  align-items: center;
+/* ---- Тест-драйв -------------------------------------------------------
+   У секции свой, меньший внешний отступ — не переиспользует .section. */
+.testDriveSection {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-7) var(--container-gutter);
 }
 
-.testDrivePhoto {
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  filter: var(--photo-filter);
+/* Родитель — сама фотография (background-image, задаётся инлайново через
+   --test-drive-photo: так картинка остаётся импортом Vite, а не строкой
+   в CSS). Внутри — два flex: 1, ровно пополам. Левый пустой: под ним
+   видно фото целиком. Правый — колонка, которая центрирует блок текста
+   внутри своей половины. Уводить фото под текст (справа) не даёт градиент
+   поверх фона: он гасит картинку до сплошного цвета уже к середине, так
+   что правая половина физически не может показать под собой фото. */
+.testDrive {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  min-height: clamp(320px, 30vw, 460px);
+  background-color: var(--color-surface);
+  background-image:
+    linear-gradient(to right, transparent 0%, transparent 36%, var(--color-surface) 50%),
+    var(--test-drive-photo);
+  background-repeat: no-repeat;
+  /* На фото — по одному значению на слой (сперва градиент, потом снимок):
+     `cover` на всю ширину секции (шире прежнего кадра под фото) резал кадр
+     сильнее, чем раньше, и картинка казалась придвинутой к левому краю
+     и зумленной. `auto 100%` держит естественные пропорции снимка, вписывая
+     его по высоте, без обрезки по ширине. */
+  background-position: center, left center;
+  background-size: 100% 100%, auto 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+}
+
+.testDrive::before {
+  /* Обработка фото (§ CarCard) — маска её не берёт, потому что фото тут
+     не элемент, а фон; тонирует и приглушает насыщенность тем же фильтром
+     отдельным слоем поверх. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  backdrop-filter: var(--photo-filter);
+  -webkit-backdrop-filter: var(--photo-filter);
+}
+
+.testDriveSpacer {
+  flex: 1;
+}
+
+.testDriveTextCol {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
 }
 
 .testDriveText {
   display: grid;
   justify-items: start;
   gap: var(--space-3);
+  max-width: 40ch;
 }
 
 /* ---- Брейкпоинты ----------------------------------------------------- */
@@ -307,6 +367,34 @@
     flex: 0 0 72%;
     scroll-snap-align: start;
   }
+
+  /* Уже места нет для бокового растворения — колонки встают одна над
+     другой, фото гаснет вниз, а не вправо (та же пара градиент + фон). */
+  .testDrive {
+    flex-direction: column;
+    min-height: 0;
+    background-image:
+      linear-gradient(to bottom, transparent 0%, transparent 42%, var(--color-surface) 62%),
+      var(--test-drive-photo);
+    /* Колонка вместо строки — снимок снова разумной ширины (375px и
+       около того), обрезка по высоте здесь уместна, как раньше у <img>. */
+    background-position: center, center top;
+    background-size: 100% 100%, cover;
+  }
+
+  .testDriveSpacer {
+    flex: none;
+    height: 200px;
+  }
+
+  .testDriveTextCol {
+    flex: none;
+    padding: var(--space-5);
+  }
+
+  .testDriveText {
+    max-width: none;
+  }
 }
 
 @media (min-width: 640px) {
@@ -318,14 +406,11 @@
   .stats {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-
-  .testDrive {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (min-width: 1024px) {
-  .cars,
+  /* Карточки авто теперь горизонтальные и широкие (§CarCard) — в ряд из
+     четырёх на весь контейнер они бы сплющились. 2×2 остаётся с 640px. */
   .advantages {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
