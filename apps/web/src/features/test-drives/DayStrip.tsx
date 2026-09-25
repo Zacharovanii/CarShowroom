@@ -19,20 +19,40 @@ export interface DayStripProps {
  * (`?date=`) он остался бы за краем экрана.
  */
 export function DayStrip({ days, value, onChange }: DayStripProps) {
-  const selected = useRef<HTMLInputElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
+  const selected = useRef<HTMLLabelElement>(null);
 
   useEffect(() => {
-    selected.current?.scrollIntoView({ block: "nearest", inline: "center" });
+    // Не `selected.current?.scrollIntoView(...)`: у радиокнопки нет своего
+    // вертикального скролл-контейнера, и браузер прокрутил бы до неё саму
+    // страницу — ленту сдвигаем горизонтально сами, окно не трогаем.
+    const el = selected.current;
+    const container = strip.current;
+    if (!el || !container) return;
+
+    const elRect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const target =
+      elRect.left -
+      containerRect.left +
+      container.scrollLeft -
+      (container.clientWidth - elRect.width) / 2;
+
+    container.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
   }, [value]);
 
   const today = toSalonDay();
 
   return (
-    <div className={styles.strip} role="radiogroup" aria-label="День тест-драйва">
+    <div ref={strip} className={styles.strip} role="radiogroup" aria-label="День тест-драйва">
       {days.map((day) => (
-        <label key={day} className={styles.day} data-selected={day === value || undefined}>
+        <label
+          key={day}
+          ref={day === value ? selected : undefined}
+          className={styles.day}
+          data-selected={day === value || undefined}
+        >
           <input
-            ref={day === value ? selected : undefined}
             type="radio"
             name="test-drive-day"
             className={styles.input}

@@ -4,11 +4,12 @@
   min-width: 0;
 }
 
-/* Та же высота, что у фотокадра: переключение вкладок
-   не дёргает страницу по высоте. */
+/* Тот же размер, что у фотокадра (Gallery.module.css): переключение
+   вкладок не дёргает страницу по высоте. */
 .frame {
   position: relative;
-  height: var(--media-height);
+  aspect-ratio: 3 / 2;
+  max-height: var(--media-height);
   overflow: hidden;
   background: var(--color-surface);
   border-radius: var(--radius-surface);

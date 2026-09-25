@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import { Link, useParams } from "react-router-dom";
-import { CalendarClock, ChevronRight, CircleSlash } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { ArrowLeft, CalendarClock, CircleSlash } from "lucide-react";
 import { Button, PriceTag, StatePanel } from "@/components/ui";
 import { LinkButton } from "@/shared/ui/LinkButton";
 import { CarMedia, CarPageSkeleton, CarSpecs, isCarNotFound, useCar } from "@/features/car";
@@ -19,6 +19,13 @@ export default function CarPage() {
   const { slug } = useParams<{ slug: string }>();
   const car = useCar(slug);
   const testDrive = useRef<HTMLDivElement>(null);
+
+  // Переход из каталога — это SPA-навигация, а не загрузка страницы: без
+  // сброса скролл остаётся там, где был на каталоге, и машина открывается
+  // не с начала.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   if (car.isError) {
     return (
@@ -48,19 +55,21 @@ export default function CarPage() {
 
   return (
     <div className={styles.page}>
-      <nav className={styles.crumbs} aria-label="Хлебные крошки">
-        <Link to="/catalog">Каталог</Link>
-        <ChevronRight aria-hidden="true" />
-        {/* Пока данные едут, в крошках стоит slug из адреса: он и так
-            в адресной строке, и строка не прыгает при подстановке. */}
-        <span aria-current="page">{car.data?.name ?? slug}</span>
-      </nav>
-
       {car.isPending ? (
         <CarPageSkeleton />
       ) : (
         <>
           <div className={styles.top}>
+            <LinkButton
+              to="/catalog"
+              variant="ghost"
+              size="sm"
+              iconStart={<ArrowLeft aria-hidden="true" />}
+              className={styles.back}
+            >
+              В каталог
+            </LinkButton>
+
             <CarMedia car={car.data} />
 
             <div className={styles.head}>

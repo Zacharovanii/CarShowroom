@@ -4,21 +4,109 @@
   min-width: 0;
 }
 
-/* Кадр фиксированной высоты: снимки разной пропорции вписываются в него
-   целиком — без обрезки, растяжения и фильтров, в исходном качестве. */
+/* Кадр — пропорция снимка, но не выше --media-height: на широком экране
+   фото не раздувается на весь монитор, на телефоне не вытягивается в полоску. */
 .frame {
-  display: grid;
-  place-items: center;
-  height: var(--media-height);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  max-height: var(--media-height);
   overflow: hidden;
   background: var(--color-surface);
   border-radius: var(--radius-surface);
+  /* Вертикальный свайп — прокрутка страницы, горизонтальный — наш */
+  touch-action: pan-y;
+  user-select: none;
 }
 
+.frame:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.track {
+  display: flex;
+  height: 100%;
+  transform: translateX(calc(var(--index) * -100% + var(--drag)));
+  transition: transform var(--duration-3) var(--ease-out);
+}
+
+/* Пока кадр тянут пальцем, он идёт за ним без задержки */
+.track[data-dragging] {
+  transition: none;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+/* Снимок вписан в кадр целиком: вертикальный — по высоте (поля слева
+   и справа), горизонтальный — по ширине (поля сверху и снизу).
+   Абсолютная рамка = ровно слайд: процентная высота в grid/flex-ячейке
+   считалась от самой картинки, и высокие снимки вылезали за кадр. */
 .photo {
-  max-width: 100%;
-  max-height: 100%;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+}
+
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  background: var(--color-bg-translucent);
+  border-radius: var(--radius-pill);
+  opacity: 0;
+  transition: opacity var(--duration-2) var(--ease-standard);
+}
+
+.prev {
+  left: var(--space-3);
+}
+
+.next {
+  right: var(--space-3);
+}
+
+/* Стрелки проявляются при наведении на кадр и при фокусе с клавиатуры;
+   на крайнем кадре ненужная стрелка не показывается вовсе. */
+.frame:hover .prev:not(:disabled),
+.frame:hover .next:not(:disabled),
+.prev:focus-visible,
+.next:focus-visible {
+  opacity: 1;
+}
+
+.prev:disabled,
+.next:disabled {
+  visibility: hidden;
+}
+
+/* На сенсорных экранах наведения нет — листают свайпом и миниатюрами */
+@media (hover: none) {
+  .prev,
+  .next {
+    display: none;
+  }
+}
+
+.counter {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 1;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-bg-translucent);
+  border-radius: var(--radius-pill);
+  color: var(--color-fg);
+  font: var(--text-caption);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Фотографий нет: место кадра занимает тот же прямоугольник со знаком */
@@ -28,6 +116,7 @@
   justify-items: center;
   gap: var(--space-3);
   aspect-ratio: 3 / 2;
+  max-height: var(--media-height);
   background: var(--color-surface);
   border-radius: var(--radius-surface);
   color: var(--color-fg-disabled);
@@ -40,31 +129,33 @@
   stroke-width: var(--icon-stroke);
 }
 
+/* Миниатюры — одной строкой; не влезли — лента прокручивается вбок */
 .thumbs {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.thumbs::-webkit-scrollbar {
+  display: none;
 }
 
 .thumb {
+  flex: none;
   /* Ширина миниатюры взята из шкалы отступов: своего токена размера
      под неё нет, а хардкод пикселей в модулях запрещён. */
-  width: var(--space-13);
+  width: var(--space-12);
   aspect-ratio: 3 / 2;
   padding: 0;
   overflow: hidden;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: var(--border-width-emphasis) solid transparent;
   border-radius: var(--radius-surface);
   cursor: pointer;
   transition: border-color var(--duration-1) var(--ease-standard);
 }
 
-.thumb:hover {
-  border-color: var(--color-border-hover);
-}
-
-/* Выбранный кадр: кромка в основной цвет текста плюс aria-pressed */
 .thumb[aria-pressed="true"] {
   border-color: var(--color-fg);
 }
@@ -73,15 +164,23 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  filter: var(--photo-filter);
-}
-
-.thumb[aria-pressed="false"] img {
-  opacity: 0.7;
+  object-fit: contain;
+  opacity: 0.55;
   transition: opacity var(--duration-1) var(--ease-standard);
 }
 
-.thumb:hover img {
+.thumb:hover img,
+.thumb[aria-pressed="true"] img {
   opacity: 1;
+}
+
+.thumb:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (min-width: 640px) {
+  .thumb {
+    width: var(--space-13);
+  }
 }

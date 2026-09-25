@@ -7,7 +7,10 @@
   scroll-padding: var(--space-3);
 }
 
+/* position: relative — якорь для скрытой радиокнопки: без него она
+   позиционируется от body, вылезает из ленты и растягивает страницу вширь */
 .day {
+  position: relative;
   display: grid;
   flex: none;
   justify-items: center;
