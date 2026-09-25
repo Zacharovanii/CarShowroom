@@ -1,0 +1,55 @@
+.input {
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  font: var(--text-body);
+  transition:
+    border-color var(--duration-1) var(--ease-standard),
+    background-color var(--duration-1) var(--ease-standard);
+}
+
+/* Числа и даты выравниваются по разрядам, иначе колонки «пляшут» */
+.input[type="number"],
+.input[type="date"],
+.input[type="tel"] {
+  font-variant-numeric: tabular-nums;
+}
+
+.input::placeholder {
+  color: var(--color-fg-subtle);
+}
+
+.input:hover:not(:disabled):not([readonly]) {
+  border-color: var(--color-fg-subtle);
+}
+
+/* Только чтение — не то же, что выключено: поле остаётся в табуляции,
+   текст из него копируется и читается скринридером. Поэтому приглушается
+   поверхность и граница, а цвет текста остаётся обычным. */
+.input[readonly] {
+  background: var(--color-bg-alt);
+  border-color: var(--color-border);
+  cursor: default;
+}
+
+/* Ошибка — не только цвет границы: рядом стоит aria-invalid,
+   а текст ошибки связан через aria-describedby (см. Field) */
+.input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.input:disabled {
+  background: var(--color-bg-alt);
+  color: var(--color-fg-disabled);
+  cursor: default;
+}
+
+@media (max-width: 639px) {
+  .input {
+    min-height: var(--tap-target-min);
+  }
+}

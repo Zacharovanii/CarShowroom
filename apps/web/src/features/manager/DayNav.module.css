@@ -1,0 +1,54 @@
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.label {
+  font: var(--text-h4);
+  color: var(--color-fg);
+}
+
+/* Поле даты рядом с подписью нужно только ради календаря браузера,
+   поэтому ужимается до значка и не спорит с подписью за место. */
+.input {
+  width: var(--control-height);
+  padding: 0;
+  color: transparent;
+}
+
+.input::-webkit-datetime-edit,
+.input::-webkit-inner-spin-button {
+  display: none;
+}
+
+.input::-webkit-calendar-picker-indicator {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.input:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+@media (max-width: 639px) {
+  .nav {
+    justify-content: space-between;
+  }
+}

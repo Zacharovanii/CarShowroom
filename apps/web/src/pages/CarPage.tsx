@@ -1,0 +1,103 @@
+import { useRef } from "react";
+import { Link, useParams } from "react-router-dom";
+import { CalendarClock, ChevronRight, CircleSlash } from "lucide-react";
+import { Button, PriceTag, StatePanel } from "@/components/ui";
+import { LinkButton } from "@/shared/ui/LinkButton";
+import { CarMedia, CarPageSkeleton, CarSpecs, isCarNotFound, useCar } from "@/features/car";
+import { TestDriveSection } from "@/features/test-drives";
+import styles from "./CarPage.module.css";
+
+/**
+ * Страница автомобиля — UC-G3, раздел 4 docs/wireframes.md.
+ *
+ * Блок тест-драйва (UC-G4, UC-U3) собирает `features/test-drives`; сюда он
+ * приходит одним компонентом. Вкладку «3D» наполняет этап 7 —
+ * см. `features/car/CarMedia.tsx`.
+ */
+export default function CarPage() {
+  // useParams — требование чек-листа ТЗ и единственный источник slug
+  const { slug } = useParams<{ slug: string }>();
+  const car = useCar(slug);
+  const testDrive = useRef<HTMLDivElement>(null);
+
+  if (car.isError) {
+    return (
+      <div className={styles.page}>
+        {isCarNotFound(car.error) ? (
+          <StatePanel
+            icon={<CircleSlash aria-hidden="true" />}
+            title="Автомобиль не найден"
+            description="Возможно, он снят с публикации или ссылка устарела."
+            action={<LinkButton to="/catalog">В каталог</LinkButton>}
+          />
+        ) : (
+          <StatePanel
+            variant="error"
+            title="Не удалось загрузить автомобиль"
+            description="Проверьте соединение и попробуйте снова."
+            action={
+              <Button variant="primary" loading={car.isFetching} onClick={() => car.refetch()}>
+                Повторить
+              </Button>
+            }
+          />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      <nav className={styles.crumbs} aria-label="Хлебные крошки">
+        <Link to="/catalog">Каталог</Link>
+        <ChevronRight aria-hidden="true" />
+        {/* Пока данные едут, в крошках стоит slug из адреса: он и так
+            в адресной строке, и строка не прыгает при подстановке. */}
+        <span aria-current="page">{car.data?.name ?? slug}</span>
+      </nav>
+
+      {car.isPending ? (
+        <CarPageSkeleton />
+      ) : (
+        <>
+          <div className={styles.top}>
+            <CarMedia car={car.data} />
+
+            <div className={styles.head}>
+              <h1 className={styles.name}>{car.data.name}</h1>
+              <p className={styles.kind}>
+                {car.data.bodyTypeName} · {car.data.modelYear}
+              </p>
+
+              <PriceTag value={car.data.price} size="lg" className={styles.price} />
+
+              <Button
+                variant="primary"
+                size="lg"
+                iconStart={<CalendarClock aria-hidden="true" />}
+                className={styles.book}
+                onClick={() => testDrive.current?.scrollIntoView({ behavior: "smooth" })}
+              >
+                Записаться на тест-драйв
+              </Button>
+
+              <p className={styles.description}>{car.data.description}</p>
+            </div>
+          </div>
+
+          <section className={styles.section} aria-labelledby="specs-title">
+            <h2 id="specs-title" className={styles.sectionTitle}>
+              Характеристики
+            </h2>
+            <CarSpecs car={car.data} />
+          </section>
+
+          {/* На якорь ведёт кнопка «Записаться на тест-драйв» из шапки карточки */}
+          <div ref={testDrive} id="test-drive" className={styles.testDrive}>
+            <TestDriveSection car={car.data} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

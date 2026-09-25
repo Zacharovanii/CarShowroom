@@ -1,0 +1,47 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height-xs);
+  padding: 0 var(--space-2);
+  font: var(--text-caption);
+  border-radius: var(--radius-control);
+  white-space: nowrap;
+  background: var(--color-surface-hover);
+  color: var(--color-fg-muted);
+}
+
+.badge[data-tone="info"] {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.badge[data-tone="success"] {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.badge[data-tone="warning"] {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.badge[data-tone="danger"] {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.dot {
+  width: var(--dot-size);
+  height: var(--dot-size);
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+.badge :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}

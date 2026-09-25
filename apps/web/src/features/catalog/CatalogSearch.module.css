@@ -1,0 +1,21 @@
+.search {
+  position: relative;
+  display: grid;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: var(--space-3);
+  width: var(--icon-size);
+  height: var(--icon-size);
+  transform: translateY(-50%);
+  color: var(--color-fg-subtle);
+  stroke-width: var(--icon-stroke);
+  pointer-events: none;
+}
+
+/* Место под иконку: левый отступ поля растёт на её ширину */
+.input {
+  padding-left: calc(var(--space-3) + var(--icon-size) + var(--space-2));
+}

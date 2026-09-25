@@ -1,0 +1,98 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-8) var(--container-gutter) var(--space-11);
+}
+
+.title {
+  font: var(--text-h1);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-6);
+}
+
+/* Телефон: разделы лентой сверху, вдоль неё можно смахнуть */
+.side {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+  min-height: var(--tap-target-min);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: var(--border-width-emphasis) solid transparent;
+  background: none;
+  font: var(--text-body);
+  color: var(--color-fg-muted);
+  cursor: pointer;
+  transition: color var(--duration-1) var(--ease-standard);
+}
+
+.item:hover {
+  color: var(--color-fg);
+}
+
+.item svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+/* Активный раздел помечен и цветом, и линией — не только цветом */
+.itemActive {
+  color: var(--color-fg);
+  border-bottom-color: var(--color-fg);
+}
+
+/* «Выйти» отделено от разделов: это действие, а не адрес */
+.signOut {
+  margin-left: auto;
+  color: var(--color-fg-subtle);
+}
+
+@media (min-width: 1024px) {
+  .body {
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-8);
+  }
+
+  .side {
+    display: grid;
+    gap: var(--space-1);
+    overflow-x: visible;
+    border-bottom: none;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .item {
+    justify-content: flex-start;
+    border-bottom: none;
+    border-left: var(--border-width-emphasis) solid transparent;
+    margin-left: calc(-1 * var(--border-width-emphasis));
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .itemActive {
+    border-bottom-color: transparent;
+    border-left-color: var(--color-fg);
+  }
+
+  .signOut {
+    margin-left: 0;
+    margin-top: var(--space-4);
+  }
+}

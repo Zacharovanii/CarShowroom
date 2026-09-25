@@ -1,0 +1,95 @@
+.section {
+  display: grid;
+  gap: var(--space-5);
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--color-border);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.title {
+  color: var(--color-fg-subtle);
+  font: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
+}
+
+.zone {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+}
+
+.legend {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+}
+
+.action {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+.limit {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+  text-align: center;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-accent);
+}
+
+.link svg {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  stroke-width: var(--icon-stroke);
+}
+
+.staff {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-fg-muted);
+  font: var(--text-body);
+}
+
+.staff svg {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  stroke-width: var(--icon-stroke);
+}
+
+@media (max-width: 639px) {
+  /* Выбранный слот — половина дела; кнопка должна остаться на виду,
+     пока человек листает сетку. */
+  .action[data-sticky] {
+    position: sticky;
+    bottom: var(--space-3);
+    padding: var(--space-3) 0;
+    background: var(--color-bg);
+  }
+
+  .action[data-sticky] button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .action {
+    justify-items: end;
+  }
+
+  .limit {
+    text-align: end;
+  }
+}

@@ -1,0 +1,67 @@
+.root {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.list {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-4);
+  background: none;
+  border: none;
+  /* Выбранная вкладка помечена не только цветом: под ней линия,
+     и Radix ставит aria-selected */
+  border-bottom: var(--border-width-emphasis) solid transparent;
+  color: var(--color-fg-muted);
+  font: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition:
+    color var(--duration-2) var(--ease-standard),
+    border-color var(--duration-2) var(--ease-standard);
+}
+
+.trigger:hover:not(:disabled) {
+  color: var(--color-fg);
+}
+
+.trigger:active:not(:disabled) {
+  background: var(--color-surface-active);
+}
+
+.trigger[data-state="active"] {
+  color: var(--color-fg);
+  border-bottom-color: var(--color-fg);
+}
+
+.trigger:disabled {
+  color: var(--color-fg-disabled);
+  cursor: default;
+}
+
+.count {
+  color: var(--color-fg-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.trigger[data-state="active"] .count {
+  color: var(--color-fg-muted);
+}
+
+.trigger:disabled .count {
+  color: var(--color-fg-disabled);
+}
+
+@media (max-width: 639px) {
+  .trigger {
+    min-height: var(--tap-target-min);
+  }
+}

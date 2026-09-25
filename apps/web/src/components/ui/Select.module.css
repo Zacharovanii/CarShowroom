@@ -1,0 +1,114 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  font: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-1) var(--ease-standard),
+    background-color var(--duration-1) var(--ease-standard);
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: var(--color-fg-subtle);
+  background: var(--color-surface-hover);
+}
+
+.trigger:active:not(:disabled) {
+  background: var(--color-surface-active);
+}
+
+.trigger[data-placeholder] {
+  color: var(--color-fg-subtle);
+}
+
+.trigger[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.trigger:disabled {
+  background: var(--color-bg-alt);
+  color: var(--color-fg-disabled);
+  cursor: default;
+}
+
+.chevron {
+  display: flex;
+  color: var(--color-fg-subtle);
+}
+
+.chevron :global(svg) {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+/* Список оторван от страницы — единственное место, где появляется тень */
+.content {
+  z-index: var(--z-dropdown);
+  min-width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-2);
+}
+
+.viewport {
+  padding: var(--space-1);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  color: var(--color-fg);
+  font: var(--text-body);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Radix подсвечивает пункт и мышью, и клавиатурой — одним атрибутом */
+.item[data-highlighted] {
+  background: var(--color-surface-hover);
+  outline: none;
+}
+
+.item[data-state="checked"] {
+  color: var(--color-accent);
+}
+
+.item[data-disabled] {
+  color: var(--color-fg-disabled);
+  cursor: default;
+}
+
+.indicator {
+  display: flex;
+}
+
+.indicator :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  stroke-width: var(--icon-stroke);
+}
+
+@media (max-width: 639px) {
+  .trigger {
+    min-height: var(--tap-target-min);
+  }
+}

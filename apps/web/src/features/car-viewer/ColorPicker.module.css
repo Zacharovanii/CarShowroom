@@ -1,0 +1,64 @@
+.picker {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.label {
+  color: var(--color-fg);
+  font: var(--text-body-sm);
+}
+
+.name {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Кружок мелкий, поэтому кнопка вокруг него добирает до минимальной
+   цели нажатия: палец попадает по цвету, а не мимо. */
+.swatch {
+  display: grid;
+  place-items: center;
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dot {
+  display: block;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: box-shadow var(--duration-1) var(--ease-standard);
+}
+
+.swatch:hover .dot {
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--color-border-hover);
+}
+
+/* Выбранный цвет: кольцо вокруг кружка плюс aria-pressed и название
+   рядом — состояние не передаётся одним лишь цветом. */
+.swatch[aria-pressed="true"] .dot {
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--color-fg);
+}
+
+.note {
+  color: var(--color-fg-muted);
+  font: var(--text-caption);
+}

@@ -1,0 +1,65 @@
+.body {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.car {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cover {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--space-11);
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+  background: var(--color-surface);
+  color: var(--color-fg-disabled);
+}
+
+.cover svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+.carName {
+  font: var(--text-h4);
+}
+
+.when {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+}
+
+/* Ссылка и кнопка внутри плашки выглядят одинаково: для человека это
+   одно и то же — продолжение текста сообщения. */
+.link {
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.terms {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.termsNote {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

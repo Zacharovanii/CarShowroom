@@ -1,0 +1,80 @@
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  flex: none;
+  margin-top: var(--space-1);
+  background: var(--color-surface);
+  color: var(--color-accent-fg);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-1) var(--ease-standard),
+    border-color var(--duration-1) var(--ease-standard);
+}
+
+.box:hover:not(:disabled) {
+  border-color: var(--color-fg-subtle);
+  background: var(--color-surface-hover);
+}
+
+.box:active:not(:disabled) {
+  background: var(--color-surface-active);
+}
+
+/* Отмечен — заливка И галочка: знак не зависит от цвета */
+.box[data-state="checked"] {
+  background: var(--color-accent-solid);
+  border-color: var(--color-accent-border);
+}
+
+.box[data-state="checked"]:hover:not(:disabled) {
+  background: var(--color-accent-solid-hover);
+}
+
+.box[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.box:disabled {
+  background: var(--color-bg-alt);
+  border-color: var(--color-border);
+  color: var(--color-fg-disabled);
+  cursor: default;
+}
+
+.indicator {
+  display: grid;
+  place-items: center;
+}
+
+.indicator :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  stroke-width: var(--icon-stroke);
+}
+
+.label {
+  /* Занимает всю оставшуюся ширину строки: подпись связана с квадратом
+     через htmlFor, поэтому её область — тоже область нажатия. Текст и так
+     переносится по ширине строки, так что видимых изменений нет, а палец
+     попадает не только в квадрат 18px. Вертикаль этим не лечится —
+     известное ограничение, см. docs/assignment-check.md. */
+  flex: 1;
+  font: var(--text-body-sm);
+  color: var(--color-fg);
+  cursor: pointer;
+}
+
+.box:disabled + .label {
+  color: var(--color-fg-disabled);
+  cursor: default;
+}

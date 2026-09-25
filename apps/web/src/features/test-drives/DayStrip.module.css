@@ -1,0 +1,70 @@
+.strip {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  /* Карточка дня не должна обрезаться на краю прокрутки */
+  scroll-padding: var(--space-3);
+}
+
+.day {
+  display: grid;
+  flex: none;
+  justify-items: center;
+  gap: var(--space-1);
+  min-width: var(--control-height-lg);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  cursor: pointer;
+  transition: border-color var(--duration-1);
+}
+
+.day:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-hover);
+}
+
+/* Выбранный день — не только заливка: подпись становится жирной,
+   а радиокнопка внутри честно объявляет состояние (WCAG 1.4.1). */
+.day[data-selected] {
+  border-color: var(--color-accent-solid);
+  background: var(--color-accent-solid);
+  color: var(--color-fg-on-accent);
+}
+
+.day[data-selected] .weekday {
+  color: var(--color-fg-on-accent);
+}
+
+.day[data-selected] .number {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Радиокнопка невидима, но остаётся в потоке фокуса: кольцо рисуется
+   на подписи, поэтому `display: none` здесь нельзя. */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.day:has(.input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.weekday {
+  color: var(--color-fg-muted);
+  font: var(--text-caption);
+  text-transform: lowercase;
+}
+
+.number {
+  font: var(--text-h4);
+  font-variant-numeric: tabular-nums;
+}

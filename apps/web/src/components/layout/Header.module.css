@@ -1,0 +1,242 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  border-bottom: 1px solid var(--color-border);
+  /* Содержимое просвечивает и размывается под шапкой (раздел 1 wireframes).
+     Там, где backdrop-filter не поддержан, остаётся просто плотный фон. */
+  background: var(--color-bg-translucent);
+  backdrop-filter: blur(var(--photo-blur));
+  -webkit-backdrop-filter: blur(var(--photo-blur));
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .header {
+    background: var(--color-bg);
+  }
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: var(--header-height);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-gutter);
+}
+
+.brand {
+  font: var(--text-h4);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--color-fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* На телефоне навигация и блок аккаунта уезжают в меню под бургером */
+.nav {
+  display: none;
+  align-items: stretch;
+  align-self: stretch;
+  gap: var(--space-5);
+}
+
+/* Активный пункт помечен подчёркиванием, а не одним цветом текста (§1.4.1) */
+.navLink {
+  display: flex;
+  align-items: center;
+  border-bottom: var(--border-width-emphasis) solid transparent;
+  color: var(--color-fg-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--duration-1) var(--ease-standard);
+}
+
+.navLink:hover {
+  color: var(--color-fg);
+}
+
+.navLinkActive {
+  color: var(--color-fg);
+  border-bottom-color: var(--color-fg);
+}
+
+.account {
+  display: none;
+  align-items: center;
+  gap: var(--space-4);
+  margin-left: auto;
+}
+
+/* Сессия ещё проверяется: место занято, но ничего не обещает */
+.accountPending {
+  display: block;
+  width: var(--space-13);
+  height: var(--control-height);
+  background: var(--color-surface);
+}
+
+.accountMenu {
+  position: relative;
+}
+
+.accountButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-fg);
+  font: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--duration-1) var(--ease-standard);
+}
+
+.accountButton:hover {
+  background: var(--color-surface-hover);
+}
+
+.accountButton svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+/* Выпадающий список оторван от страницы — единственное место, где тень уместна */
+.dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: var(--z-dropdown);
+  display: grid;
+  min-width: var(--space-13);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-2);
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-fg);
+  font: var(--text-body-sm);
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--duration-1) var(--ease-standard);
+}
+
+.dropdownItem:hover {
+  background: var(--color-surface-hover);
+}
+
+.burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--color-fg);
+  cursor: pointer;
+}
+
+.burger svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+/* Меню на телефоне — во весь экран под шапкой, пункты по 48px */
+.mobileMenu {
+  position: fixed;
+  inset: var(--header-height) 0 0;
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  overflow-y: auto;
+  padding: var(--space-4) var(--container-gutter) var(--space-9);
+  background: var(--color-bg);
+}
+
+.mobileNav,
+.mobileAccount {
+  display: grid;
+}
+
+.mobileAccount {
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.mobileName {
+  padding: var(--space-2) 0;
+  color: var(--color-fg-subtle);
+  font: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
+}
+
+.menuLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--control-height-lg);
+  border: 0;
+  border-left: var(--border-width-emphasis) solid transparent;
+  padding: 0 var(--space-3);
+  background: transparent;
+  color: var(--color-fg-muted);
+  font: var(--text-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menuLinkActive {
+  color: var(--color-fg);
+  border-left-color: var(--color-fg);
+}
+
+.menuLink svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+.mobileCta {
+  margin-top: var(--space-2);
+}
+
+/* С 640px меню и блок аккаунта помещаются в строку — бургер не нужен */
+@media (min-width: 640px) {
+  .nav,
+  .account {
+    display: flex;
+  }
+
+  .burger,
+  .mobileMenu {
+    display: none;
+  }
+}

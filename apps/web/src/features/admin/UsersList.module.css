@@ -1,0 +1,81 @@
+/* ---- Таблица (планшет и шире) ----------------------------------------- */
+
+/* Пять столбцов в узкий контейнер не влезают — таблица прокручивается
+   внутри своей рамки, а не растягивает страницу. */
+.scroller {
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--text-body-sm);
+}
+
+.th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  white-space: nowrap;
+  color: var(--color-fg-subtle);
+  font: var(--text-caption);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row + .row .td {
+  border-top: 1px solid var(--color-border);
+}
+
+.td {
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-fg-muted);
+  vertical-align: middle;
+}
+
+.name {
+  color: var(--color-fg);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ---- Карточки (телефон) ------------------------------------------------ */
+
+.cards {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  font: var(--text-body-sm);
+}
+
+/* Имя и роль — в одну строку, как в макете */
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.contact {
+  color: var(--color-fg-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Телефон и дата — цифры одной ширины, иначе столбец «дышит» */
+.date {
+  color: var(--color-fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

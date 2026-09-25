@@ -1,0 +1,100 @@
+.list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.cover {
+  display: grid;
+  place-items: center;
+  width: var(--space-12);
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+  background: var(--color-surface);
+  color: var(--color-fg-disabled);
+}
+
+.cover svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.name {
+  color: var(--color-fg);
+  font: var(--text-h4);
+  text-decoration: none;
+}
+
+.name:hover {
+  color: var(--color-accent);
+}
+
+.when {
+  font: var(--text-body);
+}
+
+.phone {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+  text-decoration: none;
+}
+
+.phone:hover {
+  color: var(--color-fg);
+}
+
+.comment {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+}
+
+.reason {
+  color: var(--color-fg);
+  font: var(--text-body-sm);
+}
+
+.actions {
+  grid-column: 2;
+  justify-self: end;
+}
+
+@media (max-width: 639px) {
+  .card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cover {
+    width: 100%;
+  }
+
+  .actions {
+    grid-column: 1;
+    justify-self: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

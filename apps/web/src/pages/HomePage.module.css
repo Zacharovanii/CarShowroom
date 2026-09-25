@@ -1,0 +1,281 @@
+.page {
+  display: block;
+}
+
+/* ---- Hero ------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  min-height: calc(100dvh - var(--header-height));
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.heroPhoto {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: var(--photo-filter);
+}
+
+/* Фото уходит в фон следующей секции и затемняется слева под текст.
+   Оба градиента собраны через color-mix от --color-bg: «прозрачный»
+   в них того же тона, что фон страницы, поэтому стыка нет ни в одной теме. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(
+      to top,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 28%,
+      color-mix(in srgb, var(--color-bg) 0%, transparent) 62%
+    ),
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-bg) 88%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 60%, transparent) 45%,
+      color-mix(in srgb, var(--color-bg) 0%, transparent) 85%
+    );
+}
+
+.heroInner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-11) var(--container-gutter) var(--space-12);
+}
+
+.heroText {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 34ch;
+}
+
+.heroTitle {
+  font: var(--text-display);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.heroLede {
+  color: var(--color-fg-muted);
+  font: var(--text-body);
+  max-width: 44ch;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ---- Секции ---------------------------------------------------------- */
+
+.section,
+.sectionInner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-11) var(--container-gutter);
+}
+
+.sectionAlt {
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eyebrow {
+  color: var(--color-fg-subtle);
+  font: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
+}
+
+.sectionTitle {
+  font: var(--text-h2);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.sectionLede {
+  margin-top: var(--space-2);
+  color: var(--color-fg-muted);
+  font: var(--text-body);
+  max-width: 52ch;
+}
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+
+.moreLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent);
+  font: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.moreLink:hover {
+  text-decoration: underline;
+}
+
+.moreLink svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+/* ---- Модельный ряд --------------------------------------------------- */
+
+.cars {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gap);
+}
+
+/* ---- Почему мы ------------------------------------------------------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-7);
+  margin-top: var(--space-7);
+  padding-bottom: var(--space-9);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stat {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.statValue {
+  font: var(--text-h2);
+  letter-spacing: var(--letter-spacing-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  color: var(--color-fg-subtle);
+  font: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
+}
+
+.advantages {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+  margin-top: var(--space-9);
+}
+
+.advantage {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.advantage svg {
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
+  stroke-width: var(--icon-stroke);
+  color: var(--color-fg-muted);
+}
+
+.advantageTitle {
+  font: var(--text-h4);
+}
+
+.advantageText {
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+  max-width: 34ch;
+}
+
+/* ---- Тест-драйв ------------------------------------------------------ */
+
+.testDrive {
+  display: grid;
+  gap: var(--space-7);
+  align-items: center;
+}
+
+.testDrivePhoto {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  filter: var(--photo-filter);
+}
+
+.testDriveText {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+/* ---- Брейкпоинты ----------------------------------------------------- */
+
+/* Телефон: карточки лентой, как в макете. Лента выходит за поля
+   контейнера, чтобы обрез карточки был у самого края экрана. */
+@media (max-width: 639px) {
+  .cars {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    margin: 0 calc(-1 * var(--container-gutter));
+    padding: 0 var(--container-gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .cars > * {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 640px) {
+  .cars,
+  .advantages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .testDrive {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cars,
+  .advantages {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .heroText {
+    max-width: 24ch;
+  }
+}

@@ -1,0 +1,25 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.spinner {
+  display: block;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border: var(--border-width-emphasis) solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-pill);
+  animation: spin var(--duration-spin) linear infinite;
+}
+
+.spinner[data-size="sm"] {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

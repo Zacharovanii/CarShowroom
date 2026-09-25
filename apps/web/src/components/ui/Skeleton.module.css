@@ -1,0 +1,38 @@
+.skeleton {
+  display: block;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface),
+    var(--color-surface-hover),
+    var(--color-surface)
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-surface);
+  animation: shimmer var(--duration-shimmer) var(--ease-in-out) infinite;
+}
+
+.skeleton[data-variant="text"] {
+  height: var(--space-5);
+}
+
+.skeleton[data-variant="title"] {
+  height: var(--space-6);
+}
+
+.skeleton[data-variant="block"] {
+  height: var(--space-11);
+}
+
+/* Карточка каталога вертикальная, 3:4 — заглушка держит ту же пропорцию,
+   иначе сетка прыгает в момент подстановки данных */
+.skeleton[data-variant="card"] {
+  aspect-ratio: 3 / 4;
+  height: auto;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}

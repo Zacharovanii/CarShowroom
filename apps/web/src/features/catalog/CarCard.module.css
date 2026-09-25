@@ -1,0 +1,197 @@
+/* Карточка автомобиля — §9 design-system.md. Разметка и слои повторяют
+   отлаженный образец из docs/styleguide.html, секция CarCard. */
+
+.card {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--color-surface);
+  border-radius: var(--radius-surface);
+  color: inherit;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+/* Размер задаёт карточка, фото подгоняется: снимок 3:2 увеличивается
+   по высоте и подрезается по бокам. */
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: var(--photo-filter);
+  transition: transform var(--duration-3) var(--ease-out);
+}
+
+.card:hover .photo,
+.card:focus-visible .photo {
+  transform: scale(1.03);
+}
+
+/* Обложки нет (coverPath = null) — вместо снимка ровная поверхность со знаком */
+.noPhoto {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-hover);
+  color: var(--color-fg-disabled);
+}
+
+.noPhoto svg {
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
+  stroke-width: var(--icon-stroke);
+}
+
+/* Слой 1 — размытие снизу вверх, маска гасит его к верху кадра */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  backdrop-filter: blur(var(--photo-blur));
+  -webkit-backdrop-filter: blur(var(--photo-blur));
+  mask-image: var(--photo-blur-mask);
+  -webkit-mask-image: var(--photo-blur-mask);
+}
+
+/* Слой 2 — затемнение. Контраст держит именно оно: размытое белое
+   остаётся белым, и на светлом кузове один блюр текст бы не вытянул. */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--photo-scrim);
+}
+
+.badges {
+  position: absolute;
+  z-index: 3;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.body {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.name {
+  font: var(--text-h4);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.year {
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.price {
+  justify-self: start;
+}
+
+.specs {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+  font: var(--text-caption);
+  color: var(--color-fg-muted);
+}
+
+.spec b {
+  display: block;
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-fg);
+}
+
+.spec span {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
+  color: var(--color-fg-subtle);
+}
+
+/* Кнопка — отдельной строкой под характеристиками, внутри текстового блока.
+   Свой слой у неё всё равно проставлен явно: так её не перекроет ничто. */
+.go {
+  position: relative;
+  z-index: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--tap-target-min);
+  max-width: var(--tap-target-min);
+  margin-top: var(--space-4);
+  padding: 0 var(--space-3);
+  overflow: hidden;
+  white-space: nowrap;
+  border-radius: var(--radius-control);
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-medium);
+  transition: max-width var(--duration-2) var(--ease-out);
+}
+
+.go svg {
+  flex: none;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  margin: 0 auto;
+  /* Единственное место с жирной линией: стрелка лежит на светлой заливке
+     и при 2px читается как волосок (§8). */
+  stroke-width: var(--icon-stroke-bold);
+}
+
+.goLabel {
+  opacity: 0;
+  transition: opacity var(--duration-1) var(--ease-standard);
+}
+
+/* Раскрытая ширина собрана из токенов: 44 + 96 хватает на стрелку,
+   зазор, поля и слово «Смотреть». */
+.card:hover .go,
+.card:focus-visible .go {
+  max-width: calc(var(--tap-target-min) + var(--space-12));
+}
+
+.card:hover .goLabel,
+.card:focus-visible .goLabel {
+  opacity: 1;
+}
+
+/* Там, где hover не бывает, кнопка нарисована сразу раскрытой */
+@media (hover: none) {
+  .go {
+    max-width: calc(var(--tap-target-min) + var(--space-12));
+  }
+
+  .goLabel {
+    opacity: 1;
+  }
+}

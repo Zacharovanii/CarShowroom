@@ -1,0 +1,106 @@
+.viewport {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(var(--toast-width), 100vw);
+  margin: 0;
+  padding: var(--space-6);
+  list-style: none;
+  outline: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  /* Тон продублирован кромкой и знаком — не только цветом текста */
+  border-left: var(--border-width-emphasis) solid var(--color-success);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-2);
+  animation: slide-in var(--duration-3) var(--ease-out);
+}
+
+.toast[data-tone="error"] {
+  border-left-color: var(--color-danger);
+}
+
+.toast[data-state="closed"] {
+  animation: fade-out var(--duration-2) var(--ease-standard);
+}
+
+.toast[data-swipe="move"] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+
+.toast[data-swipe="end"] {
+  animation: fade-out var(--duration-2) var(--ease-standard);
+}
+
+.mark {
+  display: flex;
+  flex: none;
+  color: var(--color-success);
+}
+
+.toast[data-tone="error"] .mark {
+  color: var(--color-danger);
+}
+
+.mark :global(svg) {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+.text {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.title {
+  font: var(--text-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.description {
+  margin: 0;
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+.action {
+  flex: none;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent);
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.action:hover {
+  color: var(--color-fg);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-6));
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,187 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.head {
+  font: var(--text-caption);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--color-fg-subtle);
+}
+
+.head th {
+  padding: var(--space-2) var(--space-4);
+  font-weight: var(--font-weight-medium);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row {
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--duration-1) var(--ease-standard);
+}
+
+.row:hover {
+  background: var(--color-surface-hover);
+}
+
+/* Ждёт отметки: тонировка — только половина сообщения, вторая половина
+   словами в колонке статуса. */
+.row[data-awaiting] {
+  background: var(--color-warning-bg);
+}
+
+.row[data-awaiting]:hover {
+  background: var(--color-surface-active);
+}
+
+.row td {
+  padding: var(--space-3) var(--space-4);
+  vertical-align: middle;
+}
+
+.time {
+  font: var(--text-h4);
+  white-space: nowrap;
+}
+
+.car {
+  color: var(--color-fg);
+}
+
+/* Стопка внутри ячейки, а не на самой `td`: `display: flex` на ячейке
+   выбивает её из табличной раскладки, и колонки перестают держать ширину. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.name {
+  color: var(--color-fg);
+}
+
+.phone {
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+.awaiting {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-caption);
+  color: var(--color-warning);
+}
+
+.awaiting svg {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  stroke-width: var(--icon-stroke);
+}
+
+.open {
+  width: var(--tap-target-min);
+  text-align: right;
+}
+
+.openButton {
+  display: grid;
+  place-items: center;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-control);
+  color: var(--color-fg-muted);
+  cursor: pointer;
+}
+
+.openButton:hover {
+  color: var(--color-fg);
+}
+
+.openButton svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+/* ---- Скелетон --------------------------------------------------------- */
+
+.skeleton {
+  display: grid;
+}
+
+.skeletonRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ---- Телефон: строки таблицы становятся карточками -------------------- */
+
+@media (max-width: 639px) {
+  /* Шапка таблицы прячется по образцу `.visually-hidden` из globals.css:
+     глобальный класс внутрь @media не подставить, а из разметки строки
+     и без неё понятно, что 10:00 — время, а «Запланирована» — статус. */
+  .head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time car open"
+      "time client open"
+      "time status open";
+    align-items: center;
+    column-gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  .row td {
+    padding: 0;
+  }
+
+  .row .client {
+    padding-block: var(--space-1);
+  }
+
+  .time {
+    grid-area: time;
+    font: var(--text-h3);
+  }
+
+  .car {
+    grid-area: car;
+  }
+
+  .client {
+    grid-area: client;
+  }
+
+  .status {
+    grid-area: status;
+  }
+
+  .open {
+    grid-area: open;
+    width: auto;
+  }
+
+  .skeletonRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

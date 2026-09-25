@@ -1,0 +1,139 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--control-height);
+  padding: 0 var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-1) var(--ease-standard),
+    border-color var(--duration-1) var(--ease-standard),
+    color var(--duration-1) var(--ease-standard);
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Содержимое не убирается из потока: кнопка обязана сохранить ширину */
+.button[aria-busy="true"] .content {
+  visibility: hidden;
+}
+
+.loader {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.button :global(svg) {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+/* --- Размеры ---------------------------------------------------------- */
+.button[data-size="sm"] {
+  height: var(--control-height-sm);
+  padding: 0 var(--space-3);
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.button[data-size="sm"] :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+}
+
+.button[data-size="lg"] {
+  height: var(--control-height-lg);
+  padding: 0 var(--space-7);
+}
+
+/* --- Варианты --------------------------------------------------------- */
+.button[data-variant="primary"] {
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+
+.button[data-variant="primary"]:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.button[data-variant="primary"]:active:not(:disabled) {
+  background: var(--color-primary-active);
+}
+
+.button[data-variant="secondary"] {
+  background: transparent;
+  color: var(--color-fg);
+  border-color: var(--color-border-control);
+}
+
+.button[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-fg-subtle);
+}
+
+.button[data-variant="secondary"]:active:not(:disabled) {
+  background: var(--color-surface-active);
+}
+
+.button[data-variant="ghost"] {
+  background: transparent;
+  color: var(--color-fg-muted);
+}
+
+.button[data-variant="ghost"]:hover:not(:disabled) {
+  background: var(--color-surface);
+  color: var(--color-fg);
+}
+
+.button[data-variant="ghost"]:active:not(:disabled) {
+  background: var(--color-surface-active);
+  color: var(--color-fg);
+}
+
+.button[data-variant="danger"] {
+  background: var(--color-danger-solid);
+  color: var(--color-danger-fg);
+}
+
+.button[data-variant="danger"]:hover:not(:disabled) {
+  background: var(--color-danger-solid);
+  filter: brightness(1.12);
+}
+
+.button[data-variant="danger"]:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* --- Выключено. Цвет — не единственный признак: снят курсор и стоит
+       aria-disabled, кнопка выпадает из табуляции. --------------------- */
+.button:disabled {
+  background: var(--color-surface);
+  color: var(--color-fg-disabled);
+  border-color: var(--color-border);
+  cursor: default;
+  filter: none;
+}
+
+/* На телефоне любой контрол дорастает до пальцевой цели (§4 design-system).
+   Брейкпоинт 640px повторяется руками: кастомных media-переменных нет. */
+@media (max-width: 639px) {
+  .button[data-size="md"],
+  .button[data-size="lg"] {
+    min-height: var(--tap-target-min);
+  }
+}

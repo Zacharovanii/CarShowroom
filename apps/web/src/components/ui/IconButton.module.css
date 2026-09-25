@@ -1,0 +1,102 @@
+.button {
+  display: inline-grid;
+  place-items: center;
+  width: var(--control-height);
+  height: var(--control-height);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-1) var(--ease-standard),
+    border-color var(--duration-1) var(--ease-standard),
+    color var(--duration-1) var(--ease-standard);
+}
+
+.button :global(svg) {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+.button[data-size="sm"] {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+}
+
+.button[data-size="sm"] :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+}
+
+.button[data-size="lg"] {
+  width: var(--control-height-lg);
+  height: var(--control-height-lg);
+}
+
+.button[data-variant="primary"] {
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+
+.button[data-variant="primary"]:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.button[data-variant="primary"]:active:not(:disabled) {
+  background: var(--color-primary-active);
+}
+
+.button[data-variant="secondary"] {
+  background: transparent;
+  color: var(--color-fg-muted);
+  border-color: var(--color-border-control);
+}
+
+.button[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-fg-subtle);
+  color: var(--color-fg);
+}
+
+.button[data-variant="secondary"]:active:not(:disabled) {
+  background: var(--color-surface-active);
+}
+
+.button[data-variant="ghost"] {
+  background: transparent;
+  color: var(--color-fg-muted);
+}
+
+.button[data-variant="ghost"]:hover:not(:disabled) {
+  background: var(--color-surface);
+  color: var(--color-fg);
+}
+
+.button[data-variant="ghost"]:active:not(:disabled) {
+  background: var(--color-surface-active);
+}
+
+.button[data-variant="danger"] {
+  background: var(--color-danger-solid);
+  color: var(--color-danger-fg);
+}
+
+.button[data-variant="danger"]:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.button:disabled {
+  background: var(--color-surface);
+  color: var(--color-fg-disabled);
+  border-color: var(--color-border);
+  cursor: default;
+  filter: none;
+}
+
+@media (max-width: 639px) {
+  .button[data-size="md"],
+  .button[data-size="lg"] {
+    width: var(--tap-target-min);
+    height: var(--tap-target-min);
+  }
+}

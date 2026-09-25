@@ -1,0 +1,65 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  /* Тон продублирован кромкой и знаком — не только цветом текста */
+  border-left: var(--border-width-emphasis) solid var(--color-danger);
+  background: var(--color-danger-bg);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-fg);
+}
+
+.alert[data-variant="success"] {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.alert[data-variant="warning"] {
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.alert[data-variant="info"] {
+  border-left-color: var(--color-info);
+  background: var(--color-info-bg);
+}
+
+.mark {
+  display: flex;
+  flex: none;
+  color: var(--color-danger);
+}
+
+.alert[data-variant="success"] .mark {
+  color: var(--color-success);
+}
+
+.alert[data-variant="warning"] .mark {
+  color: var(--color-warning);
+}
+
+.alert[data-variant="info"] .mark {
+  color: var(--color-info);
+}
+
+.mark :global(svg) {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+.text {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.description {
+  margin: 0;
+  font: var(--text-body-sm);
+}

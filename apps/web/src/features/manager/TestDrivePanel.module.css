@@ -1,0 +1,112 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.awaiting {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-caption);
+  color: var(--color-warning);
+}
+
+.awaiting svg,
+.closed svg {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.legend {
+  margin: 0;
+  font: var(--text-caption);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--color-fg-subtle);
+}
+
+.value {
+  margin: 0;
+  font: var(--text-body);
+  color: var(--color-fg);
+}
+
+.link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.note {
+  margin: 0;
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+.carLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-h4);
+  color: var(--color-fg);
+  text-decoration: none;
+}
+
+.carLink:hover {
+  color: var(--color-accent);
+}
+
+.carLink svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+/* ---- Подошва: действия ------------------------------------------------ */
+
+.actions {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.cancelForm {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.closed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+/* ---- Телефон: кнопки тянутся во всю ширину подошвы -------------------- */
+
+@media (max-width: 639px) {
+  .buttons > * {
+    flex: 1 1 auto;
+  }
+}

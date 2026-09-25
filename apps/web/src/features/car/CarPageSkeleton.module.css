@@ -1,0 +1,52 @@
+.skeleton {
+  display: grid;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.media {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.thumbs {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.thumb {
+  /* Ширина миниатюры — из шкалы отступов, как в самой галерее.
+     Пропорцию заглушка получает пропом `ratio`. */
+  width: var(--space-13);
+  flex: none;
+}
+
+.head {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-7);
+}
+
+@media (min-width: 640px) {
+  .specs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .skeleton {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  /* Полоса характеристик идёт во всю ширину под галереей и шапкой */
+  .specs {
+    grid-column: 1 / -1;
+  }
+}

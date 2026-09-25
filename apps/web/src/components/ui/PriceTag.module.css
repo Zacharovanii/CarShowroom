@@ -1,0 +1,17 @@
+.price {
+  font: var(--text-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.price[data-size="sm"] {
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.price[data-size="lg"] {
+  font: var(--text-h2);
+  letter-spacing: var(--letter-spacing-tight);
+}

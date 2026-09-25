@@ -1,0 +1,80 @@
+.panel {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+/* ---- Привод ---------------------------------------------------------- */
+
+.drive {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.legend {
+  padding: 0;
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.segment {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--color-border-control);
+}
+
+.option {
+  display: grid;
+  position: relative;
+}
+
+.option + .option {
+  border-left: 1px solid var(--color-border-control);
+}
+
+/* Сам radio не виден, но остаётся в потоке фокуса и в дереве доступности */
+.radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.optionLabel {
+  display: grid;
+  place-items: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-2);
+  color: var(--color-fg-muted);
+  font: var(--text-body-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-1) var(--ease-standard),
+    color var(--duration-1) var(--ease-standard);
+}
+
+.optionLabel:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-fg);
+}
+
+/* Выбранное положение отличается не только цветом: у него другой вес шрифта,
+   а состояние объявляет сам radio (§8 design-system, WCAG 1.4.1) */
+.radio:checked + .optionLabel {
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+.radio:focus-visible + .optionLabel {
+  outline: var(--focus-ring);
+  outline-offset: calc(-1 * var(--focus-ring-offset));
+}

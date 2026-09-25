@@ -1,0 +1,37 @@
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* Кнопки формы: на узком экране — в столбец во всю ширину */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.actions > * {
+  flex: 1 1 auto;
+}
+
+@media (min-width: 640px) {
+  .actions > * {
+    flex: 0 0 auto;
+  }
+}
+
+/* Единственная кнопка формы входа и регистрации — во всю ширину карточки */
+.submitWide {
+  width: 100%;
+}
+
+.legend {
+  font: var(--text-h4);
+  color: var(--color-fg);
+}
+
+.note {
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}

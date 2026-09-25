@@ -1,0 +1,88 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.slot {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--control-height-lg);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font: var(--text-body);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-1),
+    background-color var(--duration-1);
+}
+
+.slot:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-hover);
+}
+
+/* Занято: подпись зачёркнута — состояние читается без цвета */
+.slot[data-state="taken"] {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-fg-disabled);
+  cursor: not-allowed;
+}
+
+.slot[data-state="taken"] .time {
+  text-decoration: line-through;
+}
+
+/* Рано (TD-5): слот бледный и подписан словом */
+.slot[data-state="early"] {
+  border-color: var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-fg-disabled);
+  cursor: not-allowed;
+}
+
+.slot[data-state="taken"]:hover,
+.slot[data-state="early"]:hover {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+}
+
+.slot[data-selected] {
+  border-color: var(--color-accent-solid);
+  background: var(--color-accent-solid);
+  color: var(--color-fg-on-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.slot[data-selected]:hover {
+  border-color: var(--color-accent-solid-hover);
+  background: var(--color-accent-solid-hover);
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  font: var(--text-caption);
+  color: inherit;
+}
+
+.skeleton {
+  min-height: var(--control-height-lg);
+  border-radius: var(--radius-control);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,37 @@
+.screen {
+  display: grid;
+  justify-items: center;
+  padding: var(--space-9) var(--container-gutter) var(--space-11);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-5);
+  width: 100%;
+  /* Та же ширина, что у диалога: узкая форма по центру — один и тот же
+     размер «оторванного от страницы» блока, второго токена он не стоит. */
+  max-width: var(--dialog-width);
+}
+
+.title {
+  font: var(--text-h2);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+/* Пояснение «Чтобы записаться на …» — полоска с акцентной кромкой слева */
+.lead {
+  border-left: var(--border-width-emphasis) solid var(--color-accent-border);
+  background: var(--color-info-bg);
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-body-sm);
+  color: var(--color-fg);
+}
+
+.footer {
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+.footer a {
+  color: var(--color-accent);
+}
