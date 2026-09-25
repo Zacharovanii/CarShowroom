@@ -19,11 +19,18 @@
   z-index: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
-  filter: var(--photo-filter);
   opacity: 0;
   transition: opacity var(--duration-crossfade) var(--ease-in-out);
+}
+
+/* Подложка — тот же кадр, растянутый и размытый: заполняет поля вокруг
+   фото, вписанного целиком, и не показывает его пиксели. */
+.heroBackdrop {
+  object-fit: cover;
+  filter: blur(var(--photo-backdrop-blur)) brightness(0.6);
+  transform: scale(1.1);
 }
 
 .heroPhoto[data-active="true"] {

@@ -112,7 +112,6 @@
 
 @media (min-width: 1024px) {
   .top {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: var(--space-9);
   }
 }

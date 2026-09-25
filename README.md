@@ -29,7 +29,7 @@
 2. Положить его в `apps/api/licensed-assets/` так, чтобы получилось:
    ```
    apps/api/licensed-assets/models/m4-competition.glb    (18 файлов, ~200 МБ)
-   apps/api/licensed-assets/cars/m4-competition-1.webp   (85 файлов)
+   apps/api/licensed-assets/cars/m4-competition-1.jpg    (85 файлов)
    ```
    Имена файлов — `slug` автомобиля из `apps/api/db/seed/catalog.sql`.
 3. Перезапускать ничего не нужно. Проверка: `/assets/models/m4-competition.glb` весит

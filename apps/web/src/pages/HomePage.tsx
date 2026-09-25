@@ -1,5 +1,5 @@
 import { ArrowRight, CreditCard, Repeat, ShieldCheck, Wrench } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { CarCard, CarCardSkeleton, useCars } from "@/features/catalog";
 import { LinkButton } from "@/shared/ui/LinkButton";
@@ -174,17 +174,28 @@ function HeroCarousel({ photos }: { photos: HeroPhoto[] }) {
     return () => window.clearInterval(timer);
   }, [shuffled]);
 
-  return shuffled.map((photo, index) => (
-    <img
-      key={photo.coverPath}
-      className={styles.heroPhoto}
-      data-active={index === active % shuffled.length}
-      src={photo.coverPath!}
-      alt={index === active % shuffled.length ? (photo.coverAlt ?? "") : ""}
-      aria-hidden={index !== active % shuffled.length}
-      fetchPriority={index === 0 ? "high" : "low"}
-    />
-  ));
+  return shuffled.map((photo, index) => {
+    const isActive = index === active % shuffled.length;
+    return (
+      <Fragment key={photo.coverPath}>
+        <img
+          className={`${styles.heroPhoto} ${styles.heroBackdrop}`}
+          data-active={isActive}
+          src={photo.coverPath!}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className={styles.heroPhoto}
+          data-active={isActive}
+          src={photo.coverPath!}
+          alt={isActive ? (photo.coverAlt ?? "") : ""}
+          aria-hidden={!isActive}
+          fetchPriority={index === 0 ? "high" : "low"}
+        />
+      </Fragment>
+    );
+  });
 }
 
 /** Перемешивание Фишера — Йетса, возвращает новый массив. */

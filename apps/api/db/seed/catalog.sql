@@ -126,10 +126,10 @@ join series     s on s.name = v.series
 join body_types b on b.name = v.body_type
 join fuel_types f on f.name = v.fuel_type;
 
--- Фото: <slug>-1.webp — обложка, дальше галерея. Количество — сколько
+-- Фото: <slug>-1.jpg — обложка, дальше галерея. Количество — сколько
 -- снимков есть у автомобиля в licensed-assets/cars.
 insert into car_images (car_id, position, path, alt)
-select c.id, n, format('/assets/cars/%s-%s.webp', c.slug, n),
+select c.id, n, format('/assets/cars/%s-%s.jpg', c.slug, n),
        case when n = 1 then c.name else format('%s, фото %s', c.name, n) end
 from cars c
 join (values

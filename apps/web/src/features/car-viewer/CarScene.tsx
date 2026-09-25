@@ -29,9 +29,9 @@ export default function CarScene({ path, paintMaterial, colorHex, backdrop }: Ca
       <Canvas
         className={styles.canvas}
         camera={{ position: [4.5, 2.4, 6], fov: 40 }}
-        // Верхняя граница плотности пикселей: на ретине сцена остаётся
-        // резкой, но не рендерится в четырёхкратном разрешении
-        dpr={[1, 2]}
+        // Не ниже 2: на обычном мониторе сцена рендерится с запасом и
+        // сглаживается при выводе — без этого на кромках кузова видны пиксели
+        dpr={[2, 3]}
         gl={{ antialias: true }}
       >
         {/* Освещение руками, без HDRI. `<Environment preset="…">` из drei
