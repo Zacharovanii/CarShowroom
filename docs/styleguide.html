@@ -1,723 +1,1503 @@
 <!doctype html>
 <html lang="ru" data-theme="dark">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CarShowroom — витрина дизайн-системы</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CarShowroom — витрина дизайн-системы</title>
 
-<!-- Настоящий файл токенов из apps/web. Витрина ломается, если он ломается. -->
-<link rel="stylesheet" href="../apps/web/src/styles/tokens.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap&subset=cyrillic" rel="stylesheet">
+    <!-- Настоящий файл токенов из apps/web. Витрина ломается, если он ломается. -->
+    <link rel="stylesheet" href="../apps/web/src/styles/tokens.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap&subset=cyrillic"
+      rel="stylesheet"
+    />
 
-<style>
-/* Витрина пользуется ТОЛЬКО семантическими токенами — как и CSS-модули (D10).
+    <style>
+      /* Витрина пользуется ТОЛЬКО семантическими токенами — как и CSS-модули (D10).
    Если здесь понадобился var(--gray-N), значит в семантике дырка. */
 
-*, *::before, *::after { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-fg);
-  font: var(--text-body);
-  font-optical-sizing: auto;
-  -webkit-font-smoothing: antialiased;
-}
-:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--color-bg);
+        color: var(--color-fg);
+        font: var(--text-body);
+        font-optical-sizing: auto;
+        -webkit-font-smoothing: antialiased;
+      }
+      :focus-visible {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+      }
 
-.wrap { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--container-gutter); }
-.topbar {
-  position: sticky; top: 0; z-index: var(--z-header);
-  height: var(--header-height); display: flex; align-items: center; gap: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-bg) 86%, transparent);
-  backdrop-filter: blur(12px);
-}
-.brand { font: var(--text-h4); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
-section { padding: var(--space-11) 0; border-bottom: 1px solid var(--color-border); }
-h2 { font: var(--text-h2); letter-spacing: var(--letter-spacing-tight); margin: 0 0 var(--space-2); }
-h3 { font: var(--text-h4); margin: var(--space-8) 0 var(--space-4); }
-.lede { color: var(--color-fg-muted); margin: 0 0 var(--space-7); max-width: 60ch; }
-.eyebrow {
-  font: var(--text-caption); text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-caps); color: var(--color-fg-subtle);
-  margin: 0 0 var(--space-2);
-}
-.row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
-.grid { display: grid; gap: var(--space-4); }
-.note { font: var(--text-body-sm); color: var(--color-fg-subtle); margin-top: var(--space-2); }
+      .wrap {
+        max-width: var(--container-max);
+        margin: 0 auto;
+        padding: 0 var(--container-gutter);
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: var(--z-header);
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        border-bottom: 1px solid var(--color-border);
+        background: color-mix(in srgb, var(--color-bg) 86%, transparent);
+        backdrop-filter: blur(12px);
+      }
+      .brand {
+        font: var(--text-h4);
+        letter-spacing: var(--letter-spacing-caps);
+        text-transform: uppercase;
+      }
+      section {
+        padding: var(--space-11) 0;
+        border-bottom: 1px solid var(--color-border);
+      }
+      h2 {
+        font: var(--text-h2);
+        letter-spacing: var(--letter-spacing-tight);
+        margin: 0 0 var(--space-2);
+      }
+      h3 {
+        font: var(--text-h4);
+        margin: var(--space-8) 0 var(--space-4);
+      }
+      .lede {
+        color: var(--color-fg-muted);
+        margin: 0 0 var(--space-7);
+        max-width: 60ch;
+      }
+      .eyebrow {
+        font: var(--text-caption);
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-caps);
+        color: var(--color-fg-subtle);
+        margin: 0 0 var(--space-2);
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        align-items: center;
+      }
+      .grid {
+        display: grid;
+        gap: var(--space-4);
+      }
+      .note {
+        font: var(--text-body-sm);
+        color: var(--color-fg-subtle);
+        margin-top: var(--space-2);
+      }
 
-/* ---- Иконки --------------------------------------------------------- */
-.ic {
-  width: var(--icon-size); height: var(--icon-size); flex: none;
-  fill: none; stroke: currentColor; stroke-width: var(--icon-stroke);
-  stroke-linecap: round; stroke-linejoin: round;
-}
-.ic[data-size="sm"] { width: var(--icon-size-sm); height: var(--icon-size-sm); }
-.ic[data-weight="bold"] { stroke-width: var(--icon-stroke-bold); }
-.ic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: var(--space-4); }
-.ic-cell {
-  display: grid; justify-items: center; gap: var(--space-2);
-  padding: var(--space-4) var(--space-2);
-  border: 1px solid var(--color-border); border-radius: var(--radius-surface);
-  color: var(--color-fg);
-}
-.ic-cell figcaption { font: var(--text-caption); color: var(--color-fg-subtle); }
+      /* ---- Иконки --------------------------------------------------------- */
+      .ic {
+        width: var(--icon-size);
+        height: var(--icon-size);
+        flex: none;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: var(--icon-stroke);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .ic[data-size="sm"] {
+        width: var(--icon-size-sm);
+        height: var(--icon-size-sm);
+      }
+      .ic[data-weight="bold"] {
+        stroke-width: var(--icon-stroke-bold);
+      }
+      .ic-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: var(--space-4);
+      }
+      .ic-cell {
+        display: grid;
+        justify-items: center;
+        gap: var(--space-2);
+        padding: var(--space-4) var(--space-2);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-surface);
+        color: var(--color-fg);
+      }
+      .ic-cell figcaption {
+        font: var(--text-caption);
+        color: var(--color-fg-subtle);
+      }
 
-/* ---- Button ------------------------------------------------------- */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
-  height: var(--control-height); padding: 0 var(--space-5);
-  border: 1px solid transparent; border-radius: var(--radius-control);
-  font: var(--text-body); font-weight: var(--font-weight-medium);
-  cursor: pointer; text-decoration: none; white-space: nowrap;
-  transition: background-color var(--duration-1) var(--ease-standard),
-              border-color var(--duration-1) var(--ease-standard),
-              color var(--duration-1) var(--ease-standard);
-}
-.btn[data-size="sm"] { height: var(--control-height-sm); padding: 0 var(--space-3); font: var(--text-body-sm); }
-.btn[data-size="lg"] { height: var(--control-height-lg); padding: 0 var(--space-7); }
-.btn[data-variant="primary"] { background: var(--color-primary); color: var(--color-primary-fg); }
-.btn[data-variant="primary"]:hover:not(:disabled) { background: var(--color-primary-hover); }
-.btn[data-variant="primary"]:active:not(:disabled) { background: var(--color-primary-active); }
-.btn[data-variant="secondary"] { background: transparent; color: var(--color-fg); border-color: var(--color-border-control); }
-.btn[data-variant="secondary"]:hover:not(:disabled) { background: var(--color-surface-hover); border-color: var(--color-fg-subtle); }
-.btn[data-variant="secondary"]:active:not(:disabled) { background: var(--color-surface-active); }
-.btn[data-variant="ghost"] { background: transparent; color: var(--color-fg-muted); }
-.btn[data-variant="ghost"]:hover:not(:disabled) { background: var(--color-surface); color: var(--color-fg); }
-.btn[data-variant="danger"] { background: var(--color-danger-solid); color: var(--color-danger-fg); }
-.btn[data-variant="danger"]:hover:not(:disabled) { filter: brightness(1.12); }
-.btn:disabled { background: var(--color-surface); color: var(--color-fg-disabled); border-color: var(--color-border); cursor: default; }
-.btn[aria-busy="true"] { color: transparent; position: relative; }
-.btn[aria-busy="true"]::after {
-  content: ""; position: absolute; width: 16px; height: 16px;
-  border: 2px solid currentColor; border-top-color: transparent;
-  border-radius: var(--radius-pill); animation: spin 700ms linear infinite;
-  color: var(--color-primary-fg);
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+      /* ---- Button ------------------------------------------------------- */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        height: var(--control-height);
+        padding: 0 var(--space-5);
+        border: 1px solid transparent;
+        border-radius: var(--radius-control);
+        font: var(--text-body);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+          background-color var(--duration-1) var(--ease-standard),
+          border-color var(--duration-1) var(--ease-standard),
+          color var(--duration-1) var(--ease-standard);
+      }
+      .btn[data-size="sm"] {
+        height: var(--control-height-sm);
+        padding: 0 var(--space-3);
+        font: var(--text-body-sm);
+      }
+      .btn[data-size="lg"] {
+        height: var(--control-height-lg);
+        padding: 0 var(--space-7);
+      }
+      .btn[data-variant="primary"] {
+        background: var(--color-primary);
+        color: var(--color-primary-fg);
+      }
+      .btn[data-variant="primary"]:hover:not(:disabled) {
+        background: var(--color-primary-hover);
+      }
+      .btn[data-variant="primary"]:active:not(:disabled) {
+        background: var(--color-primary-active);
+      }
+      .btn[data-variant="secondary"] {
+        background: transparent;
+        color: var(--color-fg);
+        border-color: var(--color-border-control);
+      }
+      .btn[data-variant="secondary"]:hover:not(:disabled) {
+        background: var(--color-surface-hover);
+        border-color: var(--color-fg-subtle);
+      }
+      .btn[data-variant="secondary"]:active:not(:disabled) {
+        background: var(--color-surface-active);
+      }
+      .btn[data-variant="ghost"] {
+        background: transparent;
+        color: var(--color-fg-muted);
+      }
+      .btn[data-variant="ghost"]:hover:not(:disabled) {
+        background: var(--color-surface);
+        color: var(--color-fg);
+      }
+      .btn[data-variant="danger"] {
+        background: var(--color-danger-solid);
+        color: var(--color-danger-fg);
+      }
+      .btn[data-variant="danger"]:hover:not(:disabled) {
+        filter: brightness(1.12);
+      }
+      .btn:disabled {
+        background: var(--color-surface);
+        color: var(--color-fg-disabled);
+        border-color: var(--color-border);
+        cursor: default;
+      }
+      .btn[aria-busy="true"] {
+        color: transparent;
+        position: relative;
+      }
+      .btn[aria-busy="true"]::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: var(--radius-pill);
+        animation: spin 700ms linear infinite;
+        color: var(--color-primary-fg);
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-.icon-btn {
-  width: var(--tap-target-min); height: var(--tap-target-min);
-  display: inline-grid; place-items: center;
-  background: transparent; color: var(--color-fg-muted);
-  border: 1px solid var(--color-border-control); border-radius: var(--radius-control);
-  cursor: pointer; transition: all var(--duration-1) var(--ease-standard);
-}
-.icon-btn:hover { background: var(--color-surface-hover); color: var(--color-fg); }
+      .icon-btn {
+        width: var(--tap-target-min);
+        height: var(--tap-target-min);
+        display: inline-grid;
+        place-items: center;
+        background: transparent;
+        color: var(--color-fg-muted);
+        border: 1px solid var(--color-border-control);
+        border-radius: var(--radius-control);
+        cursor: pointer;
+        transition: all var(--duration-1) var(--ease-standard);
+      }
+      .icon-btn:hover {
+        background: var(--color-surface-hover);
+        color: var(--color-fg);
+      }
 
-/* ---- Field / Input ------------------------------------------------- */
-.field { display: grid; gap: var(--space-2); max-width: 340px; }
-.label { font: var(--text-body-sm); font-weight: var(--font-weight-medium); color: var(--color-fg-muted); }
-.input {
-  height: var(--control-height); padding: 0 var(--space-3);
-  background: var(--color-surface); color: var(--color-fg);
-  border: 1px solid var(--color-border-control); border-radius: var(--radius-control);
-  font: var(--text-body); width: 100%;
-  transition: border-color var(--duration-1) var(--ease-standard);
-}
-.input::placeholder { color: var(--color-fg-subtle); }
-.input:hover:not(:disabled) { border-color: var(--color-fg-subtle); }
-.input[aria-invalid="true"] { border-color: var(--color-danger); }
-.input:disabled { background: var(--color-bg-alt); color: var(--color-fg-disabled); cursor: default; }
-.hint { font: var(--text-body-sm); color: var(--color-fg-subtle); }
-.error { font: var(--text-body-sm); color: var(--color-danger); }
+      /* ---- Field / Input ------------------------------------------------- */
+      .field {
+        display: grid;
+        gap: var(--space-2);
+        max-width: 340px;
+      }
+      .label {
+        font: var(--text-body-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-fg-muted);
+      }
+      .input {
+        height: var(--control-height);
+        padding: 0 var(--space-3);
+        background: var(--color-surface);
+        color: var(--color-fg);
+        border: 1px solid var(--color-border-control);
+        border-radius: var(--radius-control);
+        font: var(--text-body);
+        width: 100%;
+        transition: border-color var(--duration-1) var(--ease-standard);
+      }
+      .input::placeholder {
+        color: var(--color-fg-subtle);
+      }
+      .input:hover:not(:disabled) {
+        border-color: var(--color-fg-subtle);
+      }
+      .input[aria-invalid="true"] {
+        border-color: var(--color-danger);
+      }
+      .input:disabled {
+        background: var(--color-bg-alt);
+        color: var(--color-fg-disabled);
+        cursor: default;
+      }
+      .hint {
+        font: var(--text-body-sm);
+        color: var(--color-fg-subtle);
+      }
+      .error {
+        font: var(--text-body-sm);
+        color: var(--color-danger);
+      }
 
-/* ---- Badge --------------------------------------------------------- */
-.badge {
-  display: inline-flex; align-items: center; gap: var(--space-2);
-  height: 24px; padding: 0 var(--space-2);
-  font: var(--text-caption); border-radius: var(--radius-control);
-  background: var(--color-surface-hover); color: var(--color-fg-muted);
-}
-.badge[data-tone="info"]    { background: var(--color-info-bg);    color: var(--color-info); }
-.badge[data-tone="success"] { background: var(--color-success-bg); color: var(--color-success); }
-.badge[data-tone="warning"] { background: var(--color-warning-bg); color: var(--color-warning); }
-.badge[data-tone="danger"]  { background: var(--color-danger-bg);  color: var(--color-danger); }
-.dot { width: 6px; height: 6px; border-radius: var(--radius-pill); background: currentColor; }
+      /* ---- Badge --------------------------------------------------------- */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        height: 24px;
+        padding: 0 var(--space-2);
+        font: var(--text-caption);
+        border-radius: var(--radius-control);
+        background: var(--color-surface-hover);
+        color: var(--color-fg-muted);
+      }
+      .badge[data-tone="info"] {
+        background: var(--color-info-bg);
+        color: var(--color-info);
+      }
+      .badge[data-tone="success"] {
+        background: var(--color-success-bg);
+        color: var(--color-success);
+      }
+      .badge[data-tone="warning"] {
+        background: var(--color-warning-bg);
+        color: var(--color-warning);
+      }
+      .badge[data-tone="danger"] {
+        background: var(--color-danger-bg);
+        color: var(--color-danger);
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: currentColor;
+      }
 
-/* ---- CarCard ------------------------------------------------------- */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--grid-gap); }
-.car {
-  position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden;
-  background: var(--color-surface); border-radius: var(--radius-surface);
-  color: inherit; text-decoration: none; isolation: isolate;
-}
-/* Карточка задаёт размер сама, фото под неё подгоняется: снимок 3:2
+      /* ---- CarCard ------------------------------------------------------- */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--grid-gap);
+      }
+      .car {
+        position: relative;
+        display: block;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        background: var(--color-surface);
+        border-radius: var(--radius-surface);
+        color: inherit;
+        text-decoration: none;
+        isolation: isolate;
+      }
+      /* Карточка задаёт размер сама, фото под неё подгоняется: снимок 3:2
    увеличивается по высоте и подрезается по бокам. */
-.car img {
-  position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
-  filter: var(--photo-filter);
-  transition: transform var(--duration-3) var(--ease-out);
-}
-.car:hover img, .car:focus-visible img { transform: scale(1.03); }
+      .car img {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        filter: var(--photo-filter);
+        transition: transform var(--duration-3) var(--ease-out);
+      }
+      .car:hover img,
+      .car:focus-visible img {
+        transform: scale(1.03);
+      }
 
-/* Слой 1 — размытие снизу вверх. Маска гасит его к верху кадра. */
-.car::before {
-  content: ""; position: absolute; inset: 0; z-index: 1;
-  backdrop-filter: blur(var(--photo-blur));
-  -webkit-backdrop-filter: blur(var(--photo-blur));
-  mask-image: var(--photo-blur-mask);
-  -webkit-mask-image: var(--photo-blur-mask);
-}
-/* Слой 2 — затемнение. Блюр красив, но контраст держит именно оно:
+      /* Слой 1 — размытие снизу вверх. Маска гасит его к верху кадра. */
+      .car::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        backdrop-filter: blur(var(--photo-blur));
+        -webkit-backdrop-filter: blur(var(--photo-blur));
+        mask-image: var(--photo-blur-mask);
+        -webkit-mask-image: var(--photo-blur-mask);
+      }
+      /* Слой 2 — затемнение. Блюр красив, но контраст держит именно оно:
    размытое белое остаётся белым. */
-.car::after {
-  content: ""; position: absolute; inset: 0; z-index: 2;
-  background: var(--photo-scrim);
-}
-.car-badges {
-  position: absolute; z-index: 3; top: var(--space-3); left: var(--space-3);
-  display: flex; gap: var(--space-2);
-}
-.car-body {
-  position: absolute; z-index: 3; left: 0; right: 0; bottom: 0;
-  padding: var(--space-4); display: grid; gap: var(--space-1);
-}
-.car-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); }
-.car-name { font: var(--text-h4); letter-spacing: var(--letter-spacing-tight); }
-.car-year { font: var(--text-body-sm); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
-.car-price {
-  font: var(--text-h4); font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-}
-.car-specs {
-  display: flex; gap: var(--space-4); margin-top: var(--space-2);
-  font: var(--text-caption); color: var(--color-fg-muted);
-}
-.car-specs b { display: block; font: var(--text-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-fg); }
-.car-specs span { text-transform: uppercase; letter-spacing: var(--letter-spacing-caps); color: var(--color-fg-subtle); }
+      .car::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: var(--photo-scrim);
+      }
+      .car-badges {
+        position: absolute;
+        z-index: 3;
+        top: var(--space-3);
+        left: var(--space-3);
+        display: flex;
+        gap: var(--space-2);
+      }
+      .car-body {
+        position: absolute;
+        z-index: 3;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: var(--space-4);
+        display: grid;
+        gap: var(--space-1);
+      }
+      .car-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--space-2);
+      }
+      .car-name {
+        font: var(--text-h4);
+        letter-spacing: var(--letter-spacing-tight);
+      }
+      .car-year {
+        font: var(--text-body-sm);
+        color: var(--color-fg-muted);
+        font-variant-numeric: tabular-nums;
+      }
+      .car-price {
+        font: var(--text-h4);
+        font-weight: var(--font-weight-semibold);
+        font-variant-numeric: tabular-nums;
+      }
+      .car-specs {
+        display: flex;
+        gap: var(--space-4);
+        margin-top: var(--space-2);
+        font: var(--text-caption);
+        color: var(--color-fg-muted);
+      }
+      .car-specs b {
+        display: block;
+        font: var(--text-body-sm);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-fg);
+      }
+      .car-specs span {
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-caps);
+        color: var(--color-fg-subtle);
+      }
 
-/* Кнопка стоит отдельной строкой под характеристиками, а не поверх них. */
-.car-go {
-  position: relative; z-index: 3;
-  justify-self: end; margin-top: var(--space-4);
-  height: var(--tap-target-min); max-width: var(--tap-target-min);
-  display: flex; align-items: center; gap: var(--space-2);
-  padding: 0 var(--space-3); overflow: hidden; white-space: nowrap;
-  background: var(--color-primary); color: var(--color-primary-fg);
-  border-radius: var(--radius-control);
-  font: var(--text-body-sm); font-weight: var(--font-weight-medium);
-  transition: max-width var(--duration-2) var(--ease-out);
-}
-.car-go .ic { margin: 0 auto; }
-.car-go span { opacity: 0; transition: opacity var(--duration-1) var(--ease-standard); }
-.car:hover .car-go, .car:focus-visible .car-go { max-width: 180px; }
-.car:hover .car-go span, .car:focus-visible .car-go span { opacity: 1; }
-@media (hover: none) {
-  .car-go { max-width: 180px; }
-  .car-go span { opacity: 1; }
-}
+      /* Кнопка стоит отдельной строкой под характеристиками, а не поверх них. */
+      .car-go {
+        position: relative;
+        z-index: 3;
+        justify-self: end;
+        margin-top: var(--space-4);
+        height: var(--tap-target-min);
+        max-width: var(--tap-target-min);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: 0 var(--space-3);
+        overflow: hidden;
+        white-space: nowrap;
+        background: var(--color-primary);
+        color: var(--color-primary-fg);
+        border-radius: var(--radius-control);
+        font: var(--text-body-sm);
+        font-weight: var(--font-weight-medium);
+        transition: max-width var(--duration-2) var(--ease-out);
+      }
+      .car-go .ic {
+        margin: 0 auto;
+      }
+      .car-go span {
+        opacity: 0;
+        transition: opacity var(--duration-1) var(--ease-standard);
+      }
+      .car:hover .car-go,
+      .car:focus-visible .car-go {
+        max-width: 180px;
+      }
+      .car:hover .car-go span,
+      .car:focus-visible .car-go span {
+        opacity: 1;
+      }
+      @media (hover: none) {
+        .car-go {
+          max-width: 180px;
+        }
+        .car-go span {
+          opacity: 1;
+        }
+      }
 
-/* ---- SlotPicker ---------------------------------------------------- */
-.slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-2); max-width: 520px; }
-.slot {
-  height: var(--tap-target-min); border-radius: var(--radius-control);
-  background: transparent; color: var(--color-fg);
-  border: 1px solid var(--color-border-control);
-  font: var(--text-body); font-variant-numeric: tabular-nums; cursor: pointer;
-  transition: all var(--duration-1) var(--ease-standard);
-}
-.slot:hover:not([aria-disabled="true"]) { background: var(--color-surface-hover); border-color: var(--color-fg-subtle); }
-.slot[aria-pressed="true"] { background: var(--color-accent-solid); border-color: var(--color-accent-border); color: var(--color-accent-fg); }
-.slot[aria-disabled="true"] { background: var(--color-surface); border-color: var(--color-border); color: var(--color-fg-disabled); cursor: default; text-decoration: line-through; }
-.slot[data-state="early"] { text-decoration: none; }
-.slot[data-state="early"]::after { content: " рано"; font: var(--text-caption); }
+      /* ---- SlotPicker ---------------------------------------------------- */
+      .slots {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: var(--space-2);
+        max-width: 520px;
+      }
+      .slot {
+        height: var(--tap-target-min);
+        border-radius: var(--radius-control);
+        background: transparent;
+        color: var(--color-fg);
+        border: 1px solid var(--color-border-control);
+        font: var(--text-body);
+        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        transition: all var(--duration-1) var(--ease-standard);
+      }
+      .slot:hover:not([aria-disabled="true"]) {
+        background: var(--color-surface-hover);
+        border-color: var(--color-fg-subtle);
+      }
+      .slot[aria-pressed="true"] {
+        background: var(--color-accent-solid);
+        border-color: var(--color-accent-border);
+        color: var(--color-accent-fg);
+      }
+      .slot[aria-disabled="true"] {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+        color: var(--color-fg-disabled);
+        cursor: default;
+        text-decoration: line-through;
+      }
+      .slot[data-state="early"] {
+        text-decoration: none;
+      }
+      .slot[data-state="early"]::after {
+        content: " рано";
+        font: var(--text-caption);
+      }
 
-/* ---- Skeleton / Spinner / StatePanel ------------------------------- */
-.skel {
-  background: linear-gradient(90deg, var(--color-surface), var(--color-surface-hover), var(--color-surface));
-  background-size: 200% 100%; animation: shimmer 1.4s var(--ease-in-out) infinite;
-  border-radius: var(--radius-surface);
-}
-@keyframes shimmer { to { background-position: -200% 0; } }
-.spinner {
-  width: 20px; height: 20px; border: 2px solid var(--color-border-control);
-  border-top-color: var(--color-fg); border-radius: var(--radius-pill);
-  animation: spin 700ms linear infinite;
-}
-.panel {
-  display: grid; justify-items: center; gap: var(--space-3);
-  padding: var(--space-11) var(--space-6); text-align: center;
-  border: 1px solid var(--color-border); border-radius: var(--radius-surface);
-  background: var(--color-surface);
-}
-.panel .mark { color: var(--color-fg-subtle); display: flex; }
-.panel .mark .ic { width: 28px; height: 28px; }
-.panel[data-variant="error"] .mark { color: var(--color-danger); }
-.panel p { margin: 0; color: var(--color-fg-muted); max-width: 42ch; }
+      /* ---- Skeleton / Spinner / StatePanel ------------------------------- */
+      .skel {
+        background: linear-gradient(
+          90deg,
+          var(--color-surface),
+          var(--color-surface-hover),
+          var(--color-surface)
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s var(--ease-in-out) infinite;
+        border-radius: var(--radius-surface);
+      }
+      @keyframes shimmer {
+        to {
+          background-position: -200% 0;
+        }
+      }
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--color-border-control);
+        border-top-color: var(--color-fg);
+        border-radius: var(--radius-pill);
+        animation: spin 700ms linear infinite;
+      }
+      .panel {
+        display: grid;
+        justify-items: center;
+        gap: var(--space-3);
+        padding: var(--space-11) var(--space-6);
+        text-align: center;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-surface);
+        background: var(--color-surface);
+      }
+      .panel .mark {
+        color: var(--color-fg-subtle);
+        display: flex;
+      }
+      .panel .mark .ic {
+        width: 28px;
+        height: 28px;
+      }
+      .panel[data-variant="error"] .mark {
+        color: var(--color-danger);
+      }
+      .panel p {
+        margin: 0;
+        color: var(--color-fg-muted);
+        max-width: 42ch;
+      }
 
-/* ---- Tabs / Dialog / Toast ----------------------------------------- */
-.tabs { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--color-border); }
-.tab {
-  height: var(--control-height); padding: 0 var(--space-4); background: none; cursor: pointer;
-  border: none; border-bottom: 2px solid transparent; color: var(--color-fg-muted);
-  font: var(--text-body); font-weight: var(--font-weight-medium);
-}
-.tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
-.tab:hover { color: var(--color-fg); }
+      /* ---- Tabs / Dialog / Toast ----------------------------------------- */
+      .tabs {
+        display: flex;
+        gap: var(--space-1);
+        border-bottom: 1px solid var(--color-border);
+      }
+      .tab {
+        height: var(--control-height);
+        padding: 0 var(--space-4);
+        background: none;
+        cursor: pointer;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--color-fg-muted);
+        font: var(--text-body);
+        font-weight: var(--font-weight-medium);
+      }
+      .tab[aria-selected="true"] {
+        color: var(--color-fg);
+        border-bottom-color: var(--color-fg);
+      }
+      .tab:hover {
+        color: var(--color-fg);
+      }
 
-.dialog {
-  max-width: 440px; background: var(--color-surface);
-  border: 1px solid var(--color-border); border-radius: var(--radius-surface);
-  box-shadow: var(--shadow-3);
-}
-.dialog-head, .dialog-foot { padding: var(--space-4) var(--space-5); }
-.dialog-head { border-bottom: 1px solid var(--color-border); font: var(--text-h4); }
-.dialog-body { padding: var(--space-5); display: grid; gap: var(--space-4); }
-.dialog-foot { border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: var(--space-3); }
+      .dialog {
+        max-width: 440px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-surface);
+        box-shadow: var(--shadow-3);
+      }
+      .dialog-head,
+      .dialog-foot {
+        padding: var(--space-4) var(--space-5);
+      }
+      .dialog-head {
+        border-bottom: 1px solid var(--color-border);
+        font: var(--text-h4);
+      }
+      .dialog-body {
+        padding: var(--space-5);
+        display: grid;
+        gap: var(--space-4);
+      }
+      .dialog-foot {
+        border-top: 1px solid var(--color-border);
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-3);
+      }
 
-.toast {
-  display: flex; align-items: center; gap: var(--space-3); max-width: 420px;
-  padding: var(--space-4); background: var(--color-surface);
-  border: 1px solid var(--color-border); border-left: 2px solid var(--color-success);
-  border-radius: var(--radius-surface); box-shadow: var(--shadow-2);
-}
-.toast a { color: var(--color-accent); }
+      .toast {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        max-width: 420px;
+        padding: var(--space-4);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-left: 2px solid var(--color-success);
+        border-radius: var(--radius-surface);
+        box-shadow: var(--shadow-2);
+      }
+      .toast a {
+        color: var(--color-accent);
+      }
 
-/* ---- Таблицы витрины ------------------------------------------------ */
-table { width: 100%; border-collapse: collapse; font: var(--text-body-sm); }
-th, td { text-align: left; padding: var(--space-3); border-bottom: 1px solid var(--color-border); }
-th { color: var(--color-fg-subtle); font-weight: var(--font-weight-medium); text-transform: uppercase;
-     font-size: var(--font-size-1); letter-spacing: var(--letter-spacing-caps); }
-td.num { font-variant-numeric: tabular-nums; }
-.swatch { width: 100%; height: 56px; border: 1px solid var(--color-border); border-radius: var(--radius-surface); }
-.scale { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: var(--space-2); }
-.scale figcaption { font: var(--text-caption); color: var(--color-fg-subtle); margin-top: var(--space-1); }
-.bar { height: 16px; background: var(--color-accent-solid); border-radius: var(--radius-control); }
-</style>
-</head>
+      /* ---- Таблицы витрины ------------------------------------------------ */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font: var(--text-body-sm);
+      }
+      th,
+      td {
+        text-align: left;
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--color-border);
+      }
+      th {
+        color: var(--color-fg-subtle);
+        font-weight: var(--font-weight-medium);
+        text-transform: uppercase;
+        font-size: var(--font-size-1);
+        letter-spacing: var(--letter-spacing-caps);
+      }
+      td.num {
+        font-variant-numeric: tabular-nums;
+      }
+      .swatch {
+        width: 100%;
+        height: 56px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-surface);
+      }
+      .scale {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+        gap: var(--space-2);
+      }
+      .scale figcaption {
+        font: var(--text-caption);
+        color: var(--color-fg-subtle);
+        margin-top: var(--space-1);
+      }
+      .bar {
+        height: 16px;
+        background: var(--color-accent-solid);
+        border-radius: var(--radius-control);
+      }
+    </style>
+  </head>
 
-<body>
-
-<!-- Спрайт иконок. Набор — Lucide (MIT): один стиль, линия 2px, viewBox 24,
+  <body>
+    <!-- Спрайт иконок. Набор — Lucide (MIT): один стиль, линия 2px, viewBox 24,
      цвет наследуется через currentColor. В проекте подключается пакетом
      lucide-react, здесь вшит спрайтом, чтобы витрина работала без сборки. -->
-<svg width="0" height="0" aria-hidden="true" style="position:absolute">
-  <defs>
-    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
-    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
-    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
-    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
-    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
-    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
-    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/></symbol>
-    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
-    <symbol id="i-cube" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
-    <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="0"/><path d="M3 10h18"/></symbol>
-    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></symbol>
-  </defs>
-</svg>
-<header class="topbar">
-  <div class="wrap row" style="width:100%; justify-content:space-between;">
-    <span class="brand">CarShowroom · витрина</span>
-    <button class="btn" data-variant="secondary" data-size="sm" id="theme">Светлая тема</button>
-  </div>
-</header>
-
-<main class="wrap">
-
-<section>
-  <p class="eyebrow">Дизайн-система</p>
-  <h2>Точность · тишина · контраст</h2>
-  <p class="lede">
-    Страница подключает настоящий <code>apps/web/src/styles/tokens.css</code> и настоящие
-    фотографии из <code>apps/api/public/assets</code>. Всё ниже сверстано только на
-    семантических токенах — как и будущие CSS-модули. Понадобился примитив — значит,
-    в семантике дырка.
-  </p>
-</section>
-
-<!-- ================= ЦВЕТ ================= -->
-<section>
-  <p class="eyebrow">Цвет</p>
-  <h2>Семантика</h2>
-  <p class="lede">Компоненты знают только эти имена. Тема меняется их переопределением.</p>
-
-  <div class="scale">
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-bg)"></div><figcaption>bg</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-bg-alt)"></div><figcaption>bg-alt</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-surface)"></div><figcaption>surface</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-surface-hover)"></div><figcaption>surface-hover</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-border)"></div><figcaption>border</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-border-control)"></div><figcaption>border-control</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-primary)"></div><figcaption>primary</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-accent-solid)"></div><figcaption>accent-solid</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-accent)"></div><figcaption>accent</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-success)"></div><figcaption>success</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-warning)"></div><figcaption>warning</figcaption></figure>
-    <figure style="margin:0"><div class="swatch" style="background:var(--color-danger)"></div><figcaption>danger</figcaption></figure>
-  </div>
-
-  <h3>Контраст — проверено, а не на глаз</h3>
-  <table>
-    <thead><tr><th>Пара</th><th>Ratio</th><th>Порог</th><th>Итог</th></tr></thead>
-    <tbody>
-      <tr><td>основной текст на фоне</td><td class="num">17.4</td><td class="num">4.5</td><td>✓</td></tr>
-      <tr><td>второй уровень на поверхности</td><td class="num">8.1</td><td class="num">4.5</td><td>✓</td></tr>
-      <tr><td>третий уровень на светлой поверхности</td><td class="num">5.1</td><td class="num">4.5</td><td>✓</td></tr>
-      <tr><td>тёмный текст на первичной заливке</td><td class="num">17.4</td><td class="num">4.5</td><td>✓</td></tr>
-      <tr><td>белый на акцентной заливке</td><td class="num">4.8</td><td class="num">4.5</td><td>✓</td></tr>
-      <tr><td>граница контрола на поверхности</td><td class="num">3.5</td><td class="num">3.0</td><td>✓</td></tr>
-      <tr><td>кольцо фокуса на фоне</td><td class="num">7.4</td><td class="num">3.0</td><td>✓</td></tr>
-      <tr><td>текст на затемнении поверх белого кузова</td><td class="num">12.6</td><td class="num">4.5</td><td>✓</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ================= ТИПОГРАФИКА ================= -->
-<section>
-  <p class="eyebrow">Типографика</p>
-  <h2>Inter, один шрифт</h2>
-  <div class="grid">
-    <div style="font:var(--text-display); letter-spacing:var(--letter-spacing-display)">Автомобили, которые ведут</div>
-    <div style="font:var(--text-h1); letter-spacing:var(--letter-spacing-display)">Заголовок страницы 44</div>
-    <div style="font:var(--text-h2); letter-spacing:var(--letter-spacing-tight)">Заголовок секции 32</div>
-    <div style="font:var(--text-h3)">Заголовок третьего уровня 24</div>
-    <div style="font:var(--text-h4)">Заголовок карточки 20</div>
-    <div style="font:var(--text-body)">Основной текст 16 — им набрано всё, что человек читает подряд.</div>
-    <div style="font:var(--text-body-sm); color:var(--color-fg-muted)">Вторичный текст 14 — подписи, ячейки таблиц, подсказки под полями.</div>
-    <div style="font:var(--text-caption); text-transform:uppercase; letter-spacing:var(--letter-spacing-caps); color:var(--color-fg-subtle)">Подпись капсом 12</div>
-    <div style="font:var(--text-h3); font-variant-numeric:tabular-nums">8 900 000 ₽ · 10:00 · 340 л.с.</div>
-    <p class="note">Последняя строка — <code>tabular-nums</code>: цены и время в колонках не должны «плясать».</p>
-  </div>
-</section>
-
-<!-- ================= КНОПКИ ================= -->
-<section>
-  <p class="eyebrow">Компоненты</p>
-  <h2>Button</h2>
-  <h3>Варианты</h3>
-  <div class="row">
-    <button class="btn" data-variant="primary">Записаться на тест-драйв</button>
-    <button class="btn" data-variant="secondary">В каталог</button>
-    <button class="btn" data-variant="ghost">Сбросить</button>
-    <button class="btn" data-variant="danger">Отменить запись</button>
-  </div>
-  <h3>Размеры</h3>
-  <div class="row">
-    <button class="btn" data-variant="secondary" data-size="sm">Малая 32</button>
-    <button class="btn" data-variant="secondary">Средняя 40</button>
-    <button class="btn" data-variant="secondary" data-size="lg">Крупная 48</button>
-  </div>
-  <h3>Состояния</h3>
-  <div class="row">
-    <button class="btn" data-variant="primary">Обычная</button>
-    <button class="btn" data-variant="primary" style="background:var(--color-primary-hover)">Hover</button>
-    <button class="btn" data-variant="primary" style="background:var(--color-primary-active)">Active</button>
-    <button class="btn" data-variant="primary" disabled>Выключена</button>
-    <button class="btn" data-variant="primary" aria-busy="true">Подтвердить</button>
-    <button class="icon-btn" aria-label="Следующий день"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
-    <button class="icon-btn" aria-label="Предыдущий день"><svg class="ic" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
-    <button class="icon-btn" aria-label="Выбрать дату"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button>
-  </div>
-  <p class="note">
-    Нажмите Tab — кольцо фокуса рисуется <b>снаружи</b> кнопки. Внутри светлой заливки
-    оно дало бы 2.3:1 и провалило требование.
-  </p>
-</section>
-
-<!-- ================= ПОЛЯ ================= -->
-<section>
-  <h2>Field, Input, Checkbox</h2>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:var(--space-7)">
-    <div class="field">
-      <label class="label" for="f1">Телефон для связи</label>
-      <input class="input" id="f1" value="+7 999 123-45-67">
-      <span class="hint">Подставлен из профиля, можно исправить</span>
-    </div>
-    <div class="field">
-      <label class="label" for="f2">Email</label>
-      <input class="input" id="f2" value="anna@example.com" aria-invalid="true" aria-describedby="f2e">
-      <span class="error" id="f2e" style="display:flex;gap:var(--space-2);align-items:center"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-alert"/></svg>Такой email уже зарегистрирован</span>
-    </div>
-    <div class="field">
-      <label class="label" for="f3">Email</label>
-      <input class="input" id="f3" value="anna@example.com" disabled>
-      <span class="hint">Email изменить нельзя</span>
-    </div>
-    <div class="field">
-      <span class="label">Условия записи (TD-8)</span>
-      <label style="display:flex; gap:var(--space-3); align-items:flex-start; font:var(--text-body-sm)">
-        <input type="checkbox" checked style="margin-top:3px; accent-color:var(--color-accent-solid); width:18px; height:18px">
-        <span>У меня есть водительское удостоверение категории B и стаж от 2 лет</span>
-      </label>
-      <label style="display:flex; gap:var(--space-3); align-items:flex-start; font:var(--text-body-sm)">
-        <input type="checkbox" style="margin-top:3px; accent-color:var(--color-accent-solid); width:18px; height:18px">
-        <span>Согласен на обработку персональных данных</span>
-      </label>
-      <span class="hint">Проверяются только на клиенте, на бэкенд не уходят (D22)</span>
-    </div>
-  </div>
-</section>
-
-<!-- ================= БЕЙДЖИ ================= -->
-<section>
-  <h2>Badge и StatusBadge</h2>
-  <div class="row">
-    <span class="badge"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-cube"/></svg>3D</span>
-    <span class="badge"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-zap"/></svg>Электро</span>
-    <span class="badge" data-tone="info"><i class="dot"></i>Запланирована</span>
-    <span class="badge" data-tone="success"><i class="dot"></i>Состоялся</span>
-    <span class="badge" data-tone="warning"><i class="dot"></i>Не пришёл</span>
-    <span class="badge"><i class="dot"></i>Отменена</span>
-    <span class="badge" data-tone="danger"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-alert"/></svg>Ждёт отметки</span>
-  </div>
-  <p class="note">У каждого статуса есть точка и подпись — статус никогда не передаётся одним цветом.</p>
-</section>
-
-<!-- ================= КАРТОЧКА ================= -->
-<section>
-  <h2>CarCard</h2>
-  <p class="lede">
-    Фото во всю карточку, снизу затемнение до поверхности, в нём — название, цена,
-    характеристики и кнопка. Наведите курсор: кнопка раскрывается, фото чуть наезжает.
-  </p>
-  <div class="cards">
-    <a class="car" href="#">
-      <img src="../apps/api/public/assets/cars/ix3-suv-1.webp" alt="BMW iX3, вид спереди">
-      <div class="car-badges"><span class="badge"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-zap"/></svg>Электро</span></div>
-      <div class="car-body">
-        <div class="car-top"><span class="car-name">BMW iX3</span><span class="car-year">2026</span></div>
-        <div class="car-price">6 700 000 ₽</div>
-        <div class="car-specs">
-          <div><b>286</b><span>л.с.</span></div>
-          <div><b>задний</b><span>привод</span></div>
-          <div><b>электро</b><span>двигатель</span></div>
-        </div>
-        <span class="car-go"><svg class="ic" data-weight="bold" aria-hidden="true"><use href="#i-arrow-right"/></svg><span>Смотреть</span></span>
+    <svg width="0" height="0" aria-hidden="true" style="position: absolute">
+      <defs>
+        <symbol id="i-arrow-right" viewBox="0 0 24 24">
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </symbol>
+        <symbol id="i-arrow-down" viewBox="0 0 24 24">
+          <path d="M12 5v14" />
+          <path d="m19 12-7 7-7-7" />
+        </symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+        <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </symbol>
+        <symbol id="i-inbox" viewBox="0 0 24 24">
+          <path d="M22 12h-6l-2 3h-4l-2-3H2" />
+          <path
+            d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+          />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.34-4.34" />
+        </symbol>
+        <symbol id="i-zap" viewBox="0 0 24 24">
+          <path
+            d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+          />
+        </symbol>
+        <symbol id="i-cube" viewBox="0 0 24 24">
+          <path
+            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
+          />
+          <path d="m3.3 7 8.7 5 8.7-5" />
+          <path d="M12 22V12" />
+        </symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24">
+          <path d="M8 2v4" />
+          <path d="M16 2v4" />
+          <rect width="18" height="18" x="3" y="4" rx="0" />
+          <path d="M3 10h18" />
+        </symbol>
+        <symbol id="i-rotate" viewBox="0 0 24 24">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+          <path d="M21 3v6h-6" />
+        </symbol>
+      </defs>
+    </svg>
+    <header class="topbar">
+      <div class="wrap row" style="width: 100%; justify-content: space-between">
+        <span class="brand">CarShowroom · витрина</span>
+        <button class="btn" data-variant="secondary" data-size="sm" id="theme">Светлая тема</button>
       </div>
-    </a>
+    </header>
 
-    <a class="car" href="#">
-      <img src="../apps/api/public/assets/cars/x5-xdrive40i-1.webp" alt="BMW X5 xDrive40i, вид спереди">
-      <div class="car-badges"><span class="badge"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-cube"/></svg>3D</span></div>
-      <div class="car-body">
-        <div class="car-top"><span class="car-name">BMW X5 xDrive40i</span><span class="car-year">2026</span></div>
-        <div class="car-price">8 900 000 ₽</div>
-        <div class="car-specs">
-          <div><b>340</b><span>л.с.</span></div>
-          <div><b>xDrive</b><span>привод</span></div>
-          <div><b>бензин</b><span>двигатель</span></div>
-        </div>
-        <span class="car-go"><svg class="ic" data-weight="bold" aria-hidden="true"><use href="#i-arrow-right"/></svg><span>Смотреть</span></span>
-      </div>
-    </a>
-
-    <a class="car" href="#">
-      <img src="../apps/api/public/assets/cars/m850i-coupe-1.webp" alt="BMW M850i xDrive Coupé, вид спереди">
-      <div class="car-badges"><span class="badge"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-cube"/></svg>3D</span></div>
-      <div class="car-body">
-        <div class="car-top"><span class="car-name">BMW M850i xDrive</span><span class="car-year">2025</span></div>
-        <div class="car-price">13 400 000 ₽</div>
-        <div class="car-specs">
-          <div><b>530</b><span>л.с.</span></div>
-          <div><b>xDrive</b><span>привод</span></div>
-          <div><b>бензин</b><span>двигатель</span></div>
-        </div>
-        <span class="car-go"><svg class="ic" data-weight="bold" aria-hidden="true"><use href="#i-arrow-right"/></svg><span>Смотреть</span></span>
-      </div>
-    </a>
-  </div>
-  <p class="note">
-    Два слоя, а не один: снизу вверх поднимается размытие (<code>--photo-blur</code>,
-    маска гасит его к верху кадра), поверх — затемнение (<code>--photo-scrim</code>).
-    Контраст держит именно затемнение: размытое белое остаётся белым, и на светлом
-    кузове один блюр текст бы не вытянул. Плотность 96% посчитана по худшему случаю —
-    основной текст 14.2:1, подпись капсом 5.0:1.
-  </p>
-  <p class="note">
-    Карточка вертикальная (3:4) и задаёт размер сама: снимок 3:2 увеличивается
-    по высоте и подрезается по бокам. На демо-фото с парковки это скорее помогает —
-    соседние машины уходят из кадра, — но широкие планы теряют края автомобиля.
-    Под подобранные вертикальные кадры это уйдёт само.
-  </p>
-</section>
-
-<!-- ================= СЛОТЫ ================= -->
-<section>
-  <h2>SlotPicker</h2>
-  <div class="slots">
-    <button class="slot">10:00</button>
-    <button class="slot" aria-disabled="true" data-state="early">11:00</button>
-    <button class="slot" aria-disabled="true">12:00</button>
-    <button class="slot" aria-pressed="true">13:00</button>
-    <button class="slot">14:00</button>
-    <button class="slot">15:00</button>
-    <button class="slot">16:00</button>
-    <button class="slot" aria-disabled="true">17:00</button>
-    <button class="slot">18:00</button>
-  </div>
-  <p class="note">
-    Свободен · рано (TD-5) · занят (зачёркнут) · выбран. Девять слотов по TD-2,
-    состояния приходят из <code>slotSchema</code> — правила на фронте не повторяются.
-  </p>
-</section>
-
-<!-- ================= ВКЛАДКИ, ЗАГРУЗКА, ПУСТО ================= -->
-<section>
-  <h2>Tabs, Skeleton, Spinner, StatePanel</h2>
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true">Предстоящие 2</button>
-    <button class="tab" role="tab" aria-selected="false">История 5</button>
-  </div>
-
-  <h3>Загрузка</h3>
-  <div class="cards">
-    <div class="car" style="display:grid; align-content:end; gap:var(--space-2); padding:var(--space-4)">
-      <div class="skel" style="height:14px; width:55%"></div>
-      <div class="skel" style="height:22px; width:40%"></div>
-      <div class="skel" style="height:12px; width:70%"></div>
-    </div>
-    <div class="car" style="display:grid; align-content:end; gap:var(--space-2); padding:var(--space-4)">
-      <div class="skel" style="height:14px; width:45%"></div>
-      <div class="skel" style="height:22px; width:50%"></div>
-      <div class="skel" style="height:12px; width:65%"></div>
-    </div>
-    <div class="row" style="justify-content:center"><div class="spinner"></div></div>
-  </div>
-
-  <h3>Пусто и ошибка</h3>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:var(--space-6)">
-    <div class="panel">
-      <div class="mark"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></div>
-      <strong>Ничего не нашлось</strong>
-      <p>Попробуйте изменить фильтры или сбросить их.</p>
-      <button class="btn" data-variant="primary">Сбросить фильтры</button>
-    </div>
-    <div class="panel" data-variant="error">
-      <div class="mark"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg></div>
-      <strong>Не удалось загрузить каталог</strong>
-      <p>Проверьте соединение и попробуйте снова.</p>
-      <button class="btn" data-variant="primary">Повторить</button>
-    </div>
-  </div>
-</section>
-
-<!-- ================= ДИАЛОГ И ТОСТ ================= -->
-<section>
-  <h2>Dialog и Toast</h2>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:var(--space-7); align-items:start">
-    <div class="dialog">
-      <div class="dialog-head">Отменить запись?</div>
-      <div class="dialog-body">
-        <p style="margin:0; color:var(--color-fg-muted)">
-          BMW X5 xDrive40i, 25 сентября, 14:00. Время освободится для других.
+    <main class="wrap">
+      <section>
+        <p class="eyebrow">Дизайн-система</p>
+        <h2>Точность · тишина · контраст</h2>
+        <p class="lede">
+          Страница подключает настоящий <code>apps/web/src/styles/tokens.css</code> и настоящие
+          фотографии из <code>apps/api/public/assets</code>. Всё ниже сверстано только на
+          семантических токенах — как и будущие CSS-модули. Понадобился примитив — значит, в
+          семантике дырка.
         </p>
-      </div>
-      <div class="dialog-foot">
-        <button class="btn" data-variant="ghost">Не отменять</button>
-        <button class="btn" data-variant="danger">Отменить запись</button>
-      </div>
-    </div>
-    <div class="grid">
-      <div class="toast">
-        <span style="color:var(--color-success);display:flex"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-        <span>Записали на 25 сентября, 14:00.</span>
-        <a href="#">Мои записи →</a>
-      </div>
-      <div class="toast" style="border-left-color:var(--color-danger)">
-        <span style="color:var(--color-danger);display:flex"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg></span>
-        <span>Это время уже заняли. Выберите другое.</span>
-      </div>
-      <p class="note">
-        Поведение диалога — фокус-ловушка, Esc, возврат фокуса — Radix Dialog без стилей (D10).
-        Здесь нарисована только оболочка.
-      </p>
-    </div>
-  </div>
-</section>
+      </section>
 
-<!-- ================= ИКОНКИ ================= -->
-<section>
-  <h2>Иконки</h2>
-  <p class="lede">
-    Набор — <a href="https://lucide.dev" style="color:var(--color-accent)">Lucide</a> (MIT):
-    линия 2px, прямые торцы скруглены, сетка 24. Подходит к системе без скруглений,
-    и в нём есть всё, что нужно нашим экранам. В проекте — пакетом
-    <code>lucide-react</code>, здесь вшит спрайтом, чтобы витрина работала без сборки.
-  </p>
-  <div class="ic-grid">
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-arrow-right"/></svg><figcaption>arrow-right</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><figcaption>arrow-down</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-chevron-left"/></svg><figcaption>chevron-left</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg><figcaption>chevron-right</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><figcaption>check</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg><figcaption>alert</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><figcaption>x</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><figcaption>search</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg><figcaption>inbox</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><figcaption>calendar</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg><figcaption>zap</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><figcaption>cube</figcaption></figure>
-    <figure class="ic-cell" style="margin:0"><svg class="ic" aria-hidden="true"><use href="#i-rotate"/></svg><figcaption>rotate</figcaption></figure>
-  </div>
+      <!-- ================= ЦВЕТ ================= -->
+      <section>
+        <p class="eyebrow">Цвет</p>
+        <h2>Семантика</h2>
+        <p class="lede">Компоненты знают только эти имена. Тема меняется их переопределением.</p>
 
-  <h3>Толщина линии</h3>
-  <div class="row" style="gap:var(--space-7)">
-    <span class="row" style="gap:var(--space-2)"><svg class="ic" aria-hidden="true"><use href="#i-arrow-right"/></svg> обычная, 2px</span>
-    <span class="row" style="gap:var(--space-2)"><svg class="ic" data-weight="bold" aria-hidden="true"><use href="#i-arrow-right"/></svg> жирная, 2.5px</span>
-    <span class="row" style="gap:var(--space-2)"><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-arrow-right"/></svg> мелкая, 16px</span>
-  </div>
-  <p class="note">
-    Жирная — только в кнопке карточки: там стрелка лежит на светлой заливке
-    и должна читаться как знак, а не как волосок.
-  </p>
-</section>
+        <div class="scale">
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-bg)"></div>
+            <figcaption>bg</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-bg-alt)"></div>
+            <figcaption>bg-alt</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-surface)"></div>
+            <figcaption>surface</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-surface-hover)"></div>
+            <figcaption>surface-hover</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-border)"></div>
+            <figcaption>border</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-border-control)"></div>
+            <figcaption>border-control</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-primary)"></div>
+            <figcaption>primary</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-accent-solid)"></div>
+            <figcaption>accent-solid</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-accent)"></div>
+            <figcaption>accent</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-success)"></div>
+            <figcaption>success</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-warning)"></div>
+            <figcaption>warning</figcaption>
+          </figure>
+          <figure style="margin: 0">
+            <div class="swatch" style="background: var(--color-danger)"></div>
+            <figcaption>danger</figcaption>
+          </figure>
+        </div>
 
-<!-- ================= ПРОСТРАНСТВО И ДВИЖЕНИЕ ================= -->
-<section>
-  <h2>Пространство и движение</h2>
-  <h3>Отступы, база 4px</h3>
-  <div class="grid" style="max-width:520px">
-    <div class="row"><span class="note" style="width:80px">space-1</span><div class="bar" style="width:var(--space-1)"></div><span class="note">4</span></div>
-    <div class="row"><span class="note" style="width:80px">space-3</span><div class="bar" style="width:var(--space-3)"></div><span class="note">12</span></div>
-    <div class="row"><span class="note" style="width:80px">space-4</span><div class="bar" style="width:var(--space-4)"></div><span class="note">16</span></div>
-    <div class="row"><span class="note" style="width:80px">space-6</span><div class="bar" style="width:var(--space-6)"></div><span class="note">24</span></div>
-    <div class="row"><span class="note" style="width:80px">space-7</span><div class="bar" style="width:var(--space-7)"></div><span class="note">32</span></div>
-    <div class="row"><span class="note" style="width:80px">space-9</span><div class="bar" style="width:var(--space-9)"></div><span class="note">48</span></div>
-    <div class="row"><span class="note" style="width:80px">space-11</span><div class="bar" style="width:var(--space-11)"></div><span class="note">80</span></div>
-  </div>
+        <h3>Контраст — проверено, а не на глаз</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Пара</th>
+              <th>Ratio</th>
+              <th>Порог</th>
+              <th>Итог</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>основной текст на фоне</td>
+              <td class="num">17.4</td>
+              <td class="num">4.5</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>второй уровень на поверхности</td>
+              <td class="num">8.1</td>
+              <td class="num">4.5</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>третий уровень на светлой поверхности</td>
+              <td class="num">5.1</td>
+              <td class="num">4.5</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>тёмный текст на первичной заливке</td>
+              <td class="num">17.4</td>
+              <td class="num">4.5</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>белый на акцентной заливке</td>
+              <td class="num">4.8</td>
+              <td class="num">4.5</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>граница контрола на поверхности</td>
+              <td class="num">3.5</td>
+              <td class="num">3.0</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>кольцо фокуса на фоне</td>
+              <td class="num">7.4</td>
+              <td class="num">3.0</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>текст на затемнении поверх белого кузова</td>
+              <td class="num">12.6</td>
+              <td class="num">4.5</td>
+              <td>✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-  <h3>Длительности</h3>
-  <table style="max-width:640px">
-    <thead><tr><th>Токен</th><th>Значение</th><th>Что двигает</th></tr></thead>
-    <tbody>
-      <tr><td>duration-1</td><td class="num">120ms</td><td>hover, фокус, нажатие</td></tr>
-      <tr><td>duration-2</td><td class="num">200ms</td><td>раскрытие кнопки, смена вкладки</td></tr>
-      <tr><td>duration-3</td><td class="num">320ms</td><td>диалог, тост, появление содержимого</td></tr>
-    </tbody>
-  </table>
-  <p class="note">
-    При <code>prefers-reduced-motion: reduce</code> все три гасятся до 1ms прямо в токенах —
-    компоненты не переписываются. Включите настройку в системе и обновите страницу:
-    карточка перестанет наезжать, скелетон перестанет мерцать.
-  </p>
-</section>
+      <!-- ================= ТИПОГРАФИКА ================= -->
+      <section>
+        <p class="eyebrow">Типографика</p>
+        <h2>Inter, один шрифт</h2>
+        <div class="grid">
+          <div style="font: var(--text-display); letter-spacing: var(--letter-spacing-display)">
+            Автомобили, которые ведут
+          </div>
+          <div style="font: var(--text-h1); letter-spacing: var(--letter-spacing-display)">
+            Заголовок страницы 44
+          </div>
+          <div style="font: var(--text-h2); letter-spacing: var(--letter-spacing-tight)">
+            Заголовок секции 32
+          </div>
+          <div style="font: var(--text-h3)">Заголовок третьего уровня 24</div>
+          <div style="font: var(--text-h4)">Заголовок карточки 20</div>
+          <div style="font: var(--text-body)">
+            Основной текст 16 — им набрано всё, что человек читает подряд.
+          </div>
+          <div style="font: var(--text-body-sm); color: var(--color-fg-muted)">
+            Вторичный текст 14 — подписи, ячейки таблиц, подсказки под полями.
+          </div>
+          <div
+            style="
+              font: var(--text-caption);
+              text-transform: uppercase;
+              letter-spacing: var(--letter-spacing-caps);
+              color: var(--color-fg-subtle);
+            "
+          >
+            Подпись капсом 12
+          </div>
+          <div style="font: var(--text-h3); font-variant-numeric: tabular-nums">
+            8 900 000 ₽ · 10:00 · 340 л.с.
+          </div>
+          <p class="note">
+            Последняя строка — <code>tabular-nums</code>: цены и время в колонках не должны
+            «плясать».
+          </p>
+        </div>
+      </section>
 
-<section style="border:none">
-  <p class="note">
-    Витрина, токены и макеты: <code>docs/design-system.md</code>, <code>docs/wireframes.md</code>,
-    <code>apps/web/src/styles/tokens.css</code>. Учебный проект, не официальный сайт BMW.
-  </p>
-</section>
+      <!-- ================= КНОПКИ ================= -->
+      <section>
+        <p class="eyebrow">Компоненты</p>
+        <h2>Button</h2>
+        <h3>Варианты</h3>
+        <div class="row">
+          <button class="btn" data-variant="primary">Записаться на тест-драйв</button>
+          <button class="btn" data-variant="secondary">В каталог</button>
+          <button class="btn" data-variant="ghost">Сбросить</button>
+          <button class="btn" data-variant="danger">Отменить запись</button>
+        </div>
+        <h3>Размеры</h3>
+        <div class="row">
+          <button class="btn" data-variant="secondary" data-size="sm">Малая 32</button>
+          <button class="btn" data-variant="secondary">Средняя 40</button>
+          <button class="btn" data-variant="secondary" data-size="lg">Крупная 48</button>
+        </div>
+        <h3>Состояния</h3>
+        <div class="row">
+          <button class="btn" data-variant="primary">Обычная</button>
+          <button class="btn" data-variant="primary" style="background: var(--color-primary-hover)">
+            Hover
+          </button>
+          <button
+            class="btn"
+            data-variant="primary"
+            style="background: var(--color-primary-active)"
+          >
+            Active
+          </button>
+          <button class="btn" data-variant="primary" disabled>Выключена</button>
+          <button class="btn" data-variant="primary" aria-busy="true">Подтвердить</button>
+          <button class="icon-btn" aria-label="Следующий день">
+            <svg class="ic" aria-hidden="true"><use href="#i-chevron-right" /></svg>
+          </button>
+          <button class="icon-btn" aria-label="Предыдущий день">
+            <svg class="ic" aria-hidden="true"><use href="#i-chevron-left" /></svg>
+          </button>
+          <button class="icon-btn" aria-label="Выбрать дату">
+            <svg class="ic" aria-hidden="true"><use href="#i-calendar" /></svg>
+          </button>
+        </div>
+        <p class="note">
+          Нажмите Tab — кольцо фокуса рисуется <b>снаружи</b> кнопки. Внутри светлой заливки оно
+          дало бы 2.3:1 и провалило требование.
+        </p>
+      </section>
 
-</main>
+      <!-- ================= ПОЛЯ ================= -->
+      <section>
+        <h2>Field, Input, Checkbox</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-7);
+          "
+        >
+          <div class="field">
+            <label class="label" for="f1">Телефон для связи</label>
+            <input class="input" id="f1" value="+7 999 123-45-67" />
+            <span class="hint">Подставлен из профиля, можно исправить</span>
+          </div>
+          <div class="field">
+            <label class="label" for="f2">Email</label>
+            <input
+              class="input"
+              id="f2"
+              value="anna@example.com"
+              aria-invalid="true"
+              aria-describedby="f2e"
+            />
+            <span
+              class="error"
+              id="f2e"
+              style="display: flex; gap: var(--space-2); align-items: center"
+              ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-alert" /></svg>Такой
+              email уже зарегистрирован</span
+            >
+          </div>
+          <div class="field">
+            <label class="label" for="f3">Email</label>
+            <input class="input" id="f3" value="anna@example.com" disabled />
+            <span class="hint">Email изменить нельзя</span>
+          </div>
+          <div class="field">
+            <span class="label">Условия записи (TD-8)</span>
+            <label
+              style="
+                display: flex;
+                gap: var(--space-3);
+                align-items: flex-start;
+                font: var(--text-body-sm);
+              "
+            >
+              <input
+                type="checkbox"
+                checked
+                style="
+                  margin-top: 3px;
+                  accent-color: var(--color-accent-solid);
+                  width: 18px;
+                  height: 18px;
+                "
+              />
+              <span>У меня есть водительское удостоверение категории B и стаж от 2 лет</span>
+            </label>
+            <label
+              style="
+                display: flex;
+                gap: var(--space-3);
+                align-items: flex-start;
+                font: var(--text-body-sm);
+              "
+            >
+              <input
+                type="checkbox"
+                style="
+                  margin-top: 3px;
+                  accent-color: var(--color-accent-solid);
+                  width: 18px;
+                  height: 18px;
+                "
+              />
+              <span>Согласен на обработку персональных данных</span>
+            </label>
+            <span class="hint">Проверяются только на клиенте, на бэкенд не уходят (D22)</span>
+          </div>
+        </div>
+      </section>
 
-<script>
-  // Переключатель нужен ровно для одного: убедиться, что светлая тема
-  // добавляется переопределением семантики и ничего не ломает.
-  const root = document.documentElement;
-  const btn = document.getElementById('theme');
-  btn.addEventListener('click', () => {
-    const light = root.getAttribute('data-theme') === 'light';
-    root.setAttribute('data-theme', light ? 'dark' : 'light');
-    btn.textContent = light ? 'Светлая тема' : 'Тёмная тема';
-  });
-</script>
-</body>
+      <!-- ================= БЕЙДЖИ ================= -->
+      <section>
+        <h2>Badge и StatusBadge</h2>
+        <div class="row">
+          <span class="badge"
+            ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-cube" /></svg>3D</span
+          >
+          <span class="badge"
+            ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-zap" /></svg
+            >Электро</span
+          >
+          <span class="badge" data-tone="info"><i class="dot"></i>Запланирована</span>
+          <span class="badge" data-tone="success"><i class="dot"></i>Состоялся</span>
+          <span class="badge" data-tone="warning"><i class="dot"></i>Не пришёл</span>
+          <span class="badge"><i class="dot"></i>Отменена</span>
+          <span class="badge" data-tone="danger"
+            ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-alert" /></svg>Ждёт
+            отметки</span
+          >
+        </div>
+        <p class="note">
+          У каждого статуса есть точка и подпись — статус никогда не передаётся одним цветом.
+        </p>
+      </section>
+
+      <!-- ================= КАРТОЧКА ================= -->
+      <section>
+        <h2>CarCard</h2>
+        <p class="lede">
+          Фото во всю карточку, снизу затемнение до поверхности, в нём — название, цена,
+          характеристики и кнопка. Наведите курсор: кнопка раскрывается, фото чуть наезжает.
+        </p>
+        <div class="cards">
+          <a class="car" href="#">
+            <img src="../apps/api/public/assets/cars/ix3-suv-1.webp" alt="BMW iX3, вид спереди" />
+            <div class="car-badges">
+              <span class="badge"
+                ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-zap" /></svg
+                >Электро</span
+              >
+            </div>
+            <div class="car-body">
+              <div class="car-top">
+                <span class="car-name">BMW iX3</span><span class="car-year">2026</span>
+              </div>
+              <div class="car-price">6 700 000 ₽</div>
+              <div class="car-specs">
+                <div><b>286</b><span>л.с.</span></div>
+                <div><b>задний</b><span>привод</span></div>
+                <div><b>электро</b><span>двигатель</span></div>
+              </div>
+              <span class="car-go"
+                ><svg class="ic" data-weight="bold" aria-hidden="true">
+                  <use href="#i-arrow-right" /></svg
+                ><span>Смотреть</span></span
+              >
+            </div>
+          </a>
+
+          <a class="car" href="#">
+            <img
+              src="../apps/api/public/assets/cars/x5-xdrive40i-1.webp"
+              alt="BMW X5 xDrive40i, вид спереди"
+            />
+            <div class="car-badges">
+              <span class="badge"
+                ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-cube" /></svg
+                >3D</span
+              >
+            </div>
+            <div class="car-body">
+              <div class="car-top">
+                <span class="car-name">BMW X5 xDrive40i</span><span class="car-year">2026</span>
+              </div>
+              <div class="car-price">8 900 000 ₽</div>
+              <div class="car-specs">
+                <div><b>340</b><span>л.с.</span></div>
+                <div><b>xDrive</b><span>привод</span></div>
+                <div><b>бензин</b><span>двигатель</span></div>
+              </div>
+              <span class="car-go"
+                ><svg class="ic" data-weight="bold" aria-hidden="true">
+                  <use href="#i-arrow-right" /></svg
+                ><span>Смотреть</span></span
+              >
+            </div>
+          </a>
+
+          <a class="car" href="#">
+            <img
+              src="../apps/api/public/assets/cars/m850i-coupe-1.webp"
+              alt="BMW M850i xDrive Coupé, вид спереди"
+            />
+            <div class="car-badges">
+              <span class="badge"
+                ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-cube" /></svg
+                >3D</span
+              >
+            </div>
+            <div class="car-body">
+              <div class="car-top">
+                <span class="car-name">BMW M850i xDrive</span><span class="car-year">2025</span>
+              </div>
+              <div class="car-price">13 400 000 ₽</div>
+              <div class="car-specs">
+                <div><b>530</b><span>л.с.</span></div>
+                <div><b>xDrive</b><span>привод</span></div>
+                <div><b>бензин</b><span>двигатель</span></div>
+              </div>
+              <span class="car-go"
+                ><svg class="ic" data-weight="bold" aria-hidden="true">
+                  <use href="#i-arrow-right" /></svg
+                ><span>Смотреть</span></span
+              >
+            </div>
+          </a>
+        </div>
+        <p class="note">
+          Два слоя, а не один: снизу вверх поднимается размытие (<code>--photo-blur</code>, маска
+          гасит его к верху кадра), поверх — затемнение (<code>--photo-scrim</code>). Контраст
+          держит именно затемнение: размытое белое остаётся белым, и на светлом кузове один блюр
+          текст бы не вытянул. Плотность 96% посчитана по худшему случаю — основной текст 14.2:1,
+          подпись капсом 5.0:1.
+        </p>
+        <p class="note">
+          Карточка вертикальная (3:4) и задаёт размер сама: снимок 3:2 увеличивается по высоте и
+          подрезается по бокам. На демо-фото с парковки это скорее помогает — соседние машины уходят
+          из кадра, — но широкие планы теряют края автомобиля. Под подобранные вертикальные кадры
+          это уйдёт само.
+        </p>
+      </section>
+
+      <!-- ================= СЛОТЫ ================= -->
+      <section>
+        <h2>SlotPicker</h2>
+        <div class="slots">
+          <button class="slot">10:00</button>
+          <button class="slot" aria-disabled="true" data-state="early">11:00</button>
+          <button class="slot" aria-disabled="true">12:00</button>
+          <button class="slot" aria-pressed="true">13:00</button>
+          <button class="slot">14:00</button>
+          <button class="slot">15:00</button>
+          <button class="slot">16:00</button>
+          <button class="slot" aria-disabled="true">17:00</button>
+          <button class="slot">18:00</button>
+        </div>
+        <p class="note">
+          Свободен · рано (TD-5) · занят (зачёркнут) · выбран. Девять слотов по TD-2, состояния
+          приходят из <code>slotSchema</code> — правила на фронте не повторяются.
+        </p>
+      </section>
+
+      <!-- ================= ВКЛАДКИ, ЗАГРУЗКА, ПУСТО ================= -->
+      <section>
+        <h2>Tabs, Skeleton, Spinner, StatePanel</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" aria-selected="true">Предстоящие 2</button>
+          <button class="tab" role="tab" aria-selected="false">История 5</button>
+        </div>
+
+        <h3>Загрузка</h3>
+        <div class="cards">
+          <div
+            class="car"
+            style="display: grid; align-content: end; gap: var(--space-2); padding: var(--space-4)"
+          >
+            <div class="skel" style="height: 14px; width: 55%"></div>
+            <div class="skel" style="height: 22px; width: 40%"></div>
+            <div class="skel" style="height: 12px; width: 70%"></div>
+          </div>
+          <div
+            class="car"
+            style="display: grid; align-content: end; gap: var(--space-2); padding: var(--space-4)"
+          >
+            <div class="skel" style="height: 14px; width: 45%"></div>
+            <div class="skel" style="height: 22px; width: 50%"></div>
+            <div class="skel" style="height: 12px; width: 65%"></div>
+          </div>
+          <div class="row" style="justify-content: center"><div class="spinner"></div></div>
+        </div>
+
+        <h3>Пусто и ошибка</h3>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-6);
+          "
+        >
+          <div class="panel">
+            <div class="mark">
+              <svg class="ic" aria-hidden="true"><use href="#i-search" /></svg>
+            </div>
+            <strong>Ничего не нашлось</strong>
+            <p>Попробуйте изменить фильтры или сбросить их.</p>
+            <button class="btn" data-variant="primary">Сбросить фильтры</button>
+          </div>
+          <div class="panel" data-variant="error">
+            <div class="mark">
+              <svg class="ic" aria-hidden="true"><use href="#i-alert" /></svg>
+            </div>
+            <strong>Не удалось загрузить каталог</strong>
+            <p>Проверьте соединение и попробуйте снова.</p>
+            <button class="btn" data-variant="primary">Повторить</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ДИАЛОГ И ТОСТ ================= -->
+      <section>
+        <h2>Dialog и Toast</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-7);
+            align-items: start;
+          "
+        >
+          <div class="dialog">
+            <div class="dialog-head">Отменить запись?</div>
+            <div class="dialog-body">
+              <p style="margin: 0; color: var(--color-fg-muted)">
+                BMW X5 xDrive40i, 25 сентября, 14:00. Время освободится для других.
+              </p>
+            </div>
+            <div class="dialog-foot">
+              <button class="btn" data-variant="ghost">Не отменять</button>
+              <button class="btn" data-variant="danger">Отменить запись</button>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="toast">
+              <span style="color: var(--color-success); display: flex"
+                ><svg class="ic" aria-hidden="true"><use href="#i-check" /></svg
+              ></span>
+              <span>Записали на 25 сентября, 14:00.</span>
+              <a href="#">Мои записи →</a>
+            </div>
+            <div class="toast" style="border-left-color: var(--color-danger)">
+              <span style="color: var(--color-danger); display: flex"
+                ><svg class="ic" aria-hidden="true"><use href="#i-alert" /></svg
+              ></span>
+              <span>Это время уже заняли. Выберите другое.</span>
+            </div>
+            <p class="note">
+              Поведение диалога — фокус-ловушка, Esc, возврат фокуса — Radix Dialog без стилей
+              (D10). Здесь нарисована только оболочка.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ИКОНКИ ================= -->
+      <section>
+        <h2>Иконки</h2>
+        <p class="lede">
+          Набор — <a href="https://lucide.dev" style="color: var(--color-accent)">Lucide</a> (MIT):
+          линия 2px, прямые торцы скруглены, сетка 24. Подходит к системе без скруглений, и в нём
+          есть всё, что нужно нашим экранам. В проекте — пакетом <code>lucide-react</code>, здесь
+          вшит спрайтом, чтобы витрина работала без сборки.
+        </p>
+        <div class="ic-grid">
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-arrow-right" /></svg>
+            <figcaption>arrow-right</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-arrow-down" /></svg>
+            <figcaption>arrow-down</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-chevron-left" /></svg>
+            <figcaption>chevron-left</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-chevron-right" /></svg>
+            <figcaption>chevron-right</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-check" /></svg>
+            <figcaption>check</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-alert" /></svg>
+            <figcaption>alert</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-x" /></svg>
+            <figcaption>x</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-search" /></svg>
+            <figcaption>search</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-inbox" /></svg>
+            <figcaption>inbox</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-calendar" /></svg>
+            <figcaption>calendar</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-zap" /></svg>
+            <figcaption>zap</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-cube" /></svg>
+            <figcaption>cube</figcaption>
+          </figure>
+          <figure class="ic-cell" style="margin: 0">
+            <svg class="ic" aria-hidden="true"><use href="#i-rotate" /></svg>
+            <figcaption>rotate</figcaption>
+          </figure>
+        </div>
+
+        <h3>Толщина линии</h3>
+        <div class="row" style="gap: var(--space-7)">
+          <span class="row" style="gap: var(--space-2)"
+            ><svg class="ic" aria-hidden="true"><use href="#i-arrow-right" /></svg> обычная,
+            2px</span
+          >
+          <span class="row" style="gap: var(--space-2)"
+            ><svg class="ic" data-weight="bold" aria-hidden="true">
+              <use href="#i-arrow-right" />
+            </svg>
+            жирная, 2.5px</span
+          >
+          <span class="row" style="gap: var(--space-2)"
+            ><svg class="ic" data-size="sm" aria-hidden="true"><use href="#i-arrow-right" /></svg>
+            мелкая, 16px</span
+          >
+        </div>
+        <p class="note">
+          Жирная — только в кнопке карточки: там стрелка лежит на светлой заливке и должна читаться
+          как знак, а не как волосок.
+        </p>
+      </section>
+
+      <!-- ================= ПРОСТРАНСТВО И ДВИЖЕНИЕ ================= -->
+      <section>
+        <h2>Пространство и движение</h2>
+        <h3>Отступы, база 4px</h3>
+        <div class="grid" style="max-width: 520px">
+          <div class="row">
+            <span class="note" style="width: 80px">space-1</span>
+            <div class="bar" style="width: var(--space-1)"></div>
+            <span class="note">4</span>
+          </div>
+          <div class="row">
+            <span class="note" style="width: 80px">space-3</span>
+            <div class="bar" style="width: var(--space-3)"></div>
+            <span class="note">12</span>
+          </div>
+          <div class="row">
+            <span class="note" style="width: 80px">space-4</span>
+            <div class="bar" style="width: var(--space-4)"></div>
+            <span class="note">16</span>
+          </div>
+          <div class="row">
+            <span class="note" style="width: 80px">space-6</span>
+            <div class="bar" style="width: var(--space-6)"></div>
+            <span class="note">24</span>
+          </div>
+          <div class="row">
+            <span class="note" style="width: 80px">space-7</span>
+            <div class="bar" style="width: var(--space-7)"></div>
+            <span class="note">32</span>
+          </div>
+          <div class="row">
+            <span class="note" style="width: 80px">space-9</span>
+            <div class="bar" style="width: var(--space-9)"></div>
+            <span class="note">48</span>
+          </div>
+          <div class="row">
+            <span class="note" style="width: 80px">space-11</span>
+            <div class="bar" style="width: var(--space-11)"></div>
+            <span class="note">80</span>
+          </div>
+        </div>
+
+        <h3>Длительности</h3>
+        <table style="max-width: 640px">
+          <thead>
+            <tr>
+              <th>Токен</th>
+              <th>Значение</th>
+              <th>Что двигает</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>duration-1</td>
+              <td class="num">120ms</td>
+              <td>hover, фокус, нажатие</td>
+            </tr>
+            <tr>
+              <td>duration-2</td>
+              <td class="num">200ms</td>
+              <td>раскрытие кнопки, смена вкладки</td>
+            </tr>
+            <tr>
+              <td>duration-3</td>
+              <td class="num">320ms</td>
+              <td>диалог, тост, появление содержимого</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="note">
+          При <code>prefers-reduced-motion: reduce</code> все три гасятся до 1ms прямо в токенах —
+          компоненты не переписываются. Включите настройку в системе и обновите страницу: карточка
+          перестанет наезжать, скелетон перестанет мерцать.
+        </p>
+      </section>
+
+      <section style="border: none">
+        <p class="note">
+          Витрина, токены и макеты: <code>docs/design-system.md</code>,
+          <code>docs/wireframes.md</code>, <code>apps/web/src/styles/tokens.css</code>. Учебный
+          проект, не официальный сайт BMW.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      // Переключатель нужен ровно для одного: убедиться, что светлая тема
+      // добавляется переопределением семантики и ничего не ломает.
+      const root = document.documentElement;
+      const btn = document.getElementById("theme");
+      btn.addEventListener("click", () => {
+        const light = root.getAttribute("data-theme") === "light";
+        root.setAttribute("data-theme", light ? "dark" : "light");
+        btn.textContent = light ? "Светлая тема" : "Тёмная тема";
+      });
+    </script>
+  </body>
 </html>

@@ -108,30 +108,48 @@
 
 ---
 
-## 8. Архитектура фронта (черновик)
+## 8. Архитектура фронта
+
+Сверено с кодом на этапе 11 — дерево ниже описывает то, что есть.
 
 ```
 apps/web/src/
   main.tsx
-  app/                 # App, роутер, провайдеры (QueryClient, AuthProvider, Theme)
+  app/                 # App (провайдеры: QueryClient, AuthProvider, ToastProvider,
+                       #   BrowserRouter), AppRoutes — карта маршрутов
   pages/               # страницы-маршруты: тонкие, собирают фичи
   features/
-    auth/              # authClient (Better Auth), AuthContext, ProtectedRoute, формы
-    catalog/           # useCars, FilterPanel, CarGrid
-    car/               # useCar, галерея, характеристики, выбор цвета
-    car-viewer/        # 3D: Canvas, CarModel, свет/окружение (грузится лениво)
-    test-drives/       # SlotPicker, форма записи, «Мои записи»
-    manager/           # список записей дня, смена статуса
+    auth/              # authClient (Better Auth), AuthContext, ProtectedRoute/RoleRoute/
+                       #   GuestOnlyRoute, формы входа, регистрации, профиля, пароля
+    catalog/           # useCars, useCatalogFilters, useCatalogQuery, CarCard,
+                       #   CatalogSearch, FilterPanel, PriceRange
+    car/               # useCar, CarMedia, Gallery, CarSpecs, CarPageSkeleton
+    car-viewer/        # 3D: Canvas, CarModel, свет, ColorPicker (грузится лениво)
+    test-drives/       # DayStrip, SlotGrid, BookingDialog, «Мои записи», отмена
+    manager/           # день записей, фильтры, таблица, панель смены статуса
     admin/             # список пользователей, форма создания менеджера
   components/
-    ui/                # примитивы дизайн-системы
-    layout/            # Header, Footer, PageContainer
+    ui/                # примитивы дизайн-системы (инвентарь — design-system.md §8)
+    layout/            # RootLayout (каркас с <Outlet />), Header, Footer
   shared/
     api/               # fetch-клиент: база, ошибки из contracts, credentials
     format/            # деньги, даты
-    hooks/
+    form/              # разбор ZodError в «поле → сообщение»
+    hooks/             # useDebouncedField, useMediaQuery
+    ui/                # LinkButton — ссылка в стилях Button
   styles/              # reset.css, tokens.css, globals.css
 ```
+
+Чего в черновике этого раздела было, а в коде не оказалось:
+
+- **Провайдера темы нет.** Светлая тема живёт только в токенах
+  (`styles/tokens.css`, блок `[data-theme="light"]`) и на компонентах не проверена —
+  `design-system.md` §10. Вторым контекстом вместо темы стал `ToastContext`.
+- **`CarGrid` отдельным компонентом не стал** — сетка каталога это `display: grid`
+  на `CatalogPage`, оборачивать её было не во что.
+- **`PageContainer` тоже не появился:** поля и максимальная ширина задаёт сама
+  страница (`--container-max`, `--container-gutter`), иначе hero главной пришлось бы
+  выламывать из контейнера отрицательными margin.
 
 Правила:
 - **Серверное состояние** — только TanStack Query; ключи запросов — фабрикой в фиче.
@@ -201,4 +219,4 @@ apps/api/
   layout) → каталог → страница автомобиля → 3D и выбор цвета → тест-драйвы (клиент) →
   экран менеджера → экран админа →
   полировка (анимации, адаптив, пустые состояния, консоль) → прогон сценария защиты.
-- Сценарий защиты и распределение ролей (фронт / бэк) — описать отдельно ближе к сдаче.
+- Сценарий защиты — [defense.md](defense.md). Распределение ролей не понадобилось: проект делается одним человеком.
