@@ -16,6 +16,79 @@
   }
 }
 
+/* Над hero-фото главной, пока шапка не вышла за пределы hero: плавающая
+   шапка, фото уходит под неё до самого верха страницы (референс дизайна).
+   Не sticky, а fixed. Никакой тёмной подложки — только блюр (см. ::before
+   ниже), она тут не нужна и не нужна вовсе, пока фото ещё под шапкой. */
+.headerHero {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom-color: transparent;
+  background: transparent;
+}
+
+/* Сам блюр — на отдельном слое позади содержимого шапки (как ::before
+   у .heroText в HomePage.module.css), а не на самой .headerHero: иначе
+   маска ниже смазывала бы вместе с фоном ещё и лого с меню.
+   Раньше маска держала блюр сплошным первые 35% и только потом гасила —
+   у самой границы шапки сила всё ещё была ~77%, это и читалось как жёсткий
+   край. Теперь угасание идёт непрерывно от самого верха, без плато:
+   у границы шапки (40% высоты слоя) сила уже 60% и дальше плавно тает
+   на всю дополнительную высоту снизу — шва не видно вообще. */
+.headerHero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  bottom: calc(-1.5 * var(--header-height));
+  z-index: -1;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* После того как шапка вышла за пределы hero (см. Header.tsx — следит за
+   низом hero-секции, а не просто за фактом скролла): та же плавающая
+   (fixed) шапка, но с обычной подложкой — свойства фона/блюра/границы
+   берутся из .header ниже. Без этого переключения текст меню и контент
+   секций под ним визуально накладываются друг на друга. */
+.headerScrolled {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Приглушённый --color-fg-muted теряется на светлых участках фото. */
+.headerHero .navLink {
+  color: color-mix(in srgb, var(--color-fg-on-accent) 82%, transparent);
+}
+
+.headerHero .navLink:hover {
+  color: var(--color-fg-on-accent);
+}
+
+.headerHero .navLinkActive {
+  color: var(--color-fg-on-accent);
+  border-bottom-color: var(--color-fg-on-accent);
+}
+
+/* «Войти» на hero — как вторичная кнопка hero-текста (HomePage.module.css):
+   обычный "ghost" тут не виден (серый текст, без рамки), нужна белая рамка
+   на прозрачном. «Регистрация» на hero рисуется variant="primary" прямо
+   в Header.tsx — она и так сплошная белая заливка, отдельных правил не надо. */
+.headerHeroButton[data-variant="ghost"] {
+  border-color: var(--color-fg-on-accent);
+  color: var(--color-fg-on-accent);
+}
+
+.headerHeroButton[data-variant="ghost"]:hover {
+  background: color-mix(in srgb, var(--color-fg-on-accent) 14%, transparent);
+  color: var(--color-fg-on-accent);
+}
+
 .inner {
   display: flex;
   align-items: center;
@@ -38,8 +111,10 @@
 /* На телефоне навигация и блок аккаунта уезжают в меню под бургером */
 .nav {
   display: none;
-  align-items: stretch;
-  align-self: stretch;
+  /* Раньше был stretch: пункт растягивался на всю высоту шапки (64px),
+     текст оставался по центру, а подчёркивание активного пункта —
+     border-bottom — уезжало на нижний край шапки, далеко от текста. */
+  align-items: center;
   gap: var(--space-5);
 }
 

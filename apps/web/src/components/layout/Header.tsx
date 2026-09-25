@@ -16,6 +16,33 @@ export function Header() {
   const { user, isStaff, isAdmin, isPending } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  // Hero на главной — фото во весь экран от самого верха страницы (§ HomePage);
+  // шапка над ним плавает почти без подложки, как в референсе дизайна.
+  const isHero = location.pathname === "/";
+
+  // Тёмная подложка нужна не от факта скролла, а от того, вышла ли сама
+  // шапка за пределы hero-секции: пока низ hero ниже низа шапки, под шапкой
+  // всё ещё фото и подложка не нужна. Как только hero прокрутили выше —
+  // там уже обычный контент секций, накладывающийся на прозрачную шапку.
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!isHero) return;
+    const heroEl = document.querySelector<HTMLElement>("[data-hero-section]");
+    if (!heroEl) return;
+
+    function onScroll() {
+      const headerHeight = headerRef.current?.offsetHeight ?? 0;
+      setScrolled(heroEl!.getBoundingClientRect().bottom <= headerHeight);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [isHero]);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -84,7 +111,14 @@ export function Header() {
   }
 
   return (
-    <header className={styles.header}>
+    <header
+      ref={headerRef}
+      className={
+        isHero
+          ? `${styles.header} ${scrolled ? styles.headerScrolled : styles.headerHero}`
+          : styles.header
+      }
+    >
       <div className={styles.inner}>
         <Link to="/" className={styles.brand}>
           CarShowroom
@@ -138,6 +172,18 @@ export function Header() {
                 </nav>
               )}
             </div>
+          ) : isHero ? (
+            // Над hero — как кнопки самого hero-блока: одна залита белым,
+            // вторая с белой рамкой на прозрачном. Обычные navLink/secondary
+            // (серый текст, серая рамка) на фото не читаются.
+            <>
+              <LinkButton to="/login" variant="ghost" className={styles.headerHeroButton}>
+                Войти
+              </LinkButton>
+              <LinkButton to="/register" variant="primary">
+                Регистрация
+              </LinkButton>
+            </>
           ) : (
             <>
               <Link to="/login" className={styles.navLink}>

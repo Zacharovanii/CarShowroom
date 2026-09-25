@@ -2,15 +2,23 @@
   display: block;
 }
 
-/* ---- Hero ------------------------------------------------------------ */
+/* ---- Hero ------------------------------------------------------------
+   Фото во всю ширину страницы и во весь экран (включая шапку — на главной
+   она прозрачна, см. .headerHero в Header.module.css), обрезается по
+   высоте контейнера.
 
+   --hero-crop-top / --hero-crop-left — во сколько кадр «сдвинут» при
+   обрезке, 0–100%. 0% — обрезка происходит с противоположной стороны
+   (низ / право), 100% — вся обрезка достаётся этой стороне (верх / лево).
+   Крутить руками и смотреть, пока кадр не сядет как влитой — заголовок
+   пока держит значения из середины диапазона. */
 .hero {
+  --hero-crop-top: 100%;
+  --hero-crop-left: 0;
   position: relative;
-  min-height: calc(100dvh - var(--header-height));
-  display: flex;
-  align-items: center;
+  width: 100%;
+  height: 100dvh;
   overflow: hidden;
-  isolation: isolate;
 }
 
 .heroPhoto {
@@ -19,60 +27,79 @@
   z-index: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
-  opacity: 0;
-  transition: opacity var(--duration-crossfade) var(--ease-in-out);
-}
-
-/* Подложка — тот же кадр, растянутый и размытый: заполняет поля вокруг
-   фото, вписанного целиком, и не показывает его пиксели. */
-.heroBackdrop {
   object-fit: cover;
-  filter: blur(var(--photo-backdrop-blur)) brightness(0.6);
-  transform: scale(1.1);
+  object-position: var(--hero-crop-left) var(--hero-crop-top);
 }
 
-.heroPhoto[data-active="true"] {
-  opacity: 1;
-}
-
-/* Фото уходит в фон следующей секции и затемняется слева под текст.
-   Оба градиента собраны через color-mix от --color-bg: «прозрачный»
-   в них того же тона, что фон страницы, поэтому стыка нет ни в одной теме. */
+/* Лёгкое затемнение под текстом слева — вместе с подложкой .heroText
+   (ниже) держит контраст там, где кадр после обрезки окажется светлым. */
 .hero::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
-  background:
-    linear-gradient(
-      to top,
-      var(--color-bg) 0%,
-      color-mix(in srgb, var(--color-bg) 55%, transparent) 28%,
-      color-mix(in srgb, var(--color-bg) 0%, transparent) 62%
-    ),
-    linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-bg) 88%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 60%, transparent) 45%,
-      color-mix(in srgb, var(--color-bg) 0%, transparent) 85%
-    );
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-bg) 55%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 15%, transparent) 40%,
+    transparent 70%
+  );
 }
 
 .heroInner {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 2;
-  width: 100%;
-  max-width: var(--container-max);
-  margin: 0 auto;
-  padding: var(--space-11) var(--container-gutter) var(--space-12);
+  display: flex;
+  /* Блок стоит не по центру (50%), а на 33% высоты hero — выше середины. */
+  align-items: flex-start;
+  justify-content: flex-start;
+  /* Слева — увеличенный отступ (не просто --container-gutter): машина
+     на кадре стоит справа-внизу, текст переехал на левую половину и его
+     нужно оторвать от края экрана сильнее, чем на остальных секциях.
+     На узком экране 128px съели бы половину ширины — поэтому clamp, а
+     не фиксированное значение. Сверху — 33dvh вместо расчёта от шапки:
+     при 100dvh-высоте hero это и есть треть экрана, а от шапки (112px)
+     он в любом случае больше на всех вменяемых высотах viewport. */
+  padding: 33dvh var(--container-gutter) var(--space-9)
+    clamp(var(--container-gutter), 8vw, var(--space-13));
 }
 
 .heroText {
+  position: relative;
+  z-index: 0; /* свой контекст наложения — чтобы ::before c z-index:-1 не
+                 провалился за фото, а остался только за текстом (ниже) */
   display: grid;
   gap: var(--space-5);
-  max-width: 34ch;
+  /* 34ch — величина в ch кузова .heroLede (обычный текст), а не заголовка:
+     --text-display в разы крупнее, и та же цифра в его собственных ch
+     оставляла бы слова заголовка шире колонки. Ширина в vw/px подобрана
+     по факту под --font-size-9: clamp(40px, 7vw, 72px). */
+  max-width: min(90vw, 640px);
+  text-align: left;
+}
+
+/* Блюр радиусом от текста — сильнее в центре блока, к краям гаснет через
+   маску, вместо явной прямоугольной подложки с плотным краем. Область
+   шире самого текста ("--space-9" на сторону), чтобы фон растворялся
+   плавно, а не резко. */
+.heroText::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--space-9));
+  z-index: -1;
+  background: color-mix(in srgb, var(--color-bg) 20%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+}
+
+/* Без этого элементы — grid-items — отказываются сжиматься уже своего
+   min-content (самого длинного слова) и вылезают за .heroText, а рамка
+   .hero их обрезает (overflow: hidden). */
+.heroText > * {
+  min-width: 0;
 }
 
 .heroTitle {
@@ -81,7 +108,8 @@
 }
 
 .heroLede {
-  color: var(--color-fg-muted);
+  /* Было --color-fg-muted: на фото, да ещё под блюром, читалось слабо. */
+  color: var(--color-fg);
   font: var(--text-body);
   max-width: 44ch;
 }
@@ -89,8 +117,22 @@
 .heroActions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-start;
   gap: var(--space-3);
   margin-top: var(--space-2);
+}
+
+/* Вторичная кнопка hero — вариант "ghost" в остальном сайте создан для
+   обычных поверхностей (серый текст, без рамки) и на фото теряется.
+   Поверх фото — как в референсе: белая рамка, заливка остаётся прозрачной. */
+.heroActions .heroGhostButton[data-variant="ghost"] {
+  border-color: var(--color-fg-on-accent);
+  color: var(--color-fg-on-accent);
+}
+
+.heroActions .heroGhostButton[data-variant="ghost"]:hover {
+  background: color-mix(in srgb, var(--color-fg-on-accent) 14%, transparent);
+  color: var(--color-fg-on-accent);
 }
 
 /* ---- Секции ---------------------------------------------------------- */
@@ -286,9 +328,5 @@
   .cars,
   .advantages {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .heroText {
-    max-width: 24ch;
   }
 }
