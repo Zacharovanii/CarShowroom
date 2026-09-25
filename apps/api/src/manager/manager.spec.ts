@@ -24,9 +24,11 @@ describe("Менеджер", () => {
   let otherCarId: number;
 
   const now = new Date();
-  // будущий день — для отмен, прошедший — для результата визита
-  const futureDay = salonDay(new Date(now.getTime() + 10 * 24 * 3_600_000));
-  const pastDay = salonDay(new Date(now.getTime() - 5 * 24 * 3_600_000));
+  // будущий день — для отмен, прошедший — для результата визита.
+  // +12 и −6, а не +10 и −5: test-drives.spec идёт параллельно на той же
+  // машине в эти дни, и общие слоты ломали бы тесты друг другу.
+  const futureDay = salonDay(new Date(now.getTime() + 12 * 24 * 3_600_000));
+  const pastDay = salonDay(new Date(now.getTime() - 6 * 24 * 3_600_000));
 
   beforeAll(async () => {
     moduleRef = await Test.createTestingModule({

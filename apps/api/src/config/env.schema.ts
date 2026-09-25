@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+/** `WEB_ORIGIN` — один URL или несколько через запятую. */
+export function splitOrigins(value: string | undefined): string[] {
+  return (value ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
 // Единственное место, где перечислены переменные окружения приложения
 // (кроме auth/auth.ts — он собирается раньше, до NestFactory.create,
 // см. src/env.ts). Список и есть источник правды для .env.example.
@@ -14,8 +22,15 @@ export const envSchema = z.object({
    * поэтому браузер шлёт Origin этого порта, а не BETTER_AUTH_URL. Better Auth
    * сверяет Origin со списком доверенных и иначе отвечает 403 INVALID_ORIGIN.
    * В проде Nest раздаёт фронт и API с одного origin — переменная не нужна.
+   * Можно несколько через запятую: localhost и 127.0.0.1 — разные origin.
    */
-  WEB_ORIGIN: z.url().optional(),
+  WEB_ORIGIN: z
+    .string()
+    .refine(
+      (value) => splitOrigins(value).every((origin) => z.url().safeParse(origin).success),
+      "список URL через запятую",
+    )
+    .optional(),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

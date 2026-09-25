@@ -7,6 +7,7 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { signUpSchema, updateProfileSchema } from "@carshowroom/contracts";
 import type { BetterAuthOptions } from "better-auth";
 import type { ZodType } from "zod";
+import { splitOrigins } from "../config/env.schema.js";
 
 // Отдельный пул для Better Auth (D7.1): postgres.js — для остального кода,
 // сюда наружу из модуля auth не выходит. max=5, явно — чтобы число было
@@ -75,7 +76,7 @@ export const auth = betterAuth({
   // только baseURL и отвечает 403 INVALID_ORIGIN — вход в браузере не работает
   // вовсе, хотя curl с подставленным Origin проходит. В проде фронт и API
   // на одном origin, WEB_ORIGIN не задаётся и список сводится к baseURL.
-  trustedOrigins: [process.env.BETTER_AUTH_URL, process.env.WEB_ORIGIN].filter(
+  trustedOrigins: [process.env.BETTER_AUTH_URL, ...splitOrigins(process.env.WEB_ORIGIN)].filter(
     (origin): origin is string => Boolean(origin),
   ),
 

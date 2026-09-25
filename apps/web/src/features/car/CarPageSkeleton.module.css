@@ -1,52 +1,87 @@
+/* Заглушки кита — .skeleton[data-variant]: размеры ниже стоят с родителем
+   в селекторе, иначе проигрывают по специфичности. */
+/* Раскладка повторяет CarPage: одна колонка, те же зазоры между блоками */
 .skeleton {
   display: grid;
-  gap: var(--space-8);
-  align-items: start;
+  gap: var(--space-7);
 }
 
+/* Строка «В каталог» + вкладки, с линией под ней — как CarMedia */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  height: var(--control-height);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.bar .back {
+  width: var(--space-12);
+}
+
+.bar .tab {
+  width: var(--space-9);
+}
+
+.bar .tabShort {
+  width: var(--space-7);
+}
+
+/* Кадр — как у галереи и 3D: 3:2, не выше --media-height */
 .media {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
+  margin-top: calc(-1 * var(--space-3));
+}
+
+.media .frame {
+  width: 100%;
+  max-height: var(--media-height);
 }
 
 .thumbs {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  overflow: hidden;
 }
 
-.thumb {
-  /* Ширина миниатюры — из шкалы отступов, как в самой галерее.
-     Пропорцию заглушка получает пропом `ratio`. */
-  width: var(--space-13);
+.thumbs .thumb {
   flex: none;
+  width: var(--space-12);
 }
 
 .head {
   display: grid;
   gap: var(--space-4);
-  align-content: start;
 }
 
+.skeleton .head .button {
+  width: calc(var(--space-13) * 2);
+  height: var(--control-height-lg);
+}
+
+/* Характеристики: на телефоне две колонки, шире — плотный ряд */
 .specs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6) var(--space-7);
+  gap: var(--space-4) var(--space-5);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
 }
 
 @media (min-width: 640px) {
-  .specs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  .skeleton {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  .thumbs .thumb {
+    width: var(--space-13);
   }
 
-  /* Полоса характеристик идёт во всю ширину под галереей и шапкой */
   .specs {
-    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5) var(--space-9);
+  }
+
+  .specs .spec {
+    width: var(--space-13);
   }
 }
