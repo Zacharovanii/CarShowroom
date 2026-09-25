@@ -3,6 +3,8 @@ export type { CarCardProps } from "./CarCard";
 export { CarCardSkeleton } from "./CarCardSkeleton";
 export { CatalogSearch } from "./CatalogSearch";
 export type { CatalogSearchProps } from "./CatalogSearch";
+export { FilterDisclosure } from "./FilterDisclosure";
+export type { FilterDisclosureProps } from "./FilterDisclosure";
 export { FilterPanel } from "./FilterPanel";
 export type { FilterPanelProps } from "./FilterPanel";
 export { PriceRange } from "./PriceRange";

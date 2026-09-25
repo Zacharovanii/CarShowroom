@@ -1,0 +1,50 @@
+/* Та же коробочная модель, что у .card/.photoBox/.body в CarCard.module.css */
+
+.card {
+  display: flex;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+}
+
+/* Своя заглушка вместо Skeleton: та задаёт высоту через data-variant,
+   а здесь высота должна идти от строки (align-items: stretch по умолчанию),
+   не от варианта. */
+.photo {
+  flex: 0 0 38%;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface),
+    var(--color-surface-hover),
+    var(--color-surface)
+  );
+  background-size: 200% 100%;
+  animation: shimmer var(--duration-shimmer) var(--ease-in-out) infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 1 auto;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+@media (max-width: 479px) {
+  .card {
+    flex-direction: column;
+  }
+
+  .photo {
+    flex-basis: auto;
+    aspect-ratio: 16 / 9;
+  }
+}

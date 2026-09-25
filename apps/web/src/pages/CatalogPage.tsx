@@ -1,29 +1,17 @@
-import { useState } from "react";
-import { RotateCcw, SlidersHorizontal } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { CARS_PAGE_SIZE, carSorts, type CarSort } from "@carshowroom/contracts";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  Pagination,
-  Select,
-  StatePanel,
-  type SelectOption,
-} from "@/components/ui";
+import { Button, Pagination, Select, StatePanel, type SelectOption } from "@/components/ui";
 import {
   CarCard,
   CarCardSkeleton,
   CatalogSearch,
+  FilterDisclosure,
   FilterPanel,
   useCars,
   useCatalogFilters,
   useCatalogQuery,
 } from "@/features/catalog";
-import { useMediaQuery } from "@/shared/hooks";
 import styles from "./CatalogPage.module.css";
-
-/** С этой ширины появляется боковая панель фильтров (§7 design-system). */
-const SIDE_PANEL_QUERY = "(min-width: 1024px)";
 
 const SORT_LABELS: Record<CarSort, string> = {
   newest: "Сначала новые",
@@ -56,32 +44,8 @@ export default function CatalogPage() {
   const { query, setQuery, resetFilters, activeFilterCount } = useCatalogQuery();
   const filters = useCatalogFilters();
   const cars = useCars(query);
-  const hasSidePanel = useMediaQuery(SIDE_PANEL_QUERY);
-  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const total = cars.data?.total;
-
-  const panel = (
-    <FilterPanel
-      query={query}
-      filters={filters.data}
-      onChange={setQuery}
-      onReset={resetFilters}
-      activeFilterCount={activeFilterCount}
-      showReset={hasSidePanel}
-      showSearch={hasSidePanel}
-    />
-  );
-
-  const sort = (
-    <Select
-      options={SORT_OPTIONS}
-      value={query.sort}
-      aria-label="Сортировка"
-      onValueChange={(value) => setQuery({ sort: value as CarSort })}
-      className={styles.sort}
-    />
-  );
 
   function changePage(page: number) {
     setQuery({ page });
@@ -93,130 +57,97 @@ export default function CatalogPage() {
   return (
     <div className={styles.page}>
       <header className={styles.head}>
-        <div>
-          <h1 className={styles.title}>Каталог</h1>
-          <p className={styles.count}>
-            {total === undefined ? "Подбираем автомобили…" : `${total} ${carsWord(total)}`}
-          </p>
-        </div>
-
-        {hasSidePanel && (
-          <label className={styles.sortField}>
-            <span className={styles.sortLabel}>Сортировка</span>
-            {sort}
-          </label>
-        )}
+        <h1 className={styles.title}>Каталог</h1>
+        <p className={styles.count}>
+          {total === undefined ? "Подбираем автомобили…" : `${total} ${carsWord(total)}`}
+        </p>
       </header>
 
-      {/* Узкий экран: поиск строкой, фильтры — за кнопкой со счётчиком */}
-      {!hasSidePanel && (
-        <div className={styles.toolbar}>
-          <CatalogSearch value={query.q} onChange={(q) => setQuery({ q })} withLabel={false} />
+      {/* Одна строка на любой ширине: поиск, кнопка фильтров с раскрывающейся
+          панелью (как у Select) и сортировка. Раньше здесь была либо статичная
+          боковая колонка, либо отдельная модалка на телефоне — два вида
+          вместо одного без нужды. */}
+      <div className={styles.toolbar}>
+        <CatalogSearch
+          value={query.q}
+          onChange={(q) => setQuery({ q })}
+          withLabel={false}
+          className={styles.search}
+        />
 
-          <div className={styles.toolbarRow}>
-            <Button
-              iconStart={<SlidersHorizontal aria-hidden="true" />}
-              onClick={() => setFiltersOpen(true)}
-            >
-              Фильтры
-              {activeFilterCount > 0 && <span className={styles.badge}>{activeFilterCount}</span>}
-            </Button>
-            {sort}
-          </div>
-        </div>
-      )}
+        <FilterDisclosure activeFilterCount={activeFilterCount}>
+          <FilterPanel
+            query={query}
+            filters={filters.data}
+            onChange={setQuery}
+            onReset={resetFilters}
+            activeFilterCount={activeFilterCount}
+            showSearch={false}
+          />
+        </FilterDisclosure>
 
-      <div className={styles.layout}>
-        {hasSidePanel && <aside className={styles.aside}>{panel}</aside>}
-
-        <section className={styles.results}>
-          {cars.isError ? (
-            <StatePanel
-              variant="error"
-              title="Не удалось загрузить каталог"
-              description="Проверьте соединение и попробуйте снова."
-              action={
-                <Button variant="primary" loading={cars.isFetching} onClick={() => cars.refetch()}>
-                  Повторить
-                </Button>
-              }
-            />
-          ) : cars.isPending ? (
-            <div className={styles.grid} aria-busy="true">
-              {Array.from({ length: CARS_PAGE_SIZE }, (_, index) => (
-                <CarCardSkeleton key={index} />
-              ))}
-            </div>
-          ) : cars.data.items.length === 0 ? (
-            <StatePanel
-              title="Ничего не нашлось"
-              description="Попробуйте изменить фильтры или сбросить их."
-              action={
-                // Пусто бывает и без фильтров: по чужой ссылке со страницей,
-                // которой в текущей выборке уже нет. Сброс возвращает и её.
-                activeFilterCount > 0 || query.page > 1 ? (
-                  <Button
-                    variant="primary"
-                    iconStart={<RotateCcw aria-hidden="true" />}
-                    onClick={resetFilters}
-                  >
-                    Сбросить фильтры
-                  </Button>
-                ) : undefined
-              }
-            />
-          ) : (
-            <>
-              <div className={styles.grid}>
-                {cars.data.items.map((car, index) => (
-                  <CarCard key={car.id} car={car} priority={index < 3} />
-                ))}
-              </div>
-
-              <Pagination
-                page={cars.data.page}
-                totalPages={cars.data.totalPages}
-                onPageChange={changePage}
-                className={styles.pagination}
-              />
-            </>
-          )}
-        </section>
+        <Select
+          options={SORT_OPTIONS}
+          value={query.sort}
+          aria-label="Сортировка"
+          onValueChange={(value) => setQuery({ sort: value as CarSort })}
+          className={styles.sort}
+        />
       </div>
 
-      {/* Панель фильтров на телефоне: лист снизу со строкой действий в подошве.
-          Размещение, прокрутку тела, ловушку фокуса, Esc и возврат фокуса
-          даёт Dialog из кита. */}
-      {!hasSidePanel && (
-        <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <DialogContent
-            title="Фильтры"
-            placement="sheet"
-            footerClassName={styles.sheetActions}
-            footer={
-              <>
+      <section className={styles.results}>
+        {cars.isError ? (
+          <StatePanel
+            variant="error"
+            title="Не удалось загрузить каталог"
+            description="Проверьте соединение и попробуйте снова."
+            action={
+              <Button variant="primary" loading={cars.isFetching} onClick={() => cars.refetch()}>
+                Повторить
+              </Button>
+            }
+          />
+        ) : cars.isPending ? (
+          <div className={styles.grid} aria-busy="true">
+            {Array.from({ length: CARS_PAGE_SIZE }, (_, index) => (
+              <CarCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : cars.data.items.length === 0 ? (
+          <StatePanel
+            title="Ничего не нашлось"
+            description="Попробуйте изменить фильтры или сбросить их."
+            action={
+              // Пусто бывает и без фильтров: по чужой ссылке со страницей,
+              // которой в текущей выборке уже нет. Сброс возвращает и её.
+              activeFilterCount > 0 || query.page > 1 ? (
                 <Button
-                  variant="ghost"
-                  disabled={activeFilterCount === 0}
+                  variant="primary"
                   iconStart={<RotateCcw aria-hidden="true" />}
                   onClick={resetFilters}
                 >
-                  Сбросить
+                  Сбросить фильтры
                 </Button>
-                <Button
-                  variant="primary"
-                  loading={cars.isPending}
-                  onClick={() => setFiltersOpen(false)}
-                >
-                  {total === undefined ? "Показать" : `Показать ${total}`}
-                </Button>
-              </>
+              ) : undefined
             }
-          >
-            {panel}
-          </DialogContent>
-        </Dialog>
-      )}
+          />
+        ) : (
+          <>
+            <div className={styles.grid}>
+              {cars.data.items.map((car, index) => (
+                <CarCard key={car.id} car={car} priority={index < 3} />
+              ))}
+            </div>
+
+            <Pagination
+              page={cars.data.page}
+              totalPages={cars.data.totalPages}
+              onPageChange={changePage}
+              className={styles.pagination}
+            />
+          </>
+        )}
+      </section>
     </div>
   );
 }

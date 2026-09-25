@@ -25,11 +25,10 @@ function isElectric(fuelTypeName: string): boolean {
 }
 
 /**
- * Карточка каталога — раздел 9 docs/design-system.md.
- *
- * Слои: фото `z-index: 0`, размытие на `::before`, затемнение на `::after`,
- * содержимое `z-index: 3`. Без явных слоёв `<img>` перекрывает псевдоэлемент,
- * потому что он первый потомок, а картинка идёт в разметке позже.
+ * Карточка каталога — горизонтальная: фото слева во всю высоту карточки,
+ * характеристики справа обычным потоком, а не поверх снимка. Раньше текст
+ * лежал на фото через блюр и затемнение — на тёмных машинах и в тёмной теме
+ * кадр в итоге было почти не видно.
  *
  * Ссылка — сама карточка целиком, кнопка «Смотреть» внутри неё, а не второй
  * интерактивный элемент: иначе каждая карточка занимала бы две остановки
@@ -38,28 +37,32 @@ function isElectric(fuelTypeName: string): boolean {
 export function CarCard({ car, priority = false }: CarCardProps) {
   return (
     <Link to={`/catalog/${car.slug}`} className={styles.card}>
-      {car.coverPath ? (
-        <img
-          className={styles.photo}
-          src={car.coverPath}
-          alt={car.coverAlt ?? car.name}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-        />
-      ) : (
-        // Обложка в контракте nullable: у автомобиля без фото карточка
-        // должна остаться карточкой, а не пустым прямоугольником.
-        <span className={styles.noPhoto}>
-          <ImageOff aria-hidden="true" />
-        </span>
-      )}
+      <span className={styles.photoBox}>
+        {car.coverPath ? (
+          <img
+            className={styles.photo}
+            src={car.coverPath}
+            alt={car.coverAlt ?? car.name}
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+          />
+        ) : (
+          // Обложка в контракте nullable: у автомобиля без фото карточка
+          // должна остаться карточкой, а не пустым прямоугольником.
+          <span className={styles.noPhoto}>
+            <ImageOff aria-hidden="true" />
+          </span>
+        )}
 
-      {(car.has3d || isElectric(car.fuelTypeName)) && (
-        <span className={styles.badges}>
-          {car.has3d && <Badge icon={<Box aria-hidden="true" />}>3D</Badge>}
-          {isElectric(car.fuelTypeName) && <Badge icon={<Zap aria-hidden="true" />}>Электро</Badge>}
-        </span>
-      )}
+        {(car.has3d || isElectric(car.fuelTypeName)) && (
+          <span className={styles.badges}>
+            {car.has3d && <Badge icon={<Box aria-hidden="true" />}>3D</Badge>}
+            {isElectric(car.fuelTypeName) && (
+              <Badge icon={<Zap aria-hidden="true" />}>Электро</Badge>
+            )}
+          </span>
+        )}
+      </span>
 
       <span className={styles.body}>
         <span className={styles.top}>
@@ -84,11 +87,9 @@ export function CarCard({ car, priority = false }: CarCardProps) {
           </span>
         </span>
 
-        {/* Кнопка стоит отдельной строкой ВНУТРИ текстового блока: снаружи
-            она попала бы в поток от верха карточки и уехала под слои. */}
         <span className={styles.go}>
-          <ArrowRight aria-hidden="true" />
           <span className={styles.goLabel}>Смотреть</span>
+          <ArrowRight aria-hidden="true" />
         </span>
       </span>
     </Link>

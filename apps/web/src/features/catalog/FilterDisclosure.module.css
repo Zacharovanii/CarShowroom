@@ -1,0 +1,37 @@
+.root {
+  position: relative;
+}
+
+/* Счётчик заданных фильтров в кнопке */
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--control-height-xs);
+  height: var(--control-height-xs);
+  padding: 0 var(--space-1);
+  margin-left: var(--space-2);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
+  border-radius: var(--radius-control);
+  font: var(--text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Тот же вид, что у выпадающего списка Select: оторвана от страницы,
+   поэтому тень уместна. */
+.panel {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + var(--space-2));
+  left: 0;
+  display: grid;
+  gap: var(--space-5);
+  width: min(360px, calc(100vw - 2 * var(--container-gutter)));
+  max-height: calc(100dvh - var(--header-height) - var(--space-8));
+  overflow-y: auto;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-2);
+}
