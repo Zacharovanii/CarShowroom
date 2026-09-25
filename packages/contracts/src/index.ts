@@ -47,6 +47,7 @@ export type {
 export { SALON_TIME_ZONE } from "./common.js";
 
 export {
+  MAX_ACTIVE_TEST_DRIVES,
   createTestDriveSchema,
   myTestDrivesSchema,
   slotSchema,

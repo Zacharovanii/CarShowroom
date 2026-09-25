@@ -27,8 +27,13 @@ export const SLOT_HOURS: readonly number[] = Array.from(
 export const BOOKING_MIN_LEAD_MINUTES = 120;
 export const BOOKING_MAX_DAYS_AHEAD = 30;
 
-/** TD-6: не более 2 активных будущих записей у клиента. */
-export const MAX_ACTIVE_TEST_DRIVES = 2;
+/**
+ * TD-6: не более 2 активных будущих записей у клиента.
+ * Само число живёт в контракте — оно нужно и фронту, чтобы гасить кнопку
+ * заранее. Здесь только реэкспорт, чтобы остальной код правил не знал,
+ * откуда оно пришло.
+ */
+export { MAX_ACTIVE_TEST_DRIVES } from "@carshowroom/contracts";
 
 const MINUTE_MS = 60_000;
 const DAY_MS = 24 * 60 * MINUTE_MS;

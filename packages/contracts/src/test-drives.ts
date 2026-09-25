@@ -15,6 +15,17 @@ export const testDriveStatuses = ["scheduled", "completed", "no_show", "cancelle
 
 export type TestDriveStatus = (typeof testDriveStatuses)[number];
 
+/**
+ * TD-6: не больше двух активных будущих записей у клиента.
+ *
+ * Правило проверяет сервер, но число нужно и фронту — чтобы погасить кнопку
+ * заранее и не вести человека в модалку ради ошибки 422 (раздел 4
+ * docs/wireframes.md). Живёт в контракте по той же причине, что и
+ * CARS_PAGE_SIZE: иначе двойка разъезжается между apps/api и apps/web,
+ * и расхождение заметят только на защите.
+ */
+export const MAX_ACTIVE_TEST_DRIVES = 2;
+
 // ---------------------------------------------------------------------
 // GET /api/cars/:slug/slots?date=YYYY-MM-DD
 // ---------------------------------------------------------------------
