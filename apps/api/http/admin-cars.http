@@ -1,0 +1,135 @@
+### CarShowroom — карточки автомобилей в админке (UC-A3, UC-A4, D26).
+### Перед прогоном: apps/api запущен (`npm run dev:api`), БД накатана
+### (`npm run db:migrate && npm run db:seed`). Cookie сессии REST-клиент
+### хранит сам, поэтому после входа запросы идут от админа.
+###
+### Админ через API не создаётся (UC-A2) — в проекте его заводит seed.
+### Для прогона вручную:
+###
+###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
+###     -c "update users set role = 'admin' where email = 'admin@example.com';"
+###
+### id справочников и цветов в теле #5 — из ответа #4 (options).
+
+@baseUrl = http://localhost:3000
+@origin = http://localhost:3000
+@adminEmail = admin@example.com
+@password = SuperSecret123!
+### id автомобиля, созданного в #5 (поле id ответа)
+@carId = 1
+### id автомобиля из seed, на который есть записи на тест-драйв
+@carWithTestDrivesId = 1
+
+
+### 1. Вход админом.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{password}}"
+}
+
+
+### 2. Список вместе с черновиками: поиск по названию и slug, статус, страницы.
+# status: all (по умолчанию) | published | draft. Страница — 20 строк.
+GET {{baseUrl}}/api/admin/cars?q=m3&status=all&page=1
+
+
+### 3. Только черновики.
+GET {{baseUrl}}/api/admin/cars?status=draft
+
+
+### 4. Справочники формы: серии, кузова, двигатели, цвета.
+GET {{baseUrl}}/api/admin/cars/options
+
+
+### 5. Создание — 201, всегда черновик (isPublished: false), фото пока нет.
+# colorIds может быть пустым: палитра нужна только 3D-просмотру.
+POST {{baseUrl}}/api/admin/cars
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "name": "BMW M3 Тестовый",
+  "slug": "bmw-m3-test",
+  "seriesId": 1,
+  "bodyTypeId": 1,
+  "fuelTypeId": 1,
+  "driveType": "xdrive",
+  "modelYear": 2026,
+  "description": "Черновик, заведённый из REST-клиента.",
+  "powerHp": 530,
+  "accelerationS": "3.5",
+  "topSpeedKmh": 290,
+  "price": "12500000.00",
+  "colorIds": [1, 2]
+}
+
+
+### 6. Тот же slug второй раз — 409 SLUG_TAKEN, details.field = "slug".
+# Занятое название при свободном slug — 409 NAME_TAKEN.
+POST {{baseUrl}}/api/admin/cars
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "name": "BMW M3 Другой",
+  "slug": "bmw-m3-test",
+  "seriesId": 1,
+  "bodyTypeId": 1,
+  "fuelTypeId": 1,
+  "driveType": "xdrive",
+  "modelYear": 2026,
+  "description": "Повтор slug.",
+  "powerHp": 530,
+  "accelerationS": "3.5",
+  "topSpeedKmh": 290,
+  "price": "12500000.00",
+  "colorIds": []
+}
+
+
+### 7. Карточка для редактирования: поля, палитра, фото, модель, число записей.
+GET {{baseUrl}}/api/admin/cars/{{carId}}
+
+
+### 8. Изменение — только переданные поля; colorIds заменяет палитру целиком.
+# Пустое тело — 400 VALIDATION_FAILED; несуществующий id цвета или
+# справочника — 400 VALIDATION_FAILED с details.field.
+PATCH {{baseUrl}}/api/admin/cars/{{carId}}
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "price": "11900000.00",
+  "colorIds": [2]
+}
+
+
+### 9. Публикация без фото — 409 CAR_NOT_READY.
+# Фото добавляется загрузкой (этап файлов, UC-A5) или вручную SQL-ом:
+#   insert into car_images (car_id, position, path, alt)
+#   values (<carId>, 1, '/assets/cars/bmw-m3-test-1.webp', 'BMW M3');
+# После этого — 200, isPublished: true; повтор — тоже 200 без изменений.
+POST {{baseUrl}}/api/admin/cars/{{carId}}/publish
+Origin: {{origin}}
+
+
+### 10. Снятие с публикации — 200, isPublished: false; повтор — тоже 200.
+POST {{baseUrl}}/api/admin/cars/{{carId}}/unpublish
+Origin: {{origin}}
+
+
+### 11. Удаление автомобиля без записей — 204, пустое тело. Повтор — 404 NOT_FOUND.
+# Фото и палитра уходят вместе с ним, файлы /media/... — из MinIO.
+DELETE {{baseUrl}}/api/admin/cars/{{carId}}
+Origin: {{origin}}
+
+
+### 12. Удаление автомобиля с записями на тест-драйв (любого статуса) —
+# 409 CAR_HAS_TEST_DRIVES, автомобиль остаётся. Такой можно только снять
+# с публикации (#10).
+DELETE {{baseUrl}}/api/admin/cars/{{carWithTestDrivesId}}
+Origin: {{origin}}
