@@ -174,9 +174,11 @@ erDiagram
 - `/media/cars/<carId>/<uuid>.<ext>` и `/media/models/<carId>/<uuid>.glb` — загруженные
   админом, объекты в MinIO (D26).
 
-CHECK-и путей (`car_images_path_ck`, `cars_model_3d_path_ck`) сейчас допускают только
-`^/assets/...`; миграция этапа 2 расширяет их до `^/media/(cars|models)/...` (фото —
-`webp|avif|jpg|png`, модель — `glb`). SQL-файлы этой папки синхронизируются тогда же.
+CHECK-и путей (`car_images_path_ck`, `cars_model_3d_path_ck`) допускают оба префикса:
+`^/assets/...` и `^/media/cars/<carId>/<uuid>.(webp|avif|jpg|png)` /
+`^/media/models/<carId>/<uuid>.glb`. Расширены миграцией
+`apps/api/db/migrations/20261013120000_media_paths.sql`; формат `/media` уже, чем
+у `/assets`, — ключи генерирует только API.
 
 Объекты в MinIO БД не видит: внешнего ключа на файл не бывает. Поэтому файлы убирает
 API — **после** коммита транзакции, которая перестала на них ссылаться (замена фото

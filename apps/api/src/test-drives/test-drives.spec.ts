@@ -231,6 +231,50 @@ describe("Тест-драйвы", () => {
     });
   });
 
+  // Новая карточка из админки — черновик (D26): пока её не опубликовали,
+  // записаться на неё нельзя ни по slug, ни по id, иначе черновик «утёк» бы
+  // через форму записи, хотя в каталоге его нет.
+  describe("черновик автомобиля", () => {
+    const slug = "spec-draft-test-drive";
+    let draftId: number;
+
+    beforeAll(async () => {
+      const [row] = await sql<{ id: number }[]>`
+        insert into cars (series_id, body_type_id, fuel_type_id, slug, name, model_year,
+                          description, drive_type, power_hp, acceleration_s, top_speed_kmh,
+                          price, is_published)
+        values ((select min(id) from series),
+                (select min(id) from body_types),
+                (select min(id) from fuel_types),
+                ${slug}, 'Черновик (тест тест-драйвов)', 2026,
+                'Черновик карточки: записи на него быть не должно.',
+                'rwd', 200, 6.5, 240, 5000000, false)
+        returning id::int as id`;
+      draftId = row!.id;
+    });
+
+    afterAll(async () => {
+      await sql`delete from cars where slug = ${slug}`;
+    });
+
+    it("слоты по slug — NOT_FOUND", async () => {
+      await expect(testDrives.getSlots(slug, date)).rejects.toMatchObject({
+        code: "NOT_FOUND",
+        status: 404,
+      });
+    });
+
+    it("запись по id — NOT_FOUND", async () => {
+      await expect(
+        testDrives.create(clientId, {
+          carId: draftId,
+          startsAt: slotAt(11),
+          phone: "+79990000001",
+        }),
+      ).rejects.toMatchObject({ code: "NOT_FOUND", status: 404 });
+    });
+  });
+
   describe("POST /api/me/test-drives/:id/cancel", () => {
     it("отменяет свою будущую запись", async () => {
       const created = await testDrives.create(clientId, {

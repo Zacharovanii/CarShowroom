@@ -103,7 +103,7 @@ CREATE TABLE public.car_images (
     path text NOT NULL,
     alt text NOT NULL,
     CONSTRAINT car_images_alt_ck CHECK ((length(btrim(alt)) > 0)),
-    CONSTRAINT car_images_path_ck CHECK ((path ~ '^/assets/[a-z0-9/_.-]+\.(webp|avif|jpg|png)$'::text)),
+    CONSTRAINT car_images_path_ck CHECK (((path ~ '^/assets/[a-z0-9/_.-]+\.(webp|avif|jpg|png)$'::text) OR (path ~ '^/media/cars/[0-9]+/[a-z0-9-]+\.(webp|avif|jpg|png)$'::text))),
     CONSTRAINT car_images_position_ck CHECK (("position" >= 1))
 );
 
@@ -147,7 +147,7 @@ CREATE TABLE public.cars (
     CONSTRAINT cars_description_ck CHECK ((length(btrim(description)) > 0)),
     CONSTRAINT cars_drive_ck CHECK ((drive_type = ANY (ARRAY['rwd'::text, 'xdrive'::text]))),
     CONSTRAINT cars_model_3d_ck CHECK (((model_3d_path IS NULL) = (paint_material IS NULL))),
-    CONSTRAINT cars_model_3d_path_ck CHECK (((model_3d_path IS NULL) OR (model_3d_path ~ '^/assets/[a-z0-9/_.-]+\.glb$'::text))),
+    CONSTRAINT cars_model_3d_path_ck CHECK (((model_3d_path IS NULL) OR (model_3d_path ~ '^/assets/[a-z0-9/_.-]+\.glb$'::text) OR (model_3d_path ~ '^/media/models/[0-9]+/[a-z0-9-]+\.glb$'::text))),
     CONSTRAINT cars_name_ck CHECK ((length(btrim(name)) > 0)),
     CONSTRAINT cars_paint_material_ck CHECK (((paint_material IS NULL) OR (length(btrim(paint_material)) > 0))),
     CONSTRAINT cars_price_ck CHECK ((price > (0)::numeric)),
@@ -837,4 +837,5 @@ ALTER TABLE ONLY public.test_drives
 --
 
 INSERT INTO public.schema_migrations (version) VALUES
-    ('20260919120000');
+    ('20260919120000'),
+    ('20261013120000');

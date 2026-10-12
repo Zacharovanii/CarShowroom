@@ -104,6 +104,29 @@ select expect_violation($$
     select id, 3, '/tmp/x.webp', 'alt' from cars where slug = 'smoke-x5-xdrive40i'
 $$, 'car_images_path_ck');
 
+-- Загруженное админом (D26): /media/cars/<carId>/<uuid>.<ext> принимается,
+-- а произвольная структура под /media — нет: ключи генерирует только API
+insert into car_images (car_id, position, path, alt)
+select id, 3, '/media/cars/' || id || '/0b6f3c1e-9d2a-4f5b-8c7d-1e2f3a4b5c6d.webp', 'alt'
+from cars where slug = 'smoke-x5-xdrive40i';
+
+select expect_violation($$
+    insert into car_images (car_id, position, path, alt)
+    select id, 4, '/media/cars/x5/photo.webp', 'alt' from cars where slug = 'smoke-x5-xdrive40i'
+$$, 'car_images_path_ck');
+
+select expect_violation($$
+    insert into car_images (car_id, position, path, alt)
+    select id, 4, '/media/models/' || id || '/0b6f3c1e.webp', 'alt' from cars where slug = 'smoke-x5-xdrive40i'
+$$, 'car_images_path_ck');
+
+update cars set model_3d_path = '/media/models/' || id || '/0b6f3c1e-9d2a-4f5b-8c7d-1e2f3a4b5c6d.glb'
+where slug = 'smoke-x5-xdrive40i';
+
+select expect_violation($$
+    update cars set model_3d_path = '/media/cars/' || id || '/model.glb' where slug = 'smoke-x5-xdrive40i'
+$$, 'cars_model_3d_path_ck');
+
 -- Обложка одна: position уникален в пределах автомобиля
 select expect_violation($$
     insert into car_images (car_id, position, path, alt)

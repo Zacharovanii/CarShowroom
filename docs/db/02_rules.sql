@@ -59,12 +59,17 @@ alter table cars
     add constraint cars_price_ck       check (price > 0),
     -- путь к GLB и имя материала краски имеют смысл только вместе
     add constraint cars_model_3d_ck       check ((model_3d_path is null) = (paint_material is null)),
-    add constraint cars_model_3d_path_ck  check (model_3d_path is null or model_3d_path ~ '^/assets/[a-z0-9/_.-]+\.glb$'),
+    -- /assets/... — файлы seed-а; /media/models/<carId>/<uuid>.glb — загружено админом (D26)
+    add constraint cars_model_3d_path_ck  check (model_3d_path is null
+                                                 or model_3d_path ~ '^/assets/[a-z0-9/_.-]+\.glb$'
+                                                 or model_3d_path ~ '^/media/models/[0-9]+/[a-z0-9-]+\.glb$'),
     add constraint cars_paint_material_ck check (paint_material is null or length(btrim(paint_material)) > 0);
 
 alter table car_images
     add constraint car_images_position_ck check (position >= 1),
-    add constraint car_images_path_ck     check (path ~ '^/assets/[a-z0-9/_.-]+\.(webp|avif|jpg|png)$'),
+    -- /assets/... — файлы seed-а; /media/cars/<carId>/<uuid>.<ext> — загружено админом (D26)
+    add constraint car_images_path_ck     check (path ~ '^/assets/[a-z0-9/_.-]+\.(webp|avif|jpg|png)$'
+                                                 or path ~ '^/media/cars/[0-9]+/[a-z0-9-]+\.(webp|avif|jpg|png)$'),
     add constraint car_images_alt_ck      check (length(btrim(alt)) > 0);
 
 alter table colors
