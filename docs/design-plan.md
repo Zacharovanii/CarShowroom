@@ -166,14 +166,16 @@ API дополнительно разбирает JSON-чанк и ищет ма
 
 ## 8. Архитектура фронта
 
-Сверено с кодом на этапе 11 — дерево ниже описывает то, что есть.
+Сверено с кодом на этапе 11, дополнено D26 (фронт админки каталога) — дерево ниже
+описывает то, что есть.
 
 ```
 apps/web/src/
   main.tsx
   app/                 # App (провайдеры: QueryClient, AuthProvider, ToastProvider,
                        #   BrowserRouter), AppRoutes — карта маршрутов
-  pages/               # страницы-маршруты: тонкие, собирают фичи
+  pages/               # страницы-маршруты: тонкие, собирают фичи;
+                       #   admin/ — UsersPage, CarsPage, CarNewPage, CarEditPage
   features/
     auth/              # authClient (Better Auth), AuthContext, ProtectedRoute/RoleRoute/
                        #   GuestOnlyRoute, формы входа, регистрации, профиля, пароля
@@ -184,11 +186,15 @@ apps/web/src/
     test-drives/       # DayStrip, SlotGrid, BookingDialog, «Мои записи», отмена
     manager/           # день записей, фильтры, таблица, панель смены статуса
     admin/             # список пользователей, форма создания менеджера
+    admin-cars/        # управление каталогом (D26): хуки списка, справочников, карточки
+                       #   и мутаций (полей, публикации, фото, модели), AdminCarsList,
+                       #   AdminCarForm, AdminCarActions, AdminCarImages, AdminCarModel
   components/
     ui/                # примитивы дизайн-системы (инвентарь — design-system.md §8)
     layout/            # RootLayout (каркас с <Outlet />), Header, Footer
   shared/
-    api/               # fetch-клиент: база, ошибки из contracts, credentials
+    api/               # fetch-клиент: база, ошибки из contracts, credentials;
+                       #   FormData в body уходит multipart-ом без JSON-заголовка
     format/            # деньги, даты
     form/              # разбор ZodError в «поле → сообщение»
     hooks/             # useDebouncedField, useMediaQuery
