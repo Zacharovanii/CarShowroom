@@ -8,6 +8,7 @@ import { CatalogModule } from "./catalog/catalog.module.js";
 import { TestDrivesModule } from "./test-drives/test-drives.module.js";
 import { ManagerModule } from "./manager/manager.module.js";
 import { AdminModule } from "./admin/admin.module.js";
+import { AdminCarsModule } from "./admin-cars/admin-cars.module.js";
 import { AllExceptionsFilter } from "./common/all-exceptions.filter.js";
 import { AppController } from "./app.controller.js";
 import { AppService } from "./app.service.js";
@@ -22,6 +23,7 @@ import { AppService } from "./app.service.js";
     TestDrivesModule,
     ManagerModule,
     AdminModule,
+    AdminCarsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: AllExceptionsFilter }],
