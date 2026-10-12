@@ -40,7 +40,10 @@
 
 ## 4. API
 
-Префикс `/api`. Ошибки — единый формат из contracts:
+Префикс `/api` — у всех эндпоинтов, кроме раздачи файлов: `/assets/*` (seed-файлы
+из репозитория и `licensed-assets`, D15.1, D25) и `/media/*` (загруженные админом,
+из MinIO, D26). Пути к файлам лежат в БД целиком, фронт подставляет их как есть
+и `/assets` от `/media` не отличает. Ошибки — единый формат из contracts:
 `{ "error": { "code": "SLOT_TAKEN", "message": "...", "details"?: {...} } }`.
 Даты и деньги — строки (инвариант контракта).
 
@@ -49,23 +52,61 @@
 | * | `/api/auth/*` | — | Better Auth: sign-up/email, sign-in/email, sign-out, get-session, update-user, change-password |
 | GET | `/api/catalog/filters` | гость | справочники для фильтров: серии, кузова, типы двигателя (`id`, `name`, `position`) |
 | GET | `/api/cars` | гость | каталог: `q`, `series`, `body`, `fuel` (id из справочников), `drive`, `priceMin`, `priceMax`, `sort`, `page` |
-| GET | `/api/cars/:slug` | гость | автомобиль: характеристики, цена, фото, палитра, путь к GLB |
-| GET | `/api/cars/:slug/slots` | гость | `date` → 9 слотов дня со статусом свободен/занят/недоступен |
+| GET | `/api/cars/:slug` | гость | автомобиль: характеристики, цена, фото, палитра, путь к GLB; черновик → 404 `NOT_FOUND` |
+| GET | `/api/cars/:slug/slots` | гость | `date` → 9 слотов дня со статусом свободен/занят/недоступен; черновик → 404 `NOT_FOUND` |
 | GET | `/api/me/test-drives` | клиент | свои записи: предстоящие и история |
-| POST | `/api/me/test-drives` | клиент | `carId`, `startsAt`, `phone`, `comment?` → 409 `SLOT_TAKEN`, 422 `TOO_MANY_ACTIVE` |
+| POST | `/api/me/test-drives` | клиент | `carId`, `startsAt`, `phone`, `comment?` → 409 `SLOT_TAKEN`, 422 `TOO_MANY_ACTIVE`, черновик → 404 `NOT_FOUND` |
 | POST | `/api/me/test-drives/:id/cancel` | клиент | отмена своей будущей записи |
 | GET | `/api/manager/test-drives` | менеджер | `date`, `carId?`, `status?` → записи дня с клиентом |
 | PATCH | `/api/manager/test-drives/:id` | менеджер | `status`: `completed` / `no_show` / `cancelled` + `cancelReason` |
 | GET | `/api/admin/users` | админ | `q?`, `role?`, `page` — список пользователей |
 | POST | `/api/admin/users` | админ | `name`, `email`, `phone`, `password` → менеджер |
+| GET | `/api/admin/cars` | админ | `q?` (название, slug), `status?` (`all` по умолчанию / `published` / `draft`), `page` — список вместе с черновиками |
+| GET | `/api/admin/cars/options` | админ | справочники для формы: серии, кузова, типы двигателя, цвета (`id`, `name`) |
+| GET | `/api/admin/cars/:id` | админ | карточка для редактирования: id справочников, `colorIds`, фото (`id`, `position`, `path`, `alt`), модель, `isPublished`, `testDrivesCount` → 404 `NOT_FOUND` |
+| POST | `/api/admin/cars` | админ | поля автомобиля, `slug`, `colorIds` → 201, черновик (`isPublished: false`); 409 `SLUG_TAKEN`, `NAME_TAKEN` |
+| PATCH | `/api/admin/cars/:id` | админ | любые поля, `slug`; `colorIds` заменяет палитру целиком → 409 `SLUG_TAKEN`, `NAME_TAKEN` |
+| POST | `/api/admin/cars/:id/publish` | админ | опубликовать; повтор — 200 без изменений → 409 `CAR_NOT_READY` (нет ни одного фото) |
+| POST | `/api/admin/cars/:id/unpublish` | админ | снять с публикации; повтор — 200 без изменений, ограничений нет |
+| DELETE | `/api/admin/cars/:id` | админ | удалить вместе с файлами в MinIO → 204; 409 `CAR_HAS_TEST_DRIVES` (есть записи в любом статусе) |
+| POST | `/api/admin/cars/:id/images` | админ | multipart `file`, `alt` → 201, фото в конец |
+| PUT | `/api/admin/cars/:id/images/:imageId/file` | админ | multipart `file` — заменить файл; `position` и `alt` не меняются |
+| PATCH | `/api/admin/cars/:id/images/:imageId` | админ | `alt` |
+| PUT | `/api/admin/cars/:id/images/order` | админ | `imageIds` — полный новый порядок, ровно текущие фото → 400 `VALIDATION_FAILED` |
+| DELETE | `/api/admin/cars/:id/images/:imageId` | админ | удалить, позиции сдвигаются без дыр → 409 `LAST_IMAGE` (последнее фото опубликованного) |
+| PUT | `/api/admin/cars/:id/model` | админ | multipart `file` (GLB), `paintMaterial` (`CarPaint` по умолчанию) → 400 `PAINT_MATERIAL_NOT_FOUND` |
+| DELETE | `/api/admin/cars/:id/model` | админ | убрать модель: `model_3d_path` и `paint_material` → `null` |
+| GET | `/media/*` | все | вне `/api`: загруженный файл из MinIO, `Cache-Control: public, max-age=31536000, immutable` (ключ с uuid, файл по ключу не меняется); публикацию не проверяет → 404, если объекта нет |
+
+**Загрузка файлов** — `multipart/form-data` через Nest, поле `file` (+ `alt` у фото,
++ `paintMaterial` у модели). Лимиты: фото 10 МБ (JPEG, PNG, WebP, AVIF), модель 60 МБ
+(GLB 2.0). Формат проверяется по сигнатуре файла, а не по `mimetype` от клиента; у GLB
+API дополнительно разбирает JSON-чанк и ищет материал `paintMaterial`. Все мутации
+карточки, фото и модели возвращают полную админскую карточку (как
+`GET /api/admin/cars/:id`) — фронт кладёт её в кеш без второго запроса. Исключение —
+`DELETE /api/admin/cars/:id`: карточки больше нет, ответ 204. Не найден автомобиль или
+фото (в том числе фото чужого автомобиля) — 404 `NOT_FOUND`.
 
 Коды ошибок: `SLOT_TAKEN` (409), `TOO_MANY_ACTIVE`, `SLOT_OUT_OF_RANGE`,
 `SLOT_NOT_ON_GRID`, `ALREADY_CLOSED`, `TOO_LATE_TO_CANCEL`, `SLOT_NOT_STARTED`, `EMAIL_TAKEN`,
-`NOT_FOUND`, `FORBIDDEN`, `VALIDATION_FAILED`.
+`NOT_FOUND`, `FORBIDDEN`, `VALIDATION_FAILED`; управление каталогом (D26): `SLUG_TAKEN`,
+`NAME_TAKEN`, `CAR_HAS_TEST_DRIVES`, `CAR_NOT_READY`, `LAST_IMAGE` (409), `INVALID_FILE`,
+`PAINT_MATERIAL_NOT_FOUND` (400, в `details.materials` — имена материалов в файле),
+`FILE_TOO_LARGE` (413).
 
 `SLOT_NOT_STARTED` (422) добавлен при реализации менеджера: результат визита
 (`completed` / `no_show`) отмечается только после начала слота, а отмена — только до
 (UC-M2). Для второй половины правила код уже был — `TOO_LATE_TO_CANCEL`.
+
+Коды каталога добавлены с управлением каталогом из админки (D26). `SLUG_TAKEN` и
+`NAME_TAKEN` — перевод `unique_violation` (23505) по имени ограничения (`cars_slug_uq`,
+`cars_name_uq`), как `SLOT_TAKEN`: БД сама гарантирует уникальность, отдельный `select`
+не нужен. `CAR_HAS_TEST_DRIVES` — удалять автомобиль с историей записей нельзя, его
+снимают с публикации. `CAR_NOT_READY` и `LAST_IMAGE` — две стороны одного правила
+«у опубликованного автомобиля есть хотя бы одно фото»: без обложки карточка каталога
+пустая. Ошибки файла отделены от `VALIDATION_FAILED`, чтобы форма показала их у поля
+загрузки, а не у полей карточки; для `PAINT_MATERIAL_NOT_FOUND` список материалов
+в `details` позволяет админу сразу исправить имя.
 
 **Открыто:** пагинация страницами или «показать ещё» (курсор)? Черновик: `page` + `pageSize`, данных мало.
 
@@ -74,6 +115,21 @@
 ## 5. Карта маршрутов
 
 > **Заменено** разделом «Страницы» в [use-cases.md](use-cases.md).
+
+**Дополнено D26** (13.10.2026) — страницы управления каталогом. Источник истины —
+по-прежнему «Страницы» в use-cases.md, здесь только сводка:
+
+- `/admin/cars` — список автомобилей с черновиками: поиск по названию и slug, фильтр
+  «все / опубликованные / черновики», страницы, кнопка «Добавить автомобиль».
+- `/admin/cars/new` — создание черновика: только поля карточки и палитра. После
+  сохранения — переход на `/admin/cars/:id`: фото и модель привязываются к `id`,
+  которого до создания нет.
+- `/admin/cars/:id` — редактирование: поля и палитра, фото (загрузка, замена, `alt`,
+  порядок, удаление), 3D-модель, «Опубликовать» / «Снять с публикации», удаление
+  (при записях вместо него предлагается снять с публикации).
+
+Доступ — админ. В админской навигации два пункта: «Пользователи» (`/admin/users`)
+и «Автомобили» (`/admin/cars`); вход админа по-прежнему ведёт на `/admin/users`.
 
 Вайрфреймы: для каждой страницы — desktop и mobile, со всеми состояниями
 (загрузка, пусто, ошибка, гость / клиент / сотрудник).
