@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Injectable, Logger } from "@nestjs/common";
 import {
   ADMIN_CARS_PAGE_SIZE,
@@ -12,13 +13,16 @@ import {
 } from "@carshowroom/contracts";
 import { AppError } from "../common/app-error.js";
 import { StorageService } from "../storage/storage.service.js";
-import { isMediaPath, keyFromMediaPath } from "../storage/media-path.js";
+import { isMediaPath, keyFromMediaPath, mediaPathFromKey } from "../storage/media-path.js";
 import {
   AdminCarsRepository,
   type AdminCarImageRow,
   type AdminCarListRow,
   type AdminCarRow,
+  type DeleteImageOutcome,
+  type ReorderImagesOutcome,
 } from "./admin-cars.repository.js";
+import { detectImage, GLB_CONTENT_TYPE, readGlbMaterials } from "./file-checks.js";
 
 // Ошибка postgres.js: `code` — код Postgres, `constraint_name` — имя
 // нарушенного ограничения (документированные поля, как в test-drives).
@@ -66,6 +70,22 @@ function toFieldError(error: unknown): unknown {
 
 function notFound(id: number): AppError {
   return new AppError("NOT_FOUND", "Автомобиль не найден", { id });
+}
+
+function imageNotFound(id: number, imageId: number): AppError {
+  return new AppError("NOT_FOUND", "Фото не найдено", { id, imageId });
+}
+
+/**
+ * 23505 при записи путей и позиций (car_images_path_uq, cars_model_3d_uq,
+ * car_images_car_position_uq) — не ошибка клиента: ключи с uuid, позиции
+ * считаются под блокировкой. Глобальный фильтр сделал бы из неё SLOT_TAKEN,
+ * поэтому превращаем в обычную ошибку — это 500 INTERNAL_ERROR.
+ */
+function toFileError(error: unknown): unknown {
+  const constraint = pgConstraint(error, "23505");
+  if (constraint === undefined) return error;
+  return new Error(`Нарушено ограничение ${constraint} при записи файла`, { cause: error });
 }
 
 /**
@@ -170,6 +190,135 @@ export class AdminCarsService {
     if (!paths) throw notFound(id);
 
     await this.deleteMediaObjects(paths);
+  }
+
+  /** UC-A5: новое фото в конец списка (201). */
+  async addImage(id: number, file: Buffer, alt: string): Promise<AdminCar> {
+    const { ext, contentType } = detectImage(file);
+    const key = `cars/${id}/${randomUUID()}.${ext}`;
+
+    await this.withUploaded(key, file, contentType, async () => {
+      if (!(await this.repository.addImage(id, mediaPathFromKey(key), alt))) throw notFound(id);
+    });
+    return this.getCar(id);
+  }
+
+  /** Замена файла фото; position и alt остаются, старый объект удаляется. */
+  async replaceImageFile(id: number, imageId: number, file: Buffer): Promise<AdminCar> {
+    const { ext, contentType } = detectImage(file);
+    const key = `cars/${id}/${randomUUID()}.${ext}`;
+
+    const oldPath = await this.withUploaded(key, file, contentType, async () => {
+      const outcome = await this.repository.replaceImageFile(id, imageId, mediaPathFromKey(key));
+      if (outcome === "car_not_found") throw notFound(id);
+      if (outcome === "image_not_found") throw imageNotFound(id, imageId);
+      return outcome.oldPath;
+    });
+
+    await this.deleteMediaObjects([oldPath]);
+    return this.getCar(id);
+  }
+
+  async updateImageAlt(id: number, imageId: number, alt: string): Promise<AdminCar> {
+    if (!(await this.repository.updateImageAlt(id, imageId, alt))) {
+      throw imageNotFound(id, imageId);
+    }
+    return this.getCar(id);
+  }
+
+  /** Полный новый порядок — ровно текущие фото, иначе 400. */
+  async reorderImages(id: number, imageIds: number[]): Promise<AdminCar> {
+    let outcome: ReorderImagesOutcome;
+    try {
+      outcome = await this.repository.reorderImages(id, imageIds);
+    } catch (error) {
+      throw toFileError(error);
+    }
+    if (outcome === "car_not_found") throw notFound(id);
+    if (outcome === "mismatch") {
+      throw new AppError("VALIDATION_FAILED", "Порядок должен содержать ровно текущие фото", {
+        field: "imageIds",
+      });
+    }
+    return this.getCar(id);
+  }
+
+  /** Удаление фото; у опубликованного последнее удалить нельзя (D26). */
+  async deleteImage(id: number, imageId: number): Promise<AdminCar> {
+    let outcome: DeleteImageOutcome;
+    try {
+      outcome = await this.repository.deleteImage(id, imageId);
+    } catch (error) {
+      throw toFileError(error);
+    }
+    if (outcome === "car_not_found") throw notFound(id);
+    if (outcome === "image_not_found") throw imageNotFound(id, imageId);
+    if (outcome === "last_image") {
+      throw new AppError(
+        "LAST_IMAGE",
+        "Нельзя удалить последнее фото опубликованного автомобиля — сначала снимите его с публикации",
+        { id, imageId },
+      );
+    }
+
+    await this.deleteMediaObjects([outcome.oldPath]);
+    return this.getCar(id);
+  }
+
+  /**
+   * UC-A6: модель вместо прежней. Материал проверяется до загрузки в MinIO:
+   * без него 3D-просмотр не перекрасит кузов (D26).
+   */
+  async setModel(id: number, file: Buffer, paintMaterial: string): Promise<AdminCar> {
+    const materials = readGlbMaterials(file);
+    if (!materials.includes(paintMaterial)) {
+      throw new AppError("PAINT_MATERIAL_NOT_FOUND", `В модели нет материала «${paintMaterial}»`, {
+        field: "paintMaterial",
+        materials,
+      });
+    }
+    const key = `models/${id}/${randomUUID()}.glb`;
+
+    const oldPath = await this.withUploaded(key, file, GLB_CONTENT_TYPE, async () => {
+      const result = await this.repository.setModel(id, mediaPathFromKey(key), paintMaterial);
+      if (!result) throw notFound(id);
+      return result.oldPath;
+    });
+
+    if (oldPath) await this.deleteMediaObjects([oldPath]);
+    return this.getCar(id);
+  }
+
+  /** Повтор без модели — 200 с той же карточкой. */
+  async removeModel(id: number): Promise<AdminCar> {
+    const result = await this.repository.removeModel(id);
+    if (!result) throw notFound(id);
+
+    if (result.oldPath) await this.deleteMediaObjects([result.oldPath]);
+    return this.getCar(id);
+  }
+
+  /**
+   * Порядок D26: объект в MinIO → транзакция `write`. Если она упала или
+   * её исход — ошибка (нет автомобиля, нет фото), объект уже никому не
+   * нужен и удаляется; его собственная ошибка удаления только пишется
+   * в лог, наружу уходит исходная.
+   */
+  private async withUploaded<T>(
+    key: string,
+    body: Buffer,
+    contentType: string,
+    write: () => Promise<T>,
+  ): Promise<T> {
+    await this.storage.put(key, body, contentType);
+    try {
+      return await write();
+    } catch (error) {
+      await this.storage.delete(key).catch((deleteError: unknown) => {
+        this.logger.warn(`Не удалось удалить объект ${key}: ${String(deleteError)}`);
+      });
+      throw toFileError(error);
+    }
   }
 
   /**

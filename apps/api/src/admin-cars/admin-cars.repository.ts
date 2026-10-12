@@ -71,6 +71,16 @@ export interface ColorOptionRow {
 /** Что увидел publish под блокировкой строки — решение принимает сервис. */
 export type PublishOutcome = "published" | "not_found" | "no_images";
 
+/**
+ * Исходы операций над фото и моделью под блокировкой автомобиля. Как и
+ * PublishOutcome, ошибку по ним бросает сервис — уже после отката, чтобы
+ * убрать загруженный объект. `oldPath` — путь, который транзакция отвязала:
+ * его объект сервис удаляет из MinIO после коммита.
+ */
+export type ReplaceImageOutcome = "car_not_found" | "image_not_found" | { oldPath: string };
+export type DeleteImageOutcome = ReplaceImageOutcome | "last_image";
+export type ReorderImagesOutcome = "car_not_found" | "mismatch" | "reordered";
+
 type CarFields = Omit<UpdateAdminCar, "colorIds">;
 
 // Поле контракта → колонка cars. Белый список, а не transform драйвера:
@@ -333,6 +343,142 @@ export class AdminCarsRepository {
       const paths = images.map((image) => image.path);
       if (deleted?.model3dPath) paths.push(deleted.model3dPath);
       return paths;
+    });
+  }
+
+  /** UC-A5: фото в конец списка. `false` — автомобиля нет. */
+  async addImage(id: number, path: string, alt: string): Promise<boolean> {
+    return this.sql.begin(async (tx) => {
+      // блокировка и от параллельного deleteCar (иначе объект нового фото
+      // остался бы в MinIO без строки), и от параллельной загрузки —
+      // две вставки посчитали бы одинаковый max(position)
+      if (!(await this.lockCar(tx, id))) return false;
+
+      await tx`
+        insert into car_images (car_id, position, path, alt)
+        select ${id}, coalesce(max(position), 0) + 1, ${path}, ${alt}
+        from car_images
+        where car_id = ${id}`;
+      return true;
+    });
+  }
+
+  /** Новый файл того же фото: position и alt остаются. */
+  async replaceImageFile(id: number, imageId: number, path: string): Promise<ReplaceImageOutcome> {
+    return this.sql.begin(async (tx): Promise<ReplaceImageOutcome> => {
+      if (!(await this.lockCar(tx, id))) return "car_not_found";
+
+      const [image] = await tx<{ path: string }[]>`
+        select path from car_images
+        where id = ${imageId} and car_id = ${id}
+        for update`;
+      if (!image) return "image_not_found";
+
+      await tx`update car_images set path = ${path} where id = ${imageId}`;
+      return { oldPath: image.path };
+    });
+  }
+
+  /**
+   * Одно поле одной строки — блокировка автомобиля не нужна: файлов и
+   * правила про последнее фото это не касается. `false` — фото нет
+   * (или оно чужого автомобиля, или нет самого автомобиля).
+   */
+  async updateImageAlt(id: number, imageId: number, alt: string): Promise<boolean> {
+    const rows = await this.sql`
+      update car_images set alt = ${alt}
+      where id = ${imageId} and car_id = ${id}
+      returning id`;
+    return rows.length > 0;
+  }
+
+  /** `imageIds` — полный новый порядок, ровно текущие фото автомобиля. */
+  async reorderImages(id: number, imageIds: number[]): Promise<ReorderImagesOutcome> {
+    return this.sql.begin(async (tx): Promise<ReorderImagesOutcome> => {
+      // под блокировкой набор фото не изменится между сверкой и update
+      if (!(await this.lockCar(tx, id))) return "car_not_found";
+
+      const rows = await tx<{ id: number }[]>`
+        select id::int as id from car_images where car_id = ${id}`;
+      // id в imageIds уникальны (контракт), поэтому равных длин и
+      // вхождения каждого достаточно для совпадения наборов
+      const current = new Set(rows.map((row) => row.id));
+      if (current.size !== imageIds.length || !imageIds.every((imageId) => current.has(imageId))) {
+        return "mismatch";
+      }
+
+      // перестановка проходит через временные дубли (car_id, position):
+      // уникальность проверяется на коммите, а не после каждой строки
+      await tx`set constraints car_images_car_position_uq deferred`;
+      await tx`
+        update car_images i set position = t.ord
+        from unnest(${imageIds}::bigint[]) with ordinality as t(id, ord)
+        where i.id = t.id and i.car_id = ${id}`;
+      return "reordered";
+    });
+  }
+
+  /**
+   * Удаляет фото и сдвигает следующие на его место — позиции без дыр.
+   * Последнее фото опубликованного удалить нельзя (см. lockCar).
+   */
+  async deleteImage(id: number, imageId: number): Promise<DeleteImageOutcome> {
+    return this.sql.begin(async (tx): Promise<DeleteImageOutcome> => {
+      const car = await this.lockCar(tx, id);
+      if (!car) return "car_not_found";
+
+      const [image] = await tx<{ path: string; position: number; total: number }[]>`
+        select path,
+               position::int,
+               (select count(*)::int from car_images where car_id = ${id}) as total
+        from car_images
+        where id = ${imageId} and car_id = ${id}`;
+      if (!image) return "image_not_found";
+      if (car.isPublished && image.total === 1) return "last_image";
+
+      await tx`delete from car_images where id = ${imageId}`;
+      await tx`set constraints car_images_car_position_uq deferred`;
+      await tx`
+        update car_images set position = position - 1
+        where car_id = ${id} and position > ${image.position}`;
+      return { oldPath: image.path };
+    });
+  }
+
+  /**
+   * UC-A6: новая модель вместо прежней (если была). Возвращает прежний
+   * путь (`null` — модели не было); `undefined` — автомобиля нет.
+   */
+  async setModel(
+    id: number,
+    path: string,
+    paintMaterial: string,
+  ): Promise<{ oldPath: string | null } | undefined> {
+    return this.sql.begin(async (tx) => {
+      if (!(await this.lockCar(tx, id))) return undefined;
+
+      const [old] = await tx<{ model3dPath: string | null }[]>`
+        select model_3d_path from cars where id = ${id}`;
+      await tx`
+        update cars set model_3d_path = ${path}, paint_material = ${paintMaterial}
+        where id = ${id}`;
+      return { oldPath: old?.model3dPath ?? null };
+    });
+  }
+
+  /** Убирает модель; повтор без модели — не ошибка. `undefined` — автомобиля нет. */
+  async removeModel(id: number): Promise<{ oldPath: string | null } | undefined> {
+    return this.sql.begin(async (tx) => {
+      if (!(await this.lockCar(tx, id))) return undefined;
+
+      const [old] = await tx<{ model3dPath: string | null }[]>`
+        select model_3d_path from cars where id = ${id}`;
+      if (old?.model3dPath) {
+        await tx`
+          update cars set model_3d_path = null, paint_material = null
+          where id = ${id}`;
+      }
+      return { oldPath: old?.model3dPath ?? null };
     });
   }
 }
