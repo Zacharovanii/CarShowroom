@@ -31,6 +31,19 @@ export const envSchema = z.object({
       "список URL через запятую",
     )
     .optional(),
+  /**
+   * S3-хранилище файлов, загруженных админом (D26). В dev — MinIO из
+   * docker/compose.yml, значения совпадают с сервисами minio и minio-init.
+   */
+  S3_ENDPOINT: z.url(),
+  /**
+   * MinIO регион не проверяет, но AWS SDK без него не создаёт клиента
+   * и подписывает запросы с регионом — us-east-1 MinIO принимает всегда.
+   */
+  S3_REGION: z.string().min(1, "не должен быть пустым"),
+  S3_BUCKET: z.string().min(1, "не должен быть пустым"),
+  S3_ACCESS_KEY: z.string().min(1, "не должен быть пустым"),
+  S3_SECRET_KEY: z.string().min(1, "не должен быть пустым"),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;
