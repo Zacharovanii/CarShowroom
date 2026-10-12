@@ -236,6 +236,7 @@ apps/api/
     test-drives/       # константы правил (rules.ts), сетка слотов, запись, отмена
     manager/           # записи дня, смена статуса
     admin/             # пользователи, создание менеджера
+    storage/           # StorageService над MinIO (S3), MediaController: GET /media/*
   test/                # e2e: Vitest + supertest, тестовая БД
 ```
 
