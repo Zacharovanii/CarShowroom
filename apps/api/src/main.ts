@@ -1,8 +1,10 @@
 import "./env.js";
 import { join } from "node:path";
+import { RequestMethod } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module.js";
+import { MEDIA_ROUTE } from "./storage/media.controller.js";
 
 async function bootstrap() {
   // Better Auth сам парсит body своих маршрутов (JSON) и переставляет
@@ -12,7 +14,10 @@ async function bootstrap() {
   // Better Auth регистрирует /api/auth/* как raw middleware в обход роутера
   // Nest (httpAdapter.use, а не @Controller) — глобальный префикс его не
   // задевает, поэтому /api и basePath: "/api/auth" в auth.ts не удваиваются.
-  app.setGlobalPrefix("api");
+  // /media/* — не API, а раздача файлов рядом с /assets/... (D26). Nest
+  // сверяет exclude с объявленным путём маршрута (path-to-regexp v8),
+  // поэтому сюда идёт та же строка, что и в @Get контроллера.
+  app.setGlobalPrefix("api", { exclude: [{ path: MEDIA_ROUTE, method: RequestMethod.GET }] });
 
   // Без этого onModuleDestroy (закрытие пулов в DatabaseModule и AuthModule)
   // не вызывается на SIGTERM/SIGINT — docker compose down останавливал бы

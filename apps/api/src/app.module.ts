@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
 import { ConfigModule } from "./config/config.module.js";
 import { DatabaseModule } from "./db/db.module.js";
+import { StorageModule } from "./storage/storage.module.js";
 import { AuthModule } from "./auth/auth.module.js";
 import { CatalogModule } from "./catalog/catalog.module.js";
 import { TestDrivesModule } from "./test-drives/test-drives.module.js";
@@ -15,6 +16,7 @@ import { AppService } from "./app.service.js";
   imports: [
     ConfigModule,
     DatabaseModule,
+    StorageModule,
     AuthModule,
     CatalogModule,
     TestDrivesModule,

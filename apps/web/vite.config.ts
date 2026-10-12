@@ -82,9 +82,12 @@ export default defineConfig({
     // Всё, что начинается с /api, уходит в Nest. Это не только удобство:
     // сессия Better Auth — httpOnly cookie, и через прокси фронт и API
     // живут на одном origin, поэтому cookie ходит без CORS и SameSite-плясок.
+    // /assets (seed, заглушки) и /media (фото из админки, D26) — файлы,
+    // которые тоже раздаёт Nest.
     proxy: {
       "/api": { target: "http://localhost:3000", changeOrigin: true },
       "/assets": { target: "http://localhost:3000", changeOrigin: true },
+      "/media": { target: "http://localhost:3000", changeOrigin: true },
     },
   },
 });
