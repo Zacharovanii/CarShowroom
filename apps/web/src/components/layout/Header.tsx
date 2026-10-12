@@ -92,7 +92,13 @@ export function Header() {
     { to: "/", label: "Главная", end: true },
     { to: "/catalog", label: "Каталог" },
     ...(isStaff ? [{ to: "/manager", label: "Записи" }] : []),
-    ...(isAdmin ? [{ to: "/admin/users", label: "Пользователи" }] : []),
+    // Без `end`: карточка `/admin/cars/5` подсвечивает свой раздел
+    ...(isAdmin
+      ? [
+          { to: "/admin/users", label: "Пользователи" },
+          { to: "/admin/cars", label: "Автомобили" },
+        ]
+      : []),
   ];
 
   async function handleSignOut() {

@@ -1,0 +1,107 @@
+.form {
+  display: grid;
+  gap: var(--space-8);
+}
+
+/* Группа полей — fieldset без рамки браузера: делит форму смыслом, а не линиями */
+.group {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: var(--space-4);
+  font: var(--text-h4);
+  color: var(--color-fg);
+}
+
+/* Телефон — поля в столбец; шире — по два в ряд, длинные во всю строку */
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.hint {
+  font: var(--text-body-sm);
+  color: var(--color-fg-subtle);
+}
+
+/* ---- Палитра -------------------------------------------------------------- */
+
+.colors {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.color {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Кружок цвета; заливку ставит inline-стиль из справочника. Рамка нужна
+   тёмным цветам на тёмном фоне — иначе кружок «пропадает». */
+.swatch {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  flex: none;
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-full);
+}
+
+/* Ошибка палитры — как у Field: у группы чекбоксов нет одного контрола для него */
+.error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-body-sm);
+  color: var(--color-danger);
+}
+
+.error :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+/* ---- Кнопки: на узком экране — в столбец во всю ширину (как AuthForm) ---- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.actions > * {
+  flex: 1 1 auto;
+}
+
+.skeletonField {
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .colors {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  }
+
+  .actions > * {
+    flex: 0 0 auto;
+  }
+}

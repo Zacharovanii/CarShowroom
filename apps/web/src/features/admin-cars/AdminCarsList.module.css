@@ -1,0 +1,153 @@
+/* ---- Миниатюра обложки ------------------------------------------------- */
+
+/* Ширина — из шкалы отступов: отдельного токена под миниатюру нет, а 64px
+   хватает, чтобы узнать машину. Пропорция 3:2 — как у фото каталога. */
+.thumb,
+.thumbSlot {
+  display: block;
+  width: var(--space-10);
+  aspect-ratio: 3 / 2;
+  flex: none;
+}
+
+.thumb {
+  object-fit: cover;
+  /* На тон темнее подсветки строки: заглушка не сливается с ней при наведении */
+  background: var(--color-surface-active);
+  border-radius: var(--radius-surface);
+}
+
+/* Заглушка без фото: тот же прямоугольник со знаком «нет снимка» */
+span.thumb {
+  display: grid;
+  place-items: center;
+  color: var(--color-fg-subtle);
+}
+
+.thumbIcon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+}
+
+.name {
+  color: var(--color-fg);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+
+/* Растянутая ссылка: её псевдоэлемент накрывает всю строку или карточку,
+   поэтому кликом ведёт куда угодно в ней, а в порядке Tab ссылка одна. */
+.name::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.price,
+.number {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.price {
+  color: var(--color-fg);
+}
+
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* ---- Таблица (планшет и шире) ----------------------------------------- */
+
+/* Шесть столбцов в узкий контейнер не влезают — таблица прокручивается
+   внутри своей рамки, а не растягивает страницу. */
+.scroller {
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--text-body-sm);
+}
+
+.th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  white-space: nowrap;
+  color: var(--color-fg-subtle);
+  font: var(--text-caption);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Точка отсчёта для растянутой ссылки */
+.row {
+  position: relative;
+  transition: background-color var(--duration-1) var(--ease-standard);
+}
+
+.row:hover,
+.row:focus-within {
+  background: var(--color-surface-hover);
+}
+
+.row + .row .td {
+  border-top: 1px solid var(--color-border);
+}
+
+.td {
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-fg-muted);
+  vertical-align: middle;
+}
+
+/* ---- Карточки (телефон) ------------------------------------------------ */
+
+.cards {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  font: var(--text-body-sm);
+  transition: background-color var(--duration-1) var(--ease-standard);
+}
+
+.card:hover,
+.card:focus-within {
+  background: var(--color-surface-hover);
+}
+
+.cardBody {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.meta {
+  color: var(--color-fg-muted);
+}
+
+.cardBody .badges {
+  margin-top: var(--space-1);
+}

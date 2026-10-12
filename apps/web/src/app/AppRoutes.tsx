@@ -13,6 +13,9 @@ import AccountLayout from "@/pages/account/AccountLayout";
 import ProfilePage from "@/pages/account/ProfilePage";
 import TestDrivesPage from "@/pages/account/TestDrivesPage";
 import UsersPage from "@/pages/admin/UsersPage";
+import CarsPage from "@/pages/admin/CarsPage";
+import CarNewPage from "@/pages/admin/CarNewPage";
+import CarEditPage from "@/pages/admin/CarEditPage";
 
 /**
  * ВРЕМЕННО, этап 2: витрина UI-кита. Грузится лениво — она нужна только
@@ -54,6 +57,9 @@ export function AppRoutes() {
 
         <Route element={<RoleRoute allow={["admin"]} />}>
           <Route path="admin/users" element={<UsersPage />} />
+          <Route path="admin/cars" element={<CarsPage />} />
+          <Route path="admin/cars/new" element={<CarNewPage />} />
+          <Route path="admin/cars/:id" element={<CarEditPage />} />
         </Route>
 
         <Route

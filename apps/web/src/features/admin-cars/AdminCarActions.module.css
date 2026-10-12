@@ -1,0 +1,27 @@
+/* Кнопки действий: переносятся, на телефоне — каждая во всю ширину строки */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.actions > * {
+  flex: 1 1 auto;
+}
+
+/* Подсказки по данным карточки: почему сервер может отказать */
+.notes {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+@media (min-width: 640px) {
+  .actions > * {
+    flex: 0 0 auto;
+  }
+}

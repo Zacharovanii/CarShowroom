@@ -1,0 +1,178 @@
+.root {
+  display: grid;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.empty,
+.hint {
+  margin: 0;
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+/* ---- Галерея: телефон — одна колонка, шире — две, на десктопе — три ---- */
+
+.list {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.preview {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: var(--color-bg-alt);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+}
+
+/* Замена или удаление идёт: превью притушено, поверх — спиннер */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--color-bg-translucent);
+  color: var(--color-fg);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+/* Подпись, под ней «Сохранить»: в узкой карточке рядом им тесно,
+   а ошибка под полем не сдвигает кнопку вбок */
+.altForm {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.altForm > :first-child {
+  justify-self: stretch;
+  min-width: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---- Загрузка новых фото ------------------------------------------------- */
+
+.upload {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.uploadTitle {
+  font: var(--text-h4);
+}
+
+/* Поле во всю ширину, кнопка под ним — по левому краю */
+.uploadRow {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.uploadField {
+  justify-self: stretch;
+  min-width: 0;
+}
+
+.queue {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Строка очереди: иконка, имя файла, статус; на телефоне статус уходит под имя */
+.queueItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+
+.queueItem[data-status="done"] {
+  color: var(--color-success);
+}
+
+.queueItem[data-status="error"] {
+  color: var(--color-danger);
+}
+
+.queueIcon {
+  display: inline-flex;
+}
+
+.queueIcon :global(svg) {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  stroke-width: var(--icon-stroke);
+}
+
+.queueName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-fg);
+}
+
+.queueStatus {
+  grid-column: 2;
+}
+
+@media (min-width: 640px) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .queueItem {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .queueStatus {
+    grid-column: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
