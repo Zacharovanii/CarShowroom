@@ -1,12 +1,5 @@
 import { z } from "zod";
-
-/**
- * Деньги на проводе — строка (инвариант контракта): в БД `numeric`,
- * postgres.js отдаёт его строкой, фронт её только форматирует.
- * Тот же формат принимаем и в фильтре цены, чтобы деньги нигде
- * не превращались в число с плавающей точкой.
- */
-const moneySchema = z.string().regex(/^\d+(\.\d{1,2})?$/, "цена — число вида 1000 или 1000.00");
+import { moneySchema } from "./common.js";
 
 export const driveTypes = ["rwd", "xdrive"] as const;
 export const carSorts = ["price-asc", "price-desc", "newest"] as const;

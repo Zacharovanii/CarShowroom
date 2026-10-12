@@ -92,3 +92,39 @@ export {
   usersResponseSchema,
 } from "./admin.js";
 export type { CreateManager, User, UserRole, UsersQuery, UsersResponse } from "./admin.js";
+
+export {
+  ADMIN_CARS_PAGE_SIZE,
+  adminCarColorOptionSchema,
+  adminCarImageSchema,
+  adminCarListItemSchema,
+  adminCarModelSchema,
+  adminCarOptionSchema,
+  adminCarOptionsSchema,
+  adminCarSchema,
+  adminCarStatuses,
+  adminCarsQuerySchema,
+  adminCarsResponseSchema,
+  carImageAltSchema,
+  carImagesOrderSchema,
+  carModelFieldsSchema,
+  createAdminCarSchema,
+  updateAdminCarSchema,
+} from "./admin-cars.js";
+export type {
+  AdminCar,
+  AdminCarColorOption,
+  AdminCarImage,
+  AdminCarListItem,
+  AdminCarModel,
+  AdminCarOption,
+  AdminCarOptions,
+  AdminCarStatus,
+  AdminCarsQuery,
+  AdminCarsResponse,
+  CarImageAlt,
+  CarImagesOrder,
+  CarModelFields,
+  CreateAdminCar,
+  UpdateAdminCar,
+} from "./admin-cars.js";
