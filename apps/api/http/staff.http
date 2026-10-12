@@ -3,18 +3,20 @@
 ### (`npm run db:migrate && npm run db:seed`). Cookie сессии REST-клиент
 ### хранит сам, поэтому после входа запросы идут от этого сотрудника.
 ###
-### Админ через API не создаётся (UC-A2) — в проекте его заводит seed.
-### Для прогона вручную:
-###
-###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
-###     -c "update users set role = 'admin' where email = 'admin@example.com';"
+### Админ через API не создаётся (UC-A2) — его заводит seed
+### (db/seed/users.mjs): admin@carshowroom.test / password123. Там же есть
+### готовый менеджер manager@carshowroom.test / password123; #3 заводит ещё одного.
 
 @baseUrl = http://localhost:3000
 @origin = http://localhost:3000
-@adminEmail = admin@example.com
+@adminEmail = admin@carshowroom.test
+@adminPassword = password123
+### менеджер, которого создаёт #3, и его временный пароль
 @managerEmail = manager@example.com
 @password = SuperSecret123!
-### день, на который смотрит менеджер, и id записи из #5
+### день, на который смотрит менеджер, и id записи из ответа #7. Seed пишет
+### записи от «сегодня», поэтому дату подставьте свою: для #9–#11 нужна
+### будущая запись (seed кладёт их на завтра и послезавтра).
 @date = 2026-10-03
 @testDriveId = 1
 
@@ -26,7 +28,7 @@ Origin: {{origin}}
 
 {
   "email": "{{adminEmail}}",
-  "password": "{{password}}"
+  "password": "{{adminPassword}}"
 }
 
 

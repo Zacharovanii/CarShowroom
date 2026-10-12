@@ -4,21 +4,19 @@
 ### (`npm run db:migrate && npm run db:seed`). Cookie сессии REST-клиент
 ### хранит сам, поэтому после входа запросы идут от админа.
 ###
-### Админ через API не создаётся (UC-A2) — в проекте его заводит seed.
-### Для прогона вручную:
-###
-###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
-###     -c "update users set role = 'admin' where email = 'admin@example.com';"
+### Админ через API не создаётся (UC-A2) — его заводит seed
+### (db/seed/users.mjs): admin@carshowroom.test / password123.
 ###
 ### id справочников и цветов в теле #5 — из ответа #4 (options).
 
 @baseUrl = http://localhost:3000
 @origin = http://localhost:3000
-@adminEmail = admin@example.com
-@password = SuperSecret123!
+@adminEmail = admin@carshowroom.test
+@password = password123
 ### id автомобиля, созданного в #5 (поле id ответа)
 @carId = 1
-### id автомобиля из seed, на который есть записи на тест-драйв
+### id автомобиля из seed, на который есть записи на тест-драйв (любой из
+### db/seed/test-drives.mjs, например m4-competition: id — в GET /api/cars/m4-competition)
 @carWithTestDrivesId = 1
 ### id фото автомобиля carId (поле images[].id ответа #13)
 @imageId = 1

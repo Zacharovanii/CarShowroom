@@ -519,5 +519,73 @@ describe("Админ: карточки автомобилей (e2e)", () => {
         .set("Cookie", adminCookie)
         .expect(200);
     });
+
+    describe("сквозной сценарий", () => {
+      it("черновик → фото → публикация → модель → замена фото → снятие → удаление", async () => {
+        const inList = async (name: string) =>
+          carsResponseSchema
+            .parse(
+              (
+                await request(http)
+                  .get(`/api/cars?q=${encodeURIComponent(name)}`)
+                  .expect(200)
+              ).body,
+            )
+            .items.map((item) => [item.id, item.has3d]);
+
+        const car = await createCar();
+        expect(car.isPublished).toBe(false);
+
+        const photo = adminCarSchema.parse((await uploadImage(car.id).expect(201)).body).images[0]!;
+        await request(http).get(photo.path).expect(200);
+
+        await request(http)
+          .post(`/api/admin/cars/${car.id}/publish`)
+          .set("Cookie", adminCookie)
+          .expect(200);
+        expect(await inList(car.name)).toEqual([[car.id, false]]);
+        const published = carDetailsSchema.parse(
+          (await request(http).get(`/api/cars/${car.slug}`).expect(200)).body,
+        );
+        expect(published.model3dPath).toBeNull();
+
+        const model = adminCarSchema.parse((await uploadModel(car.id).expect(200)).body).model!;
+        expect(await inList(car.name)).toEqual([[car.id, true]]);
+        const with3d = carDetailsSchema.parse(
+          (await request(http).get(`/api/cars/${car.slug}`).expect(200)).body,
+        );
+        expect(with3d.model3dPath).toBe(model.path);
+
+        const replaced = adminCarSchema.parse(
+          (
+            await request(http)
+              .put(`/api/admin/cars/${car.id}/images/${photo.id}/file`)
+              .set("Cookie", adminCookie)
+              .attach("file", PNG, "photo.png")
+              .expect(200)
+          ).body,
+        ).images[0]!;
+        expect(replaced).toMatchObject({ id: photo.id, position: 1 });
+        expect(replaced.path).not.toBe(photo.path);
+        expectError(await request(http).get(photo.path).expect(404), "NOT_FOUND");
+        await request(http).get(replaced.path).expect(200);
+
+        await request(http)
+          .post(`/api/admin/cars/${car.id}/unpublish`)
+          .set("Cookie", adminCookie)
+          .expect(200);
+        expectError(await request(http).get(`/api/cars/${car.slug}`).expect(404), "NOT_FOUND");
+        expect(await inList(car.name)).toEqual([]);
+
+        await request(http)
+          .delete(`/api/admin/cars/${car.id}`)
+          .set("Cookie", adminCookie)
+          .expect(204);
+        await request(http).get(`/api/admin/cars/${car.id}`).set("Cookie", adminCookie).expect(404);
+        // объекты MinIO удалены вместе с автомобилем
+        await request(http).get(replaced.path).expect(404);
+        await request(http).get(model.path).expect(404);
+      });
+    });
   });
 });
