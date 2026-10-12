@@ -1,4 +1,5 @@
-### CarShowroom — карточки автомобилей в админке (UC-A3, UC-A4, D26).
+### CarShowroom — карточки автомобилей в админке (UC-A3, UC-A4, D26),
+### фото и 3D-модель (UC-A5, UC-A6). Файлы ложатся в MinIO (`npm run db:up`).
 ### Перед прогоном: apps/api запущен (`npm run dev:api`), БД накатана
 ### (`npm run db:migrate && npm run db:seed`). Cookie сессии REST-клиент
 ### хранит сам, поэтому после входа запросы идут от админа.
@@ -19,6 +20,9 @@
 @carId = 1
 ### id автомобиля из seed, на который есть записи на тест-драйв
 @carWithTestDrivesId = 1
+### id фото автомобиля carId (поле images[].id ответа #13)
+@imageId = 1
+@secondImageId = 2
 
 
 ### 1. Вход админом.
@@ -109,7 +113,7 @@ Origin: {{origin}}
 
 
 ### 9. Публикация без фото — 409 CAR_NOT_READY.
-# Фото добавляется загрузкой (этап файлов, UC-A5) или вручную SQL-ом:
+# Фото добавляется загрузкой (#13) или вручную SQL-ом:
 #   insert into car_images (car_id, position, path, alt)
 #   values (<carId>, 1, '/assets/cars/bmw-m3-test-1.webp', 'BMW M3');
 # После этого — 200, isPublished: true; повтор — тоже 200 без изменений.
@@ -132,4 +136,98 @@ Origin: {{origin}}
 # 409 CAR_HAS_TEST_DRIVES, автомобиль остаётся. Такой можно только снять
 # с публикации (#10).
 DELETE {{baseUrl}}/api/admin/cars/{{carWithTestDrivesId}}
+Origin: {{origin}}
+
+
+### ——— Фото и 3D-модель (UC-A5, UC-A6). ———
+### Ответ мутаций — полная карточка. Автомобиль {{carId}} должен существовать:
+### после #11 создайте его заново (#5). Файлы — заглушки из public/assets.
+### Ошибки общие для загрузок: нет поля file — 400 VALIDATION_FAILED
+### (details.field = "file"), подпись файла не та — 400 INVALID_FILE,
+### больше 10 МБ (фото) / 60 МБ (модель) — 413 FILE_TOO_LARGE.
+
+
+### 13. Загрузка фото — 201, фото в конец списка. Формат определяется по
+# сигнатуре (JPEG, PNG, WebP, AVIF), а не по имени и Content-Type части.
+# Путь в карточке — /media/cars/<carId>/<uuid>.webp, открывается GET-ом.
+POST {{baseUrl}}/api/admin/cars/{{carId}}/images
+Content-Type: multipart/form-data; boundary=CarShowroomBoundary
+Origin: {{origin}}
+
+--CarShowroomBoundary
+Content-Disposition: form-data; name="alt"
+
+BMW M3 спереди
+--CarShowroomBoundary
+Content-Disposition: form-data; name="file"; filename="placeholder-car.webp"
+Content-Type: image/webp
+
+< ../public/assets/placeholder-car.webp
+--CarShowroomBoundary--
+
+
+### 14. Замена файла фото — 200; id, position и alt те же, путь новый,
+# старый объект удаляется из MinIO.
+PUT {{baseUrl}}/api/admin/cars/{{carId}}/images/{{imageId}}/file
+Content-Type: multipart/form-data; boundary=CarShowroomBoundary
+Origin: {{origin}}
+
+--CarShowroomBoundary
+Content-Disposition: form-data; name="file"; filename="placeholder-car.webp"
+Content-Type: image/webp
+
+< ../public/assets/placeholder-car.webp
+--CarShowroomBoundary--
+
+
+### 15. Описание фото. Фото другого автомобиля — 404 NOT_FOUND.
+PATCH {{baseUrl}}/api/admin/cars/{{carId}}/images/{{imageId}}
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "alt": "BMW M3, вид спереди"
+}
+
+
+### 16. Порядок фото — ровно текущий набор id, первое станет обложкой.
+# Не тот набор — 400 VALIDATION_FAILED, details.field = "imageIds".
+# Нужно два фото: повторите #13.
+PUT {{baseUrl}}/api/admin/cars/{{carId}}/images/order
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "imageIds": [{{secondImageId}}, {{imageId}}]
+}
+
+
+### 17. Удаление фото — 200, следующие сдвигаются (позиции без дыр), объект
+# удаляется из MinIO. Последнее фото опубликованного — 409 LAST_IMAGE.
+DELETE {{baseUrl}}/api/admin/cars/{{carId}}/images/{{secondImageId}}
+Origin: {{origin}}
+
+
+### 18. 3D-модель (GLB) вместо прежней — 200. paintMaterial необязателен
+# (по умолчанию CarPaint); материала нет в модели — 400
+# PAINT_MATERIAL_NOT_FOUND, в details.materials — какие есть.
+PUT {{baseUrl}}/api/admin/cars/{{carId}}/model
+Content-Type: multipart/form-data; boundary=CarShowroomBoundary
+Origin: {{origin}}
+
+--CarShowroomBoundary
+Content-Disposition: form-data; name="paintMaterial"
+
+CarPaint
+--CarShowroomBoundary
+Content-Disposition: form-data; name="file"; filename="placeholder-car.glb"
+Content-Type: model/gltf-binary
+
+< ../public/assets/placeholder-car.glb
+--CarShowroomBoundary--
+
+
+### 19. Удаление модели — 200, model: null, объект удаляется из MinIO.
+# Повтор без модели — тоже 200.
+DELETE {{baseUrl}}/api/admin/cars/{{carId}}/model
 Origin: {{origin}}

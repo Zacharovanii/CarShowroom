@@ -1,8 +1,17 @@
+import { readFileSync } from "node:fs";
 import type { Server } from "node:http";
+import { join } from "node:path";
 import { RequestMethod, type INestApplication } from "@nestjs/common";
 import { Test, type TestingModule } from "@nestjs/testing";
 import request from "supertest";
-import { apiErrorSchema } from "@carshowroom/contracts";
+import {
+  adminCarSchema,
+  apiErrorSchema,
+  carDetailsSchema,
+  carsResponseSchema,
+} from "@carshowroom/contracts";
+import { AdminCarsService } from "../src/admin-cars/admin-cars.service.js";
+import { IMAGE_MAX_BYTES } from "../src/admin-cars/file-checks.js";
 import { AppModule } from "../src/app.module.js";
 import { SQL, type Sql } from "../src/db/db.module.js";
 import { MEDIA_ROUTE } from "../src/storage/media.controller.js";
@@ -13,8 +22,13 @@ import { MEDIA_ROUTE } from "../src/storage/media.controller.js";
  * черновик не виден в публичном каталоге. Логику сервиса подробно
  * проверяет src/admin-cars/admin-cars.spec.ts.
  *
- * Свои данные (email и slug начинаются с e2e-acars-) тест убирает.
- * Фото вставляются SQL-ом с путём /assets/..., чтобы не трогать MinIO.
+ * Фото и модель (UC-A5, UC-A6) по HTTP: multipart, лимиты multer, раздача
+ * загруженного через /media и то, что модель видна в публичном каталоге.
+ * Подробно файлы проверяет src/admin-cars/admin-cars-files.spec.ts.
+ *
+ * Свои данные (email и slug начинаются с e2e-acars-) тест убирает, включая
+ * объекты MinIO: их ключи берутся из путей /media/... в БД перед удалением
+ * машин. Там, где файл не важен, фото вставляется SQL-ом с путём /assets/...
  */
 
 const PASSWORD = "SuperSecret123!";
@@ -119,6 +133,15 @@ describe("Админ: карточки автомобилей (e2e)", () => {
   });
 
   afterAll(async () => {
+    // объекты MinIO — до удаления строк, пока пути ещё есть в БД
+    const media = await sql<{ path: string }[]>`
+      select i.path from car_images i join cars c on c.id = i.car_id
+      where c.slug like 'e2e-acars-%'
+      union all
+      select model_3d_path from cars
+      where slug like 'e2e-acars-%' and model_3d_path is not null`;
+    await app.get(AdminCarsService).deleteMediaObjects(media.map((row) => row.path));
+
     await sql`
       delete from test_drives
       where car_id in (select id from cars where slug like 'e2e-acars-%')
@@ -277,5 +300,224 @@ describe("Админ: карточки автомобилей (e2e)", () => {
       .set("Cookie", adminCookie)
       .expect(200);
     expect(still.body.testDrivesCount).toBe(1);
+  });
+
+  describe("фото и модель", () => {
+    const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d]);
+    const placeholderGlb = readFileSync(
+      join(import.meta.dirname, "../public/assets/placeholder-car.glb"),
+    );
+
+    const uploadImage = (carId: number, file: Buffer = PNG, alt = "Фото") =>
+      request(http)
+        .post(`/api/admin/cars/${carId}/images`)
+        .set("Cookie", adminCookie)
+        .attach("file", file, "photo.png")
+        .field("alt", alt);
+
+    const uploadModel = (carId: number, fields: Record<string, string> = {}) => {
+      const call = request(http)
+        .put(`/api/admin/cars/${carId}/model`)
+        .set("Cookie", adminCookie)
+        .attach("file", placeholderGlb, "car.glb");
+      for (const [name, value] of Object.entries(fields)) void call.field(name, value);
+      return call;
+    };
+
+    it("клиент — 403 на загрузку фото и модели", async () => {
+      const car = await createCar();
+
+      expectError(
+        await request(http)
+          .post(`/api/admin/cars/${car.id}/images`)
+          .set("Cookie", clientCookie)
+          .attach("file", PNG, "photo.png")
+          .field("alt", "Фото")
+          .expect(403),
+        "FORBIDDEN",
+      );
+      expectError(
+        await request(http)
+          .put(`/api/admin/cars/${car.id}/model`)
+          .set("Cookie", clientCookie)
+          .attach("file", placeholderGlb, "car.glb")
+          .expect(403),
+        "FORBIDDEN",
+      );
+    });
+
+    it("POST images — 201 карточка по контракту, файл раздаётся через /media", async () => {
+      const car = await createCar();
+
+      const response = await uploadImage(car.id, PNG, "Спереди").expect(201);
+      const card = adminCarSchema.parse(response.body);
+      expect(card.images).toEqual([
+        {
+          id: expect.any(Number),
+          position: 1,
+          path: expect.stringMatching(new RegExp(`^/media/cars/${car.id}/[0-9a-f-]{36}\\.png$`)),
+          alt: "Спереди",
+        },
+      ]);
+
+      const media = await request(http).get(card.images[0]!.path).expect(200);
+      expect(media.headers["content-type"]).toBe("image/png");
+      expect(Buffer.compare(media.body as Buffer, PNG)).toBe(0);
+    });
+
+    it("ошибки загрузки: сигнатура, нет файла, лишнее поле-файл, пустой alt, размер", async () => {
+      const car = await createCar();
+
+      expectError(
+        await uploadImage(car.id, Buffer.from("GIF89a\x01\x00\x01\x00", "latin1")).expect(400),
+        "INVALID_FILE",
+      );
+
+      const noFile = await request(http)
+        .post(`/api/admin/cars/${car.id}/images`)
+        .set("Cookie", adminCookie)
+        .field("alt", "Фото")
+        .expect(400);
+      expectError(noFile, "VALIDATION_FAILED");
+      expect(noFile.body.error.details).toMatchObject({ field: "file" });
+
+      const extraFile = await uploadImage(car.id).attach("other", PNG, "other.png").expect(400);
+      expectError(extraFile, "VALIDATION_FAILED");
+      expect(extraFile.body.error.details).toMatchObject({ field: "other" });
+
+      expectError(await uploadImage(car.id, PNG, "  ").expect(400), "VALIDATION_FAILED");
+
+      const big = Buffer.alloc(IMAGE_MAX_BYTES + 1);
+      PNG.copy(big);
+      expectError(await uploadImage(car.id, big).expect(413), "FILE_TOO_LARGE");
+
+      expectError(await uploadImage(999_999_999).expect(404), "NOT_FOUND");
+
+      // ни одна неудачная попытка не оставила фото
+      const card = await request(http)
+        .get(`/api/admin/cars/${car.id}`)
+        .set("Cookie", adminCookie)
+        .expect(200);
+      expect(card.body.images).toEqual([]);
+    });
+
+    it("alt, порядок, замена файла, удаление; LAST_IMAGE у опубликованного", async () => {
+      const car = await createCar();
+      await uploadImage(car.id, PNG, "a").expect(201);
+      const uploaded = adminCarSchema.parse((await uploadImage(car.id, PNG, "b").expect(201)).body);
+      const [a, b] = uploaded.images;
+      const images = `/api/admin/cars/${car.id}/images`;
+
+      const alt = await request(http)
+        .patch(`${images}/${a!.id}`)
+        .set("Cookie", adminCookie)
+        .send({ alt: "Новое описание" })
+        .expect(200);
+      expect(alt.body.images[0]).toMatchObject({ id: a!.id, alt: "Новое описание" });
+
+      const order = await request(http)
+        .put(`${images}/order`)
+        .set("Cookie", adminCookie)
+        .send({ imageIds: [b!.id, a!.id] })
+        .expect(200);
+      expect(order.body.images.map((image: { id: number }) => image.id)).toEqual([b!.id, a!.id]);
+
+      const mismatch = await request(http)
+        .put(`${images}/order`)
+        .set("Cookie", adminCookie)
+        .send({ imageIds: [b!.id] })
+        .expect(400);
+      expectError(mismatch, "VALIDATION_FAILED");
+      expect(mismatch.body.error.details).toMatchObject({ field: "imageIds" });
+
+      const replaced = await request(http)
+        .put(`${images}/${a!.id}/file`)
+        .set("Cookie", adminCookie)
+        .attach("file", PNG, "photo.png")
+        .expect(200);
+      expect(replaced.body.images[1]).toMatchObject({ id: a!.id, position: 2 });
+      expect(replaced.body.images[1].path).not.toBe(a!.path);
+      expectError(await request(http).get(a!.path).expect(404), "NOT_FOUND");
+
+      expectError(
+        await request(http).delete(`${images}/999999999`).set("Cookie", adminCookie).expect(404),
+        "NOT_FOUND",
+      );
+
+      const deleted = await request(http)
+        .delete(`${images}/${b!.id}`)
+        .set("Cookie", adminCookie)
+        .expect(200);
+      expect(deleted.body.images).toEqual([
+        { id: a!.id, position: 1, path: replaced.body.images[1].path, alt: "Новое описание" },
+      ]);
+
+      await request(http)
+        .post(`/api/admin/cars/${car.id}/publish`)
+        .set("Cookie", adminCookie)
+        .expect(200);
+      expectError(
+        await request(http).delete(`${images}/${a!.id}`).set("Cookie", adminCookie).expect(409),
+        "LAST_IMAGE",
+      );
+    });
+
+    it("модель: CarPaint по умолчанию, неверный материал, публичный каталог, DELETE", async () => {
+      const car = await createCar();
+      await uploadImage(car.id).expect(201);
+      await request(http)
+        .post(`/api/admin/cars/${car.id}/publish`)
+        .set("Cookie", adminCookie)
+        .expect(200);
+
+      const wrong = await uploadModel(car.id, { paintMaterial: "НетТакого" }).expect(400);
+      expectError(wrong, "PAINT_MATERIAL_NOT_FOUND");
+      expect(wrong.body.error.details.materials).toEqual(expect.arrayContaining(["CarPaint"]));
+
+      expectError(
+        await request(http)
+          .put(`/api/admin/cars/${car.id}/model`)
+          .set("Cookie", adminCookie)
+          .attach("file", PNG, "car.glb")
+          .expect(400),
+        "INVALID_FILE",
+      );
+
+      const set = await uploadModel(car.id).expect(200);
+      const model = adminCarSchema.parse(set.body).model;
+      expect(model).toEqual({
+        path: expect.stringMatching(new RegExp(`^/media/models/${car.id}/[0-9a-f-]{36}\\.glb$`)),
+        paintMaterial: "CarPaint",
+      });
+
+      const media = await request(http).get(model!.path).expect(200);
+      expect(media.headers["content-type"]).toBe("model/gltf-binary");
+
+      const details = carDetailsSchema.parse(
+        (await request(http).get(`/api/cars/${car.slug}`).expect(200)).body,
+      );
+      expect(details.model3dPath).toBe(model!.path);
+
+      const list = carsResponseSchema.parse(
+        (
+          await request(http)
+            .get(`/api/cars?q=${encodeURIComponent(car.name)}`)
+            .expect(200)
+        ).body,
+      );
+      expect(list.items.map((item) => [item.id, item.has3d])).toEqual([[car.id, true]]);
+
+      const removed = await request(http)
+        .delete(`/api/admin/cars/${car.id}/model`)
+        .set("Cookie", adminCookie)
+        .expect(200);
+      expect(removed.body.model).toBeNull();
+      await request(http).get(model!.path).expect(404);
+      // повтор — то же 200
+      await request(http)
+        .delete(`/api/admin/cars/${car.id}/model`)
+        .set("Cookie", adminCookie)
+        .expect(200);
+    });
   });
 });
