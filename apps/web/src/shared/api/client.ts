@@ -48,7 +48,8 @@ export class NetworkError extends Error {
 }
 
 type RequestOptions<T> = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  /** Объект уходит JSON-ом; `FormData` — как есть, multipart (фото, GLB). */
   body?: unknown;
   /** Схема ответа из contracts. Её разбор — защита от расхождения фронта и API. */
   schema?: ZodType<T>;
@@ -77,14 +78,19 @@ export async function apiFetch<T = unknown>(
 ): Promise<T> {
   const { method = "GET", body, schema, signal, query } = options;
 
+  // Content-Type у multipart ставит сам браузер: в заголовке нужна граница
+  // частей (boundary), которую знает только он. Свой заголовок её бы затёр.
+  const isForm = body instanceof FormData;
+  const isJson = body !== undefined && !isForm;
+
   let response: Response;
   try {
     response = await fetch(buildUrl(path, query), {
       method,
       signal,
       credentials: "include",
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      headers: isJson ? { "Content-Type": "application/json" } : undefined,
+      body: isForm ? body : isJson ? JSON.stringify(body) : undefined,
     });
   } catch (cause) {
     // AbortError пробрасываем как есть: его гасит TanStack Query, а не UI
