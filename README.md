@@ -19,7 +19,7 @@
 
 ## Хранилище фото (MinIO)
 
-Фото, которые админ загружает в каталог, лежат в MinIO (S3) и отдаются API по
+Фото и 3D-модели, которые админ загружает в каталог, лежат в MinIO (S3) и отдаются API по
 `/media/...` (D26). `npm run db:up` поднимает MinIO вместе с PostgreSQL, приватный
 бакет `carshowroom` создаёт одноразовый сервис `minio-init`. Консоль —
 http://localhost:9001 (`carshowroom` / `carshowroom123`).

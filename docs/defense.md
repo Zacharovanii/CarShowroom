@@ -16,7 +16,7 @@
 
 ```bash
 npm install                     # если репозиторий свежий
-npm run db:up                   # postgres в docker: cs-db на 5434, adminer на 8080
+npm run db:up                   # docker: cs-db на 5434, adminer на 8080, MinIO на 9000/9001
 npm run build -w @carshowroom/contracts   # контракты нужны и API, и фронту
 npm run db:migrate              # dbmate: схема
 npm run db:seed                 # каталог (18 автомобилей) + три учётные записи

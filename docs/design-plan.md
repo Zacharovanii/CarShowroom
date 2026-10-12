@@ -242,7 +242,8 @@ apps/api/
     test-drives/       # константы правил (rules.ts), сетка слотов, запись, отмена
     manager/           # записи дня, смена статуса
     admin/             # пользователи, создание менеджера
-    admin-cars/        # каталог в админке: карточки, публикация, удаление (D26)
+    admin-cars/        # каталог в админке: карточки, публикация, удаление, фото и модель,
+                       #   проверка файлов по сигнатуре (file-checks.ts) (D26)
     storage/           # StorageService над MinIO (S3), MediaController: GET /media/*
   test/                # e2e: Vitest + supertest, тестовая БД
 ```
