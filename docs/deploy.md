@@ -230,17 +230,21 @@ sudo chown -R deploy:deploy /opt/carshowroom/apps/api/licensed-assets
 
 Все команды — **на сервере**.
 
-**0. Сокращение `compose`.** Один раз добавить alias — дальше в инструкции все команды
-compose записаны через него:
+**0. Сокращения `compose` и `make-admin`.** Один раз добавить в `~/.bashrc` — дальше
+в инструкции команды compose записаны через alias, а функция `make-admin` выдаёт роль
+админа (шаг 10):
 
 ```bash
-echo "alias compose='docker compose -f /opt/carshowroom/docker/compose.prod.yml'" >> ~/.bashrc
+cat >> ~/.bashrc <<'END'
+alias compose='docker compose -f /opt/carshowroom/docker/compose.prod.yml'
+make-admin() { docker compose -f /opt/carshowroom/docker/compose.prod.yml exec api node db/seed/promote-admin.mjs "$1"; }
+END
 source ~/.bashrc
 ```
 
-Путь в alias абсолютный, поэтому `compose ps`, `compose logs -f api` работают из любой
-папки; `docker/.env` compose находит рядом с файлом сам. Без alias вместо `compose`
-пишите `compose` из `/opt/carshowroom`.
+Путь абсолютный, поэтому `compose ps`, `compose logs -f api`, `make-admin` работают из
+любой папки; `docker/.env` compose находит рядом с файлом сам. Без alias вместо `compose`
+пишите `docker compose -f docker/compose.prod.yml` из `/opt/carshowroom`.
 
 **1. Собрать.** Первая сборка — 5–15 минут.
 
@@ -298,9 +302,11 @@ docker image prune -f && docker builder prune -f
 3. **На сервере:**
 
    ```bash
-   cd /opt/carshowroom
-   compose exec api node db/seed/promote-admin.mjs you@example.com
+   make-admin you@example.com
    ```
+
+   Без функции из шага 9 — то же полной командой:
+   `compose exec api node db/seed/promote-admin.mjs you@example.com`.
 
    Ответ `you@example.com теперь админ. Обновите страницу сайта, чтобы роль применилась.`
 4. Обновить страницу — в шапке появятся «Пользователи» и «Автомобили» (админка).
