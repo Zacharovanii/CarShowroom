@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/*.tsbuildinfo
+.env
+.env.*
+**/.env
+**/.env.*
+apps/api/licensed-assets
+.git
+.claude
+.idea
+.vscode
+docs
+docker/compose*.yml

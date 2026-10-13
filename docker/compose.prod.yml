@@ -1,0 +1,155 @@
+# Прод на VPS: Caddy (HTTPS, статика SPA) → Nest → Postgres и MinIO.
+# Наружу открыт только Caddy (80/443), остальное живёт во внутренней сети.
+# Переменные — в docker/.env (рядом с этим файлом: compose ищет .env в каталоге
+# проекта, а это каталог первого -f файла), образец — docker/.env.prod.example.
+#
+# Из корня клона (/opt/carshowroom):
+#   docker compose -f docker/compose.prod.yml build              — собрать
+#   docker compose -f docker/compose.prod.yml run --rm migrate    — миграции
+#   docker compose -f docker/compose.prod.yml up -d               — поднять
+#   docker compose -f docker/compose.prod.yml run --rm api node db/seed/run.mjs --catalog-only — seed каталога
+# Миграции — до up: Better Auth при первом запросе сверяет схему, без таблиц
+# отвечает 500 на всё (и на healthcheck /api) и запоминает это до перезапуска.
+name: carshowroom
+
+# Логи контейнеров по умолчанию растут без предела, а диск у VPS маленький:
+# не больше 3 файлов по 10 МБ на сервис.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    logging: *logging
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: carshowroom
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте в docker/.env}
+      POSTGRES_DB: carshowroom
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carshowroom -d carshowroom"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # S3-хранилище файлов из админки (D26). Бакет приватный, файлы отдаёт
+  # Nest через /media/*, поэтому портов наружу нет.
+  minio:
+    logging: *logging
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    restart: unless-stopped
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?задайте в docker/.env}
+      # не короче 8 символов — иначе MinIO не стартует
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?задайте в docker/.env}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Одноразово создаёт бакет и выходит; повторный up не падает на существующем.
+  # $$ — переменная раскрывается shell в контейнере, а не compose.
+  minio-init:
+    logging: *logging
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    entrypoint:
+      - sh
+      - -c
+      - |
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+        mc mb --ignore-existing local/carshowroom
+
+  api:
+    logging: *logging
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # пароль только из [A-Za-z0-9] — он подставляется в URL как есть
+      DATABASE_URL: postgres://carshowroom:${POSTGRES_PASSWORD}@db:5432/carshowroom?sslmode=disable
+      BETTER_AUTH_URL: https://${SITE_DOMAIN:?задайте в docker/.env}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?задайте в docker/.env}
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: carshowroom
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      RESEND_API_KEY: ${RESEND_API_KEY:?задайте в docker/.env}
+      MAIL_FROM: ${MAIL_FROM:?задайте в docker/.env}
+    volumes:
+      # Лицензированные модели и фото (D25) — вне гита, кладутся на сервер
+      # руками. Нет каталога — docker создаст пустой, и Nest отдаст заглушки.
+      - ../apps/api/licensed-assets:/app/apps/api/licensed-assets:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  caddy:
+    logging: *logging
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      # сертификаты Let's Encrypt — без тома перевыпускались бы на каждый up
+      - caddy-data:/data
+      - caddy-config:/config
+
+  # Миграции dbmate (чистый SQL из apps/api/db/migrations). Только по запросу:
+  #   docker compose -f docker/compose.prod.yml run --rm migrate
+  migrate:
+    logging: *logging
+    image: ghcr.io/amacneil/dbmate:2.36.0
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://carshowroom:${POSTGRES_PASSWORD}@db:5432/carshowroom?sslmode=disable
+    volumes:
+      - ../apps/api/db/migrations:/db/migrations:ro
+    command: ["--migrations-dir", "/db/migrations", "--no-dump-schema", "--wait", "up"]
+
+volumes:
+  db-data:
+  minio-data:
+  caddy-data:
+  caddy-config:
