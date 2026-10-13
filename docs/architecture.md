@@ -68,9 +68,6 @@ npm workspaces (D2), три пакета, везде TypeScript и ESM (D20):
 | DELETE | `/api/admin/cars/:id/model` | админ | убрать модель |
 | GET | `/media/*` | все | загруженный админом файл из MinIO, `Cache-Control: immutable` |
 
-В коде есть служебный `GET /api/spike-manager-only` (проверка роли `manager`) — в
-интерфейсе не используется.
-
 ### Коды ошибок
 
 - Тест-драйвы: `SLOT_TAKEN` (409), `TOO_MANY_ACTIVE`, `SLOT_OUT_OF_RANGE`,

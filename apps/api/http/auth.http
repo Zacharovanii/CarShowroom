@@ -3,8 +3,8 @@
 ### и встроенный HTTP-клиент JetBrains делают это сами) — сценарий «вход → запрос»
 ### работает без ручной передачи cookie.
 ###
-### Перед прогоном: apps/api запущен (`npm run dev -w @carshowroom/api`),
-### БД поднята и накатана (docker/compose.yml + docs/db/*.sql).
+### Перед прогоном: `npm run db:up && npm run db:migrate && npm run db:seed`,
+### apps/api запущен (`npm run dev:api`).
 
 @baseUrl = http://localhost:3000
 @email = client@example.com
@@ -17,7 +17,8 @@
 
 
 ### 1. Регистрация — создаёт users + accounts (provider_id = credential).
-# autoSignIn по умолчанию true, поэтому сразу приходит cookie сессии.
+# Сессии нет: сначала нужно подтвердить email (D27). Без RESEND_API_KEY письмо
+# не уходит — ссылка подтверждения печатается в лог API ([Mail]).
 POST {{baseUrl}}/api/auth/sign-up/email
 Content-Type: application/json
 Origin: {{origin}}
@@ -30,17 +31,7 @@ Origin: {{origin}}
 }
 
 
-### 2. Get session сразу после регистрации — должен вернуть user/session,
-# роль по умолчанию "user" (defaultRole в admin-плагине).
-GET {{baseUrl}}/api/auth/get-session
-
-
-### 3. Выход — инвалидирует текущую сессию (сравнить get-session до/после, см. #6).
-POST {{baseUrl}}/api/auth/sign-out
-Origin: {{origin}}
-
-
-### 4. Повторный вход тем же паролем — новая cookie сессии.
+### 2. Вход до подтверждения — 403 EMAIL_NOT_VERIFIED, письмо уходит повторно.
 POST {{baseUrl}}/api/auth/sign-in/email
 Content-Type: application/json
 Origin: {{origin}}
@@ -51,36 +42,40 @@ Origin: {{origin}}
 }
 
 
-### 5. Защищённый эндпоинт без роли manager — должен вернуть 403 Forbidden
-# (@Roles(["manager"]) в AppController, роль сейчас "user").
-GET {{baseUrl}}/spike-manager-only
+### 3. Подтверждение: token — из ссылки в логе API (…/verify-email?token=…).
+# Ответ ставит cookie сессии (autoSignInAfterVerification).
+@verifyToken = вставьте-токен-из-лога
+GET {{baseUrl}}/api/auth/verify-email?token={{verifyToken}}
 
 
-### 6. Get session после sign-out из #3 — должен вернуть null/401 на пустую сессию,
-# если выполнить этот запрос ДО повторного входа в #4.
+### 4. Get session — user/session, роль по умолчанию "user".
 GET {{baseUrl}}/api/auth/get-session
 
 
-### ---------------------------------------------------------------------
-### Проверка роли manager (D16, п.4 задания).
-### Роль в интерфейсе не назначается (D16: «через UI роль admin не назначается»,
-### то же верно для manager на этом этапе — нет админки). На spike выставляем
-### руками прямо в БД между запросами #4 и #7:
-###
-###   docker exec -it cs-db psql -U carshowroom -d carshowroom \
-###     -c "update users set role = 'manager' where email = 'client@example.com';"
-###
-### Сессия из #4 продолжает действовать — Better Auth читает role из users
-### при каждом getSession, отдельной пересадки сессии не нужно.
-### ---------------------------------------------------------------------
+### 5. Эндпоинт менеджера под ролью user — 403 Forbidden.
+GET {{baseUrl}}/api/manager/test-drives
 
-### 7. Тот же эндпоинт после смены роли на manager — теперь 200.
-GET {{baseUrl}}/spike-manager-only
+
+### 6. Выход — инвалидирует текущую сессию.
+POST {{baseUrl}}/api/auth/sign-out
+Content-Type: application/json
+Origin: {{origin}}
+
+
+### 7. Повторный вход тем же паролем — новая cookie сессии.
+POST {{baseUrl}}/api/auth/sign-in/email
+Content-Type: application/json
+Origin: {{origin}}
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
 
 
 ### ---------------------------------------------------------------------
 ### UC-U2. Контактные данные и пароль.
-### Прогонять подряд с #1 (регистрация) — нужна cookie сессии.
+### Прогонять после #1–#3 (регистрация и подтверждение) — нужна cookie сессии.
 ### ---------------------------------------------------------------------
 
 @newPassword = BrandNewPass456!
