@@ -7,6 +7,18 @@ import { seedUsers } from "./users.mjs";
 
 // Тот же приём, что в src/env.ts: .env нужен для локальной разработки,
 // в проде переменные задаёт docker compose — ENOENT не ошибка.
+// --catalog-only — для прода: только каталог, без тестовых пользователей
+// (у них публичный пароль) и тест-драйвов. Любой другой аргумент — ошибка,
+// чтобы опечатка во флаге не залила тестовых пользователей.
+const args = process.argv.slice(2);
+const unknown = args.filter((arg) => arg !== "--catalog-only");
+if (unknown.length > 0) {
+  console.error(`Неизвестный аргумент: ${unknown.join(" ")}`);
+  console.error("Использование: node db/seed/run.mjs [--catalog-only]");
+  process.exit(1);
+}
+const catalogOnly = args.includes("--catalog-only");
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 try {
   process.loadEnvFile(path.join(here, "../../.env"));
@@ -28,11 +40,15 @@ try {
   } = await client.query("select count(*)::int from cars");
   console.log(`  ${count} автомобилей`);
 
-  console.log("Пользователи:");
-  await seedUsers(client);
+  if (catalogOnly) {
+    console.log("Пользователи и тест-драйвы пропущены (--catalog-only)");
+  } else {
+    console.log("Пользователи:");
+    await seedUsers(client);
 
-  console.log("Тест-драйвы:");
-  await seedTestDrives(client);
+    console.log("Тест-драйвы:");
+    await seedTestDrives(client);
+  }
 
   await client.query("commit");
   console.log("Seed OK");

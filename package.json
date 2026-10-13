@@ -20,7 +20,8 @@
     "db:up": "docker compose -f docker/compose.yml up -d",
     "db:down": "docker compose -f docker/compose.yml down",
     "db:migrate": "dbmate --env-file apps/api/.env --migrations-dir apps/api/db/migrations --schema-file apps/api/db/schema.sql up",
-    "db:seed": "node apps/api/db/seed/run.mjs"
+    "db:seed": "node apps/api/db/seed/run.mjs",
+    "db:promote-admin": "node apps/api/db/seed/promote-admin.mjs"
   },
   "devDependencies": {
     "dbmate": "^2.36.0",
