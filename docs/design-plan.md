@@ -49,7 +49,7 @@
 
 | Метод | Путь | Доступ | Назначение |
 |---|---|---|---|
-| * | `/api/auth/*` | — | Better Auth: sign-up/email, sign-in/email, sign-out, get-session, update-user, change-password |
+| * | `/api/auth/*` | — | Better Auth: sign-up/email, sign-in/email, sign-out, get-session, update-user, change-password; письма (D27): send-verification-email, verify-email (`GET ?token=`), request-password-reset, reset-password. Вход неподтверждённым → 403 `EMAIL_NOT_VERIFIED`; лимит частоты → 429 |
 | GET | `/api/catalog/filters` | гость | справочники для фильтров: серии, кузова, типы двигателя (`id`, `name`, `position`) |
 | GET | `/api/cars` | гость | каталог: `q`, `series`, `body`, `fuel` (id из справочников), `drive`, `priceMin`, `priceMax`, `sort`, `page` |
 | GET | `/api/cars/:slug` | гость | автомобиль: характеристики, цена, фото, палитра, путь к GLB; черновик → 404 `NOT_FOUND` |
@@ -93,6 +93,17 @@ API дополнительно разбирает JSON-чанк и ищет ма
 `NAME_TAKEN`, `CAR_HAS_TEST_DRIVES`, `CAR_NOT_READY`, `LAST_IMAGE` (409), `INVALID_FILE`,
 `PAINT_MATERIAL_NOT_FOUND` (400, в `details.materials` — имена материалов в файле),
 `FILE_TOO_LARGE` (413).
+Коды Better Auth, которые разбирает фронт (`features/auth/authErrors.ts`):
+`INVALID_EMAIL_OR_PASSWORD` (401), `EMAIL_NOT_VERIFIED` (403, D27), ссылка подтверждения —
+`INVALID_TOKEN` / `TOKEN_EXPIRED` / `USER_NOT_FOUND` (401), ссылка сброса пароля —
+`INVALID_TOKEN` (400), 429 без кода — слишком частые запросы.
+
+Схемы тел запросов к `/api/auth/*` — в `packages/contracts/src/auth.ts`, парой «запрос +
+форма», где у формы есть поле подтверждения: `signUpSchema` / `signUpFormSchema`,
+`signInSchema`, `changePasswordSchema` / `changePasswordFormSchema`, `updateProfileSchema`;
+письма (D27): `sendVerificationEmailSchema`, `forgotPasswordSchema` (оба — одно поле
+`email`), `resetPasswordSchema` (`newPassword`, `token`) / `resetPasswordFormSchema`
+(без `token` — он из адреса страницы, + `confirmPassword`).
 
 `SLOT_NOT_STARTED` (422) добавлен при реализации менеджера: результат визита
 (`completed` / `no_show`) отмечается только после начала слота, а отмена — только до
@@ -166,8 +177,8 @@ API дополнительно разбирает JSON-чанк и ищет ма
 
 ## 8. Архитектура фронта
 
-Сверено с кодом на этапе 11, дополнено D26 (фронт админки каталога) — дерево ниже
-описывает то, что есть.
+Сверено с кодом на этапе 11, дополнено D26 (фронт админки каталога) и D27 (письма) —
+дерево ниже описывает то, что есть.
 
 ```
 apps/web/src/
@@ -175,10 +186,13 @@ apps/web/src/
   app/                 # App (провайдеры: QueryClient, AuthProvider, ToastProvider,
                        #   BrowserRouter), AppRoutes — карта маршрутов
   pages/               # страницы-маршруты: тонкие, собирают фичи;
+                       #   ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage (D27);
                        #   admin/ — UsersPage, CarsPage, CarNewPage, CarEditPage
   features/
     auth/              # authClient (Better Auth), AuthContext, ProtectedRoute/RoleRoute/
-                       #   GuestOnlyRoute, формы входа, регистрации, профиля, пароля
+                       #   GuestOnlyRoute, формы входа, регистрации, профиля, пароля;
+                       #   письма (D27): VerifyEmail, ResendVerification (пауза 60 с),
+                       #   ForgotPasswordForm, ResetPasswordForm; authErrors — коды → тексты
     catalog/           # useCars, useCatalogFilters, useCatalogQuery, CarCard,
                        #   CatalogSearch, FilterPanel, PriceRange
     car/               # useCar, CarMedia, Gallery, CarSpecs, CarPageSkeleton
@@ -216,6 +230,10 @@ apps/web/src/
 Правила:
 - **Серверное состояние** — только TanStack Query; ключи запросов — фабрикой в фиче.
 - **Глобальное клиентское** — Context: сессия и тема. Zustand/Redux не нужны.
+  `isPending` в `AuthContext` — только **первая** проверка сессии: Better Auth поднимает
+  свой `isPending` при каждом перечитывании (возврат на вкладку, signIn/signUp), и
+  `GuestOnlyRoute` размонтировал бы гостевые формы вместе с вводом и экраном «Проверьте
+  почту». `AuthProvider` пропускает наружу только первый.
 - **Фильтры каталога** — в URL (`useSearchParams`): ссылкой можно поделиться, «назад» работает.
 - **Формы** — контролируемые инпуты + zod-схема из contracts (без form-библиотеки;
   если форм станет много — react-hook-form).
@@ -236,7 +254,10 @@ apps/api/
     app.module.ts
     config/            # env через zod, падаем при старте, если конфиг неверный
     db/                # DatabaseModule: провайдер SQL (postgres.js), закрытие пула
-    auth/              # betterAuth(): pg Pool, modelName/fields, AuthModule.forRoot
+    auth/              # betterAuth(): pg Pool, modelName/fields, AuthModule.forRoot,
+                       #   письма и лимиты частоты (D27)
+    mail/              # sendMail через Resend (fetch), шаблоны писем; без ключа — лог
+                       #   и in-memory outbox для тестов (D27)
     common/            # ZodValidationPipe, AppError + коды, exception filter
     catalog/           # справочники + cars: controller, service, repository
     test-drives/       # константы правил (rules.ts), сетка слотов, запись, отмена
@@ -272,7 +293,8 @@ apps/api/
 
 ## 11. Тесты
 
-- **API e2e:** регистрация/вход; каталог с комбинацией фильтров; двойная запись на слот → 409;
+- **API e2e:** регистрация → письмо → подтверждение → вход, сброс пароля (письма из
+  in-memory outbox, D27); каталог с комбинацией фильтров; двойная запись на слот → 409;
   отмена чужой записи → 404; смена статуса клиентом → 403; создание менеджера не-админом → 403.
 - **Юнит:** правила тест-драйва (сетка слотов, горизонт, лимит, переходы статусов),
   форматирование денег и дат.

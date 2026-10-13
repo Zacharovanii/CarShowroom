@@ -82,9 +82,9 @@ create table accounts (
     constraint accounts_user_fk     foreign key (user_id) references users (id) on delete cascade
 );
 
--- Не используется (подтверждение email и сброс пароля письмом выключены),
--- но таблица нужна Better Auth. Связей нет намеренно: код выписывается
--- на адрес, которому может ещё не соответствовать ни один пользователь.
+-- Токены сброса пароля Better Auth (D27; ссылка подтверждения email — подписанный
+-- токен, сюда не пишется). Связей нет намеренно: код выписывается на адрес,
+-- которому может ещё не соответствовать ни один пользователь.
 create table verifications (
     id          uuid        not null default gen_random_uuid(),
     identifier  text        not null,
