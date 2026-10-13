@@ -73,7 +73,7 @@ npm run dev:web                             # сайт: http://127.0.0.1:5173
 
 Остальные команды: `npm run db:down` — остановить контейнеры;
 `npm run db:promote-admin -- <email>` — выдать роль админа зарегистрированному
-пользователю с подтверждённым email.
+пользователю с подтверждённым email (локально; на сервере — [deploy.md](docs/deploy.md) §10).
 
 Adminer (просмотр БД): http://localhost:8080 — система PostgreSQL, сервер `db`,
 пользователь, пароль и база `carshowroom`. Консоль MinIO: http://localhost:9001

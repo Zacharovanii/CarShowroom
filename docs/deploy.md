@@ -228,18 +228,25 @@ sudo chown -R deploy:deploy /opt/carshowroom/apps/api/licensed-assets
 
 ## 9. Первый запуск
 
-Все команды compose — **на сервере**, из `/opt/carshowroom`, с `-f docker/compose.prod.yml`.
+Все команды — **на сервере**.
 
-> Чтобы не набирать каждый раз, можно один раз добавить сокращение
-> (`echo "alias dc='docker compose -f /opt/carshowroom/docker/compose.prod.yml'" >> ~/.bashrc`,
-> затем `source ~/.bashrc`) и писать `dc ps`, `dc logs -f api`. В инструкции команды
-> записаны полностью.
+**0. Сокращение `compose`.** Один раз добавить alias — дальше в инструкции все команды
+compose записаны через него:
+
+```bash
+echo "alias compose='docker compose -f /opt/carshowroom/docker/compose.prod.yml'" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Путь в alias абсолютный, поэтому `compose ps`, `compose logs -f api` работают из любой
+папки; `docker/.env` compose находит рядом с файлом сам. Без alias вместо `compose`
+пишите `compose` из `/opt/carshowroom`.
 
 **1. Собрать.** Первая сборка — 5–15 минут.
 
 ```bash
 cd /opt/carshowroom
-docker compose -f docker/compose.prod.yml build
+compose build
 ```
 
 **2. Миграции — до запуска API.** `migrate` сам поднимет базу. Порядок важен: Better
@@ -248,14 +255,14 @@ healthcheck, и запоминает это до перезапуска — `api
 стартует, и миграции после этого не помогут без `restart api`.
 
 ```bash
-docker compose -f docker/compose.prod.yml run --rm migrate
+compose run --rm migrate
 ```
 
 **3. Поднять.**
 
 ```bash
-docker compose -f docker/compose.prod.yml up -d
-docker compose -f docker/compose.prod.yml ps
+compose up -d
+compose ps
 ```
 
 В `ps` у `api` должно быть `(healthy)`, у `caddy`, `db`, `minio` — `Up`. `minio-init`
@@ -265,7 +272,7 @@ healthy — шаг 13 (логи) и таблица в шаге 15.
 **4. Каталог** — 18 автомобилей, без тестовых пользователей и тест-драйвов.
 
 ```bash
-docker compose -f docker/compose.prod.yml run --rm api node db/seed/run.mjs --catalog-only
+compose run --rm api node db/seed/run.mjs --catalog-only
 ```
 
 **Один раз.** Повторный запуск упадёт с `duplicate key value violates unique constraint
@@ -292,7 +299,7 @@ docker image prune -f && docker builder prune -f
 
    ```bash
    cd /opt/carshowroom
-   docker compose -f docker/compose.prod.yml exec api node db/seed/promote-admin.mjs you@example.com
+   compose exec api node db/seed/promote-admin.mjs you@example.com
    ```
 
    Ответ `you@example.com теперь админ. Обновите страницу сайта, чтобы роль применилась.`
@@ -334,9 +341,9 @@ docker image prune -f && docker builder prune -f
 ```bash
 cd /opt/carshowroom
 git pull
-docker compose -f docker/compose.prod.yml build
-docker compose -f docker/compose.prod.yml run --rm migrate
-docker compose -f docker/compose.prod.yml up -d
+compose build
+compose run --rm migrate
+compose up -d
 docker image prune -f && docker builder prune -f
 ```
 
@@ -350,8 +357,8 @@ Seed при обновлении **не запускать**. `licensed-assets` 
 **На сервере**, из `/opt/carshowroom`:
 
 ```bash
-docker compose -f docker/compose.prod.yml logs -f api          # следить за API, выход — Ctrl+C
-docker compose -f docker/compose.prod.yml logs --tail 100 caddy # последние 100 строк Caddy
+compose logs -f api          # следить за API, выход — Ctrl+C
+compose logs --tail 100 caddy # последние 100 строк Caddy
 ```
 
 Ошибки отправки писем видны в логе API строками `Resend ответил <код>: ...` — там же
@@ -365,7 +372,7 @@ docker compose -f docker/compose.prod.yml logs --tail 100 caddy # последн
 
 ```bash
 cd /opt/carshowroom
-docker compose -f docker/compose.prod.yml exec -T db pg_dump -U carshowroom carshowroom | gzip > ~/backup-$(date +%F).sql.gz
+compose exec -T db pg_dump -U carshowroom carshowroom | gzip > ~/backup-$(date +%F).sql.gz
 ```
 
 Файлы, загруженные админом (том MinIO; имя тома — имя проекта `carshowroom` + `_minio-data`):
@@ -389,10 +396,10 @@ scp "deploy@IP_СЕРВЕРА:~/minio-*.tar.gz" .
 
 ```bash
 cd /opt/carshowroom
-docker compose -f docker/compose.prod.yml up -d db minio
-gunzip -c ~/backup-ДАТА.sql.gz | docker compose -f docker/compose.prod.yml exec -T db psql -U carshowroom carshowroom
+compose up -d db minio
+gunzip -c ~/backup-ДАТА.sql.gz | compose exec -T db psql -U carshowroom carshowroom
 docker run --rm -v carshowroom_minio-data:/data -v "$HOME":/backup alpine tar xzf /backup/minio-ДАТА.tar.gz -C /data
-docker compose -f docker/compose.prod.yml up -d
+compose up -d
 ```
 
 `licensed-assets` в копию не входят — их копируют отдельно, как в шаге 8.
@@ -401,7 +408,7 @@ docker compose -f docker/compose.prod.yml up -d
 
 | Симптом | Что проверить |
 |---|---|
-| Браузер ругается на сертификат, сайт не открывается по HTTPS | `nslookup ДОМЕН` отдаёт IP сервера (шаг 5); `sudo ufw status` — открыты 80 и 443; `logs --tail 100 caddy` — причина отказа Let's Encrypt. После исправления: `docker compose -f docker/compose.prod.yml restart caddy` |
+| Браузер ругается на сертификат, сайт не открывается по HTTPS | `nslookup ДОМЕН` отдаёт IP сервера (шаг 5); `sudo ufw status` — открыты 80 и 443; `logs --tail 100 caddy` — причина отказа Let's Encrypt. После исправления: `compose restart caddy` |
 | `api` не становится healthy, в логе «Некорректная конфигурация окружения» | Под заголовком перечислены переменные — заполнить их в `docker/.env`, затем `up -d` |
 | `up` пишет `container ... api ... is unhealthy`, в логе `api` — `Database schema mismatch` | `up` запущен до миграций. `run --rm migrate`, затем `restart api` и `up -d` |
 | `up` пишет «задайте в docker/.env» | Нет `docker/.env` или в нём пустая переменная; файл именно в `docker/`, не в корне |
