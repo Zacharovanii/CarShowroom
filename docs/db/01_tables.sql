@@ -1,5 +1,7 @@
 -- =====================================================================
 -- CarShowroom — схема БД. Часть 1: таблицы и связи.
+-- Обзорный срез схемы по слоям. Источник истины — миграции
+-- apps/api/db/migrations; при изменении схемы этот файл правится вслед за ними.
 --
 -- Только CREATE TABLE: PK, FK, UNIQUE, NOT NULL, DEFAULT.
 -- Правила (CHECK, индексы, представление) — в 02_rules.sql,
@@ -21,7 +23,7 @@
 -- Пользователи и сессии: Better Auth + admin-плагин.
 -- Имена таблиц и колонок задаются в конфиге Better Auth (modelName, fields),
 -- тип ключа — uuid (generateId: "uuid"), поэтому здесь не identity.
--- Состав колонок сверить с `npx auth generate` на spike S2.
+-- Состав колонок соответствует `npx @better-auth/cli generate`.
 -- ---------------------------------------------------------------------
 
 create table users (
@@ -61,7 +63,7 @@ create table sessions (
 
 -- OAuth-колонки (access_token…scope) сейчас всегда null: соцвход выключен (D7),
 -- но это часть базовой модели account в Better Auth — колонки нужны структурно,
--- иначе валидация схемы при старте не проходит (npx auth generate, spike S2).
+-- иначе валидация схемы при старте не проходит.
 create table accounts (
     id                        uuid        not null default gen_random_uuid(),
     user_id                   uuid        not null,
