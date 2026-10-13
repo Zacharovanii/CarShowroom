@@ -58,6 +58,8 @@ describe("Хранилище", () => {
     await storage.delete(key);
     const missing = await request(app.getHttpServer()).get(`/media/${key}`).expect(404);
     expect(missing.body).toMatchObject({ error: { code: "NOT_FOUND" } });
+    // 404 не кешируется навсегда: файл по ключу ещё может появиться
+    expect(missing.headers["cache-control"] ?? "").not.toContain("immutable");
   });
 
   it.each(["/media/..%2Fx", "/media/Test/X.txt", "/media/test//x.txt"])(
