@@ -15,7 +15,7 @@ import { formatDate, shiftDay } from "@/shared/format";
 import styles from "./ManagerPage.module.css";
 
 /**
- * Рабочий день менеджера — UC-M1 и UC-M2, раздел 8 docs/wireframes.md.
+ * Рабочий день менеджера — UC-M1 и UC-M2.
  *
  * День и фильтры живут в адресе, отбор идёт на сервере, а весь расчёт
  * «что можно сделать с записью» приходит готовым в `started` и `status`.

@@ -37,7 +37,7 @@ function ViewerUnavailable({ reason, onShowPhotos }: { reason: string; onShowPho
 }
 
 /**
- * Вкладка «3D» страницы автомобиля (раздел 4 wireframes.md, UC-G3 п. 2).
+ * Вкладка «3D» страницы автомобиля (UC-G3 п. 2).
  *
  * Три запасных пути, и ни один не молчит: нет WebGL — проверка до загрузки
  * кода сцены; не скачался чанк или GLB, упал three.js — граница ошибок.

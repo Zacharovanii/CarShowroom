@@ -8,7 +8,7 @@ import styles from "./Header.module.css";
 type NavItem = { to: string; label: string; end?: boolean };
 
 /**
- * Шапка — раздел 1 docs/wireframes.md. Состав меню зависит от роли, но
+ * Шапка — §8 docs/design-system.md. Состав меню зависит от роли, но
  * ничего не решает: права проверяет бэкенд, шапка лишь не показывает
  * то, куда всё равно не пустят.
  */
@@ -16,7 +16,7 @@ export function Header() {
   const { user, isStaff, isAdmin, isPending } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  // Hero на главной — фото во весь экран от самого верха страницы (§ HomePage);
+  // Hero на главной — фото во весь экран от самого верха страницы;
   // шапка над ним плавает почти без подложки, как в референсе дизайна.
   const isHero = location.pathname === "/";
 

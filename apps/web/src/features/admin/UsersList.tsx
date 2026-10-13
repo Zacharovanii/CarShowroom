@@ -6,7 +6,7 @@ import styles from "./UsersList.module.css";
 
 export interface UsersListProps {
   users: User[];
-  /** Телефон: вместо таблицы — карточки (раздел 9 макетов). */
+  /** Телефон: вместо таблицы — карточки. */
   compact: boolean;
 }
 

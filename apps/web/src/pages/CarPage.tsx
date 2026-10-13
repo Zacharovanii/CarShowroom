@@ -8,7 +8,7 @@ import { TestDriveSection } from "@/features/test-drives";
 import styles from "./CarPage.module.css";
 
 /**
- * Страница автомобиля — UC-G3, раздел 4 docs/wireframes.md.
+ * Страница автомобиля — UC-G3.
  *
  * Блок тест-драйва (UC-G4, UC-U3) собирает `features/test-drives`; сюда он
  * приходит одним компонентом. Вкладку «3D» наполняет этап 7 —

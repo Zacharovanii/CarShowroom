@@ -4,7 +4,7 @@ import { LinkButton } from "@/shared/ui/LinkButton";
 import styles from "./NotFoundPage.module.css";
 
 /**
- * Маршрут `*` — раздел 10 docs/wireframes.md. Своей вёрстки почти нет:
+ * Маршрут `*`. Своей вёрстки почти нет:
  * это то же «пусто», что у каталога и страницы автомобиля, поэтому
  * рисует его `StatePanel` из кита.
  */

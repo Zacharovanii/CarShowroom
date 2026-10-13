@@ -4,7 +4,7 @@ import styles from "./AuthScreen.module.css";
 
 export interface AuthScreenProps {
   title: string;
-  /** Зачем человека сюда отправили: строка над формой (раздел 6 макетов). */
+  /** Зачем человека сюда отправили: строка над формой. */
   lead?: ReactNode;
   children: ReactNode;
   /** Ссылка на соседнюю страницу: «Нет аккаунта? Зарегистрироваться». */

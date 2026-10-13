@@ -3,7 +3,7 @@ import { Clock, MapPin, Phone } from "lucide-react";
 import styles from "./Footer.module.css";
 
 /**
- * Подвал — раздел 1 docs/wireframes.md. Пометка «учебный проект» обязательна
+ * Подвал — §8 docs/design-system.md. Пометка «учебный проект» обязательна
  * и стоит отдельной строкой: это требование D1, а не вежливость.
  */
 export function Footer() {

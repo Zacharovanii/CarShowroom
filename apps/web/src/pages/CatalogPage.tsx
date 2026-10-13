@@ -34,7 +34,7 @@ function carsWord(count: number): string {
 }
 
 /**
- * Каталог — UC-G2, раздел 3 docs/wireframes.md.
+ * Каталог — UC-G2.
  *
  * Все фильтры, поиск, сортировка и страница живут в URL (`useCatalogQuery`),
  * поэтому страница сама состояния почти не держит: она читает запрос,

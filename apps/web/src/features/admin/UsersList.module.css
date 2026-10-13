@@ -61,7 +61,7 @@
   font: var(--text-body-sm);
 }
 
-/* Имя и роль — в одну строку, как в макете */
+/* Имя и роль — в одну строку */
 .cardHead {
   display: flex;
   align-items: center;

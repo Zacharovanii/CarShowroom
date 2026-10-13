@@ -21,7 +21,7 @@ import {
 import { useDebouncedField, useMediaQuery } from "@/shared/hooks";
 import styles from "./UsersPage.module.css";
 
-/** Ниже этой ширины таблица становится карточками (раздел 9 макетов). */
+/** Ниже этой ширины таблица становится карточками. */
 const TABLE_QUERY = "(min-width: 640px)";
 
 /** «Не выбрано» у Radix Select не может быть пустой строкой — нужен свой ключ. */
@@ -42,7 +42,7 @@ function usersWord(count: number): string {
 }
 
 /**
- * Пользователи — UC-A1 и UC-A2, раздел 9 docs/wireframes.md.
+ * Пользователи — UC-A1 и UC-A2.
  *
  * Поиск, фильтр по роли и страница живут в URL (`useUsersQuery`), поэтому
  * страница своего состояния почти не держит: читает запрос, показывает

@@ -5,7 +5,7 @@ import { signOut, useAuth } from "@/features/auth";
 import styles from "./AccountLayout.module.css";
 
 /**
- * Кабинет — раздел 7 макетов. Вложенный маршрут через <Outlet />:
+ * Кабинет. Вложенный маршрут через <Outlet />:
  * разделы слева, содержимое справа, на телефоне разделы лентой сверху.
  */
 export default function AccountLayout() {

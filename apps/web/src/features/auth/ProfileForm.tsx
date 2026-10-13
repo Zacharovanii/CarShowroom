@@ -103,7 +103,7 @@ function ProfileFields({ user }: { user: CurrentUser }) {
           <Button variant="ghost" disabled={!changed || pending} onClick={reset}>
             Отмена
           </Button>
-          {/* Пока ничего не изменилось, сохранять нечего (раздел 7 макетов) */}
+          {/* Пока ничего не изменилось, сохранять нечего */}
           <Button type="submit" variant="primary" disabled={!changed} loading={pending}>
             Сохранить
           </Button>

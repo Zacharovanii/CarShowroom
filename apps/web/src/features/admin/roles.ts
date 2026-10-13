@@ -1,7 +1,7 @@
 import type { BadgeTone } from "@/components/ui";
 import type { UserRole } from "@carshowroom/contracts";
 
-/** Роли по-русски: в интерфейсе `user` нигде не показывается (раздел 9 макетов). */
+/** Роли по-русски: в интерфейсе `user` нигде не показывается. */
 export const ROLE_LABELS: Record<UserRole, string> = {
   user: "Клиент",
   manager: "Менеджер",

@@ -11,7 +11,7 @@ import {
 import styles from "./TestDrivesPage.module.css";
 
 /**
- * «Мои записи» — UC-U4, раздел 7 docs/wireframes.md.
+ * «Мои записи» — UC-U4.
  *
  * Обе вкладки приходят одним ответом `GET /api/me/test-drives`: сервер уже
  * разложил записи на предстоящие и историю, а `cancellable` у каждой говорит,
