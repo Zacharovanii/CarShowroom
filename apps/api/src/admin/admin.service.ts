@@ -61,7 +61,10 @@ export class AdminService {
           password: input.password,
           name: input.name,
           role: "manager",
-          data: { phone: input.phone },
+          // email подтверждён сразу: адрес сотрудника вносит админ и за него
+          // ручается, а письма менеджер иначе ждал бы до первого входа
+          // (requireEmailVerification, D27)
+          data: { phone: input.phone, emailVerified: true },
         },
       });
 

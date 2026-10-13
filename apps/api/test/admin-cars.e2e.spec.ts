@@ -15,6 +15,7 @@ import { IMAGE_MAX_BYTES } from "../src/admin-cars/file-checks.js";
 import { AppModule } from "../src/app.module.js";
 import { SQL, type Sql } from "../src/db/db.module.js";
 import { MEDIA_ROUTE } from "../src/storage/media.controller.js";
+import { signUpVerified } from "./helpers.js";
 
 /**
  * Карточки автомобилей в админке (UC-A3, UC-A4) по HTTP: доступ по ролям
@@ -96,14 +97,16 @@ describe("Админ: карточки автомобилей (e2e)", () => {
         password: PASSWORD,
         name: "Тест Админ",
         role: "admin",
-        data: { phone: "+79990000041" },
+        data: { phone: "+79990000041", emailVerified: true },
       },
     });
 
-    await request(http)
-      .post("/api/auth/sign-up/email")
-      .send({ email: clientEmail, password: PASSWORD, name: "Тест Клиент", phone: "+79990000042" })
-      .expect(200);
+    await signUpVerified(http, sql, {
+      email: clientEmail,
+      password: PASSWORD,
+      name: "Тест Клиент",
+      phone: "+79990000042",
+    });
 
     adminCookie = await signIn(adminEmail);
     clientCookie = await signIn(clientEmail);

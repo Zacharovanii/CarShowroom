@@ -5,6 +5,7 @@ import request from "supertest";
 import { AppModule } from "../src/app.module.js";
 import { SQL, type Sql } from "../src/db/db.module.js";
 import { salonDay, slotInstant } from "../src/test-drives/rules.js";
+import { signUpVerified } from "./helpers.js";
 
 /**
  * Доступ к экранам сотрудников — по HTTP, через реальные guard-ы
@@ -65,14 +66,16 @@ describe("Экраны сотрудников (e2e)", () => {
         password: PASSWORD,
         name: "Тест Админ",
         role: "admin",
-        data: { phone: "+79990000031" },
+        data: { phone: "+79990000031", emailVerified: true },
       },
     });
 
-    await request(http)
-      .post("/api/auth/sign-up/email")
-      .send({ email: clientEmail, password: PASSWORD, name: "Тест Клиент", phone: "+79990000032" })
-      .expect(200);
+    await signUpVerified(http, sql, {
+      email: clientEmail,
+      password: PASSWORD,
+      name: "Тест Клиент",
+      phone: "+79990000032",
+    });
 
     adminCookie = await signIn(adminEmail);
     clientCookie = await signIn(clientEmail);

@@ -4,6 +4,7 @@ import type { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { AppModule } from "../src/app.module.js";
 import { SQL, type Sql } from "../src/db/db.module.js";
+import { signUpVerified } from "./helpers.js";
 
 /**
  * UC-U2 целиком по HTTP: контактные данные и пароль меняются маршрутами
@@ -41,12 +42,15 @@ describe("Контактные данные и пароль (e2e)", () => {
 
     await sql`delete from users where email like 'e2e-account-%'`;
 
-    const signUp = await request(http)
-      .post("/api/auth/sign-up/email")
-      .send({ email, password: PASSWORD, name: "Тест Клиент", phone: "+79990000041" })
-      .expect(200);
+    await signUpVerified(http, sql, {
+      email,
+      password: PASSWORD,
+      name: "Тест Клиент",
+      phone: "+79990000041",
+    });
 
-    cookie = (signUp.headers["set-cookie"] as unknown as string[]).join("; ");
+    const signedIn = await signIn(PASSWORD).expect(200);
+    cookie = (signedIn.headers["set-cookie"] as unknown as string[]).join("; ");
   });
 
   afterAll(async () => {
