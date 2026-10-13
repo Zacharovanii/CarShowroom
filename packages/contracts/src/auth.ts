@@ -71,6 +71,51 @@ export const changePasswordFormSchema = changePasswordSchema
 export type ChangePasswordForm = z.infer<typeof changePasswordFormSchema>;
 
 // ---------------------------------------------------------------------
+// POST /api/auth/send-verification-email
+// POST /api/auth/request-password-reset
+// ---------------------------------------------------------------------
+
+/**
+ * Повторное письмо подтверждения и запрос сброса пароля — одно поле email.
+ * Ответ всегда одинаковый, есть такой адрес или нет: по нему нельзя
+ * проверить, зарегистрирован ли человек.
+ */
+export const sendVerificationEmailSchema = z.object({
+  email: emailSchema,
+});
+
+export type SendVerificationEmail = z.infer<typeof sendVerificationEmailSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+export type ForgotPassword = z.infer<typeof forgotPasswordSchema>;
+
+// ---------------------------------------------------------------------
+// POST /api/auth/reset-password
+// ---------------------------------------------------------------------
+
+/** token — из ссылки в письме, его проверяет только бэкенд. */
+export const resetPasswordSchema = z.object({
+  newPassword: passwordSchema,
+  token: z.string().min(1),
+});
+
+export type ResetPassword = z.infer<typeof resetPasswordSchema>;
+
+// token в форму не вводится — он берётся из адреса страницы
+export const resetPasswordFormSchema = resetPasswordSchema
+  .omit({ token: true })
+  .extend({ confirmPassword: z.string() })
+  .refine((form) => form.newPassword === form.confirmPassword, {
+    message: "пароли не совпадают",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordForm = z.infer<typeof resetPasswordFormSchema>;
+
+// ---------------------------------------------------------------------
 // POST /api/auth/update-user
 // ---------------------------------------------------------------------
 

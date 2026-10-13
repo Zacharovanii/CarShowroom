@@ -41,3 +41,34 @@
   font: var(--text-body-sm);
   color: var(--color-fg-muted);
 }
+
+/* Повторная отправка письма: поле, сообщение и кнопка — плотнее, чем форма */
+.resend {
+  display: grid;
+  gap: var(--space-3);
+  /* длинный email в тексте не должен растягивать карточку на 375 */
+  overflow-wrap: anywhere;
+}
+
+/* Основной текст экранов «Проверьте почту», «Пароль изменён» */
+.text {
+  font: var(--text-body);
+  color: var(--color-fg);
+  overflow-wrap: anywhere;
+}
+
+/* «Забыли пароль?» — под полем пароля, прижата вправо */
+.forgot {
+  justify-self: end;
+  font: var(--text-body-sm);
+  color: var(--color-accent);
+}
+
+/* «Подтверждаем…» — спиннер и подпись в строку */
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--text-body);
+  color: var(--color-fg-muted);
+}

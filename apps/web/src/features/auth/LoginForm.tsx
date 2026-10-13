@@ -5,9 +5,10 @@ import { Alert, Button, Field, Input, PasswordInput } from "@/components/ui";
 import { fieldErrors, type FieldErrors } from "@/shared/form";
 import { signIn } from "./authClient";
 import { homeRouteForRole, toUserRole } from "./authContext";
-import { signInErrorMessage } from "./authErrors";
+import { emailNotVerifiedMessage, isEmailNotVerified, signInErrorMessage } from "./authErrors";
 import { formatSlot, readReturnTo } from "./returnTo";
 import { AuthScreen } from "./AuthScreen";
+import { ResendVerification } from "./ResendVerification";
 import styles from "./AuthForm.module.css";
 
 /** UC-G6. Вход по email и паролю, возврат туда, откуда человека сюда отправили. */
@@ -21,6 +22,8 @@ export function LoginForm() {
   const [errors, setErrors] = useState<FieldErrors<"email" | "password">>({});
   const [alert, setAlert] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  /** Пароль верный, но email не подтверждён: адрес, на который ушло новое письмо. */
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,13 +37,18 @@ export function LoginForm() {
 
     setErrors({});
     setAlert(null);
+    setUnverifiedEmail(null);
     setPending(true);
 
     const { data, error } = await signIn.email(parsed.data);
 
     if (error) {
       setPending(false);
-      setAlert(signInErrorMessage(error));
+      if (isEmailNotVerified(error)) {
+        setUnverifiedEmail(parsed.data.email);
+      } else {
+        setAlert(signInErrorMessage(error));
+      }
       return;
     }
 
@@ -70,6 +78,20 @@ export function LoginForm() {
         </>
       }
     >
+      {/* Отдельной формой над входом: у повторной отправки своя кнопка submit.
+          key по адресу — для другого email отсчёт паузы начинается заново */}
+      {unverifiedEmail && (
+        <div className={styles.resend}>
+          <Alert variant="warning">{emailNotVerifiedMessage(unverifiedEmail)}</Alert>
+          <ResendVerification
+            key={unverifiedEmail}
+            email={unverifiedEmail}
+            justSent
+            label="Отправить письмо ещё раз"
+          />
+        </div>
+      )}
+
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         {alert && <Alert variant="error">{alert}</Alert>}
 
@@ -97,6 +119,10 @@ export function LoginForm() {
             />
           )}
         </Field>
+
+        <Link to="/forgot-password" className={styles.forgot}>
+          Забыли пароль?
+        </Link>
 
         <Button type="submit" variant="primary" loading={pending} className={styles.submitWide}>
           Войти

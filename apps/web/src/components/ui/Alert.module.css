@@ -62,4 +62,7 @@
 .description {
   margin: 0;
   font: var(--text-body-sm);
+  /* break-word из reset не уменьшает min-content: длинный email
+     растянул бы карточку шире экрана 375 */
+  overflow-wrap: anywhere;
 }

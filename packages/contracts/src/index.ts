@@ -30,6 +30,10 @@ export type {
 export {
   changePasswordFormSchema,
   changePasswordSchema,
+  forgotPasswordSchema,
+  resetPasswordFormSchema,
+  resetPasswordSchema,
+  sendVerificationEmailSchema,
   signInSchema,
   signUpFormSchema,
   signUpSchema,
@@ -38,6 +42,10 @@ export {
 export type {
   ChangePassword,
   ChangePasswordForm,
+  ForgotPassword,
+  ResetPassword,
+  ResetPasswordForm,
+  SendVerificationEmail,
   SignIn,
   SignUp,
   SignUpForm,

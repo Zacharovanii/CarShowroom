@@ -1,21 +1,52 @@
 import { useId, useState, type FormEvent } from "react";
 import { TriangleAlert } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { signUpFormSchema } from "@carshowroom/contracts";
 import { Alert, Button, Checkbox, Field, Input, PasswordInput } from "@/components/ui";
 import fieldStyles from "@/components/ui/Field.module.css";
 import { fieldErrors, type FieldErrors } from "@/shared/form";
 import { signUp } from "./authClient";
-import { isEmailTaken, REQUEST_FAILED } from "./authErrors";
+import { isEmailTaken, requestErrorMessage } from "./authErrors";
 import { formatSlot, readReturnTo } from "./returnTo";
 import { AuthScreen } from "./AuthScreen";
+import { ResendVerification } from "./ResendVerification";
 import styles from "./AuthForm.module.css";
 
 type Fields = "name" | "email" | "phone" | "password" | "confirmPassword" | "consent";
 
-/** UC-G5. Регистрация с автоматическим входом: Better Auth ставит сессию сам. */
+/**
+ * После регистрации — экран «Проверьте почту» вместо входа: email требует
+ * подтверждения, сессии Better Auth не ставит, письмо уходит само.
+ */
+function CheckEmail({ email }: { email: string }) {
+  const location = useLocation();
+
+  return (
+    <AuthScreen
+      title="Проверьте почту"
+      footer={
+        <>
+          Подтвердили email?{" "}
+          <Link to="/login" state={location.state}>
+            Войти →
+          </Link>
+        </>
+      }
+    >
+      <p className={styles.text}>
+        Мы отправили письмо на <strong>{email}</strong>. Перейдите по ссылке, чтобы подтвердить
+        email. Ссылка действует 1 час.
+      </p>
+      <ResendVerification email={email} justSent label="Отправить ещё раз" />
+    </AuthScreen>
+  );
+}
+
+/**
+ * UC-G5. Регистрация без входа: сначала нужно подтвердить email по ссылке
+ * из письма, вход выполнится при переходе по ней (/verify-email).
+ */
 export function RegisterForm() {
-  const navigate = useNavigate();
   const location = useLocation();
   const returnTo = readReturnTo(location.state);
 
@@ -29,6 +60,8 @@ export function RegisterForm() {
   const [errors, setErrors] = useState<FieldErrors<Fields>>({});
   const [alert, setAlert] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  /** Адрес, на который ушло письмо: форма сменяется экраном «Проверьте почту». */
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,19 +92,24 @@ export function RegisterForm() {
       password: parsed.data.password,
     });
 
+    setPending(false);
+
     if (error) {
-      setPending(false);
+      // При обязательном подтверждении занятый email отвечает тем же 200,
+      // что и новый (иначе форма выдавала бы, кто зарегистрирован), — ветка
+      // осталась на случай, если подтверждение отключат.
       if (isEmailTaken(error)) {
         setErrors({ email: "такой email уже зарегистрирован" });
       } else {
-        setAlert(REQUEST_FAILED);
+        setAlert(requestErrorMessage(error));
       }
       return;
     }
 
-    // Роль нового пользователя всегда «клиент», поэтому выбора по роли нет
-    navigate(returnTo ? returnTo.to : "/account", { replace: true });
+    setRegisteredEmail(parsed.data.email);
   }
+
+  if (registeredEmail) return <CheckEmail email={registeredEmail} />;
 
   return (
     <AuthScreen

@@ -7,6 +7,9 @@ import CatalogPage from "@/pages/CatalogPage";
 import CarPage from "@/pages/CarPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import VerifyEmailPage from "@/pages/VerifyEmailPage";
 import ManagerPage from "@/pages/ManagerPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import AccountLayout from "@/pages/account/AccountLayout";
@@ -36,11 +39,17 @@ export function AppRoutes() {
         <Route path="catalog" element={<CatalogPage />} />
         <Route path="catalog/:slug" element={<CarPage />} />
 
-        {/* Вошедшему вход и регистрация не показываются */}
+        {/* Вошедшему вход, регистрация и сброс пароля не показываются */}
         <Route element={<GuestOnlyRoute />}>
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
         </Route>
+
+        {/* Ссылка из письма подтверждения. Не под GuestOnlyRoute: переход
+            по ней выполняет вход, и страница не должна пропасть посреди процесса */}
+        <Route path="verify-email" element={<VerifyEmailPage />} />
 
         {/* Кабинет клиента: вложенный маршрут через <Outlet /> */}
         <Route element={<ProtectedRoute />}>
