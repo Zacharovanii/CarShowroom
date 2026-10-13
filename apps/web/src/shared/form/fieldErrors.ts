@@ -2,7 +2,7 @@ import type { ZodError } from "zod";
 
 /**
  * Сообщения по именам полей. Форм-библиотеки в проекте нет: контролируемые
- * инпуты плюс `safeParse` схемой из contracts (design-plan §8), а разбор
+ * инпуты плюс `safeParse` схемой из contracts (docs/architecture.md, «Фронтенд»), а разбор
  * `ZodError` в «поле → сообщение» нужен всем формам проекта одинаково.
  */
 export type FieldErrors<K extends string> = Partial<Record<K, string>>;

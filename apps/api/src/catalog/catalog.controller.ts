@@ -10,7 +10,7 @@ import {
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
 import { CatalogService } from "./catalog.service.js";
 
-// Весь каталог открыт гостю (раздел 4 design-plan.md), а AuthGuard
+// Весь каталог открыт гостю (docs/architecture.md, «Эндпоинты»), а AuthGuard
 // Better Auth зарегистрирован глобально — отсюда @AllowAnonymous().
 
 @Controller("catalog")

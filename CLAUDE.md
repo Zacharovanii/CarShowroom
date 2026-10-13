@@ -2,7 +2,7 @@
 
 Учебный проект — сайт автосалона. Монорепо: `apps/web` (Vite + React), `apps/api` (NestJS),
 `packages/contracts` (zod-схемы API). Решения — [docs/decisions.md](docs/decisions.md),
-проектирование — [docs/design-plan.md](docs/design-plan.md).
+устройство системы — [docs/architecture.md](docs/architecture.md).
 
 ## Инварианты
 

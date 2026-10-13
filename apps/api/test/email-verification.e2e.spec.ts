@@ -13,9 +13,10 @@ import { signUpVerified } from "./helpers.js";
  * (RESEND_API_KEY в тестах не задан) и ложатся в outbox модуля mail, откуда
  * тест берёт ссылку — как человек взял бы её из почты.
  *
- * Все запросы к Better Auth идут с Origin фронта в dev (handoff-auth-deploy
- * §8): так их шлёт браузер, и от него же строится ссылка в письме. Этот origin
- * должен быть в WEB_ORIGIN (.env) — иначе Better Auth ответит 403 INVALID_ORIGIN.
+ * Все запросы к Better Auth идут с Origin фронта в dev (docs/architecture.md,
+ * «Авторизация»): так их шлёт браузер, и от него же строится ссылка
+ * в письме. Этот origin должен быть в WEB_ORIGIN (.env) — иначе Better Auth
+ * ответит 403 INVALID_ORIGIN.
  *
  * Свои данные (email начинаются с e2e-verify-) тест убирает: пользователей
  * и строки verifications токенов сброса — у них нет FK на users.
