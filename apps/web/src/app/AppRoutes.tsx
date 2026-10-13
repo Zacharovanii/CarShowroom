@@ -21,10 +21,10 @@ import CarNewPage from "@/pages/admin/CarNewPage";
 import CarEditPage from "@/pages/admin/CarEditPage";
 
 /**
- * ВРЕМЕННО, этап 2: витрина UI-кита. Грузится лениво — она нужна только
- * разработчику и не должна лежать в основном бандле. Удаляется на этапе 11.
+ * Витрина UI-кита (/__ui) — инструмент разработчика. Маршрут есть только
+ * в dev-сборке, грузится лениво и в основной бандл не попадает.
  */
-const UiKitPage = lazy(() => import("@/pages/UiKitPage"));
+const UiKitPage = import.meta.env.DEV ? lazy(() => import("@/pages/UiKitPage")) : null;
 
 /**
  * Карта маршрутов — раздел «Страницы» use-cases.md.
@@ -71,14 +71,16 @@ export function AppRoutes() {
           <Route path="admin/cars/:id" element={<CarEditPage />} />
         </Route>
 
-        <Route
-          path="__ui"
-          element={
-            <Suspense fallback={null}>
-              <UiKitPage />
-            </Suspense>
-          }
-        />
+        {UiKitPage && (
+          <Route
+            path="__ui"
+            element={
+              <Suspense fallback={null}>
+                <UiKitPage />
+              </Suspense>
+            }
+          />
+        )}
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>

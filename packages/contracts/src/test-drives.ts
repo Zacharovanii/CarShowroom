@@ -21,7 +21,7 @@ export type TestDriveStatus = (typeof testDriveStatuses)[number];
  * Правило проверяет сервер, но число нужно и фронту — чтобы погасить кнопку
  * заранее и не вести человека в модалку ради ошибки 422. Живёт в контракте
  * по той же причине, что и CARS_PAGE_SIZE: иначе двойка разъезжается между
- * apps/api и apps/web, и расхождение заметят только на защите.
+ * apps/api и apps/web, и расхождение не поймает ни один тип.
  */
 export const MAX_ACTIVE_TEST_DRIVES = 2;
 

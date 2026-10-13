@@ -11,11 +11,11 @@ import styles from "./CarPage.module.css";
  * Страница автомобиля — UC-G3.
  *
  * Блок тест-драйва (UC-G4, UC-U3) собирает `features/test-drives`; сюда он
- * приходит одним компонентом. Вкладку «3D» наполняет этап 7 —
+ * приходит одним компонентом. Фото и 3D переключаются вкладками —
  * см. `features/car/CarMedia.tsx`.
  */
 export default function CarPage() {
-  // useParams — требование чек-листа ТЗ и единственный источник slug
+  // slug из адреса — единственный источник: страница открывается по ссылке
   const { slug } = useParams<{ slug: string }>();
   const car = useCar(slug);
   const testDrive = useRef<HTMLDivElement>(null);

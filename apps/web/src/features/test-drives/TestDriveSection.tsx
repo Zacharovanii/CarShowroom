@@ -12,11 +12,6 @@ import { useSlotSelection } from "./useSlotSelection";
 import { useMyTestDrives, useSlots } from "./useTestDrives";
 import styles from "./TestDriveSection.module.css";
 
-/**
- * Лимит активных записей (TD-6). Считает и проверяет его сервер; здесь он
- * нужен только затем, чтобы не вести человека в модалку ради ошибки 422.
- */
-
 export interface TestDriveSectionProps {
   car: CarDetails;
 }
