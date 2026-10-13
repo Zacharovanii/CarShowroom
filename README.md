@@ -51,8 +51,9 @@ Resend** — для реальных адресов нужен свой доме
 (Domains) и прописать у регистратора выданные DNS-записи SPF и DKIM.
 
 Ограничение частоты Better Auth (вход и регистрация 5 в минуту, письма 3 в минуту → 429)
-считает по заголовку `X-Forwarded-For`, поэтому на сервере nginx перед API должен
-перезаписывать его адресом клиента: `proxy_set_header X-Forwarded-For $remote_addr;`.
+считает по заголовку `X-Forwarded-For`, поэтому на сервере его должен ставить прокси перед
+API адресом клиента. У нас это делает Caddy (`docker/Caddyfile`) без дополнительной
+настройки, API наружу не открыт — см. [docs/deploy.md](docs/deploy.md).
 
 ## Модели и фото автомобилей (обязательный шаг)
 
@@ -72,7 +73,14 @@ Resend** — для реальных адресов нужен свой доме
 3. Перезапускать ничего не нужно. Проверка: `/assets/models/m4-competition.glb` весит
    ~11 МБ (заглушка — 165 КБ), на `/catalog/m4-competition` видно настоящее фото.
 
-На сервере — то же самое: каталог копируется рядом с `dist/` API при выкатке.
+На сервере — та же раскладка в `/opt/carshowroom/apps/api/licensed-assets/` (копируется
+руками, `git pull` его не трогает) — см. [docs/deploy.md](docs/deploy.md), шаг 8.
+
+## Выкатка на сервер
+
+Прод — один VPS: docker compose (`docker/compose.prod.yml`), Caddy с автоматическим HTTPS
+перед API, Postgres и MinIO. Пошагово, от пустого сервера до первого админа, —
+[docs/deploy.md](docs/deploy.md); почему так — D28 в [docs/decisions.md](docs/decisions.md).
 
 ## Документация
 
@@ -81,4 +89,5 @@ Resend** — для реальных адресов нужен свой доме
 - [docs/use-cases.md](docs/use-cases.md) — роли, страницы, сценарии, правила тест-драйва
 - [docs/db/README.md](docs/db/README.md) — схема БД: таблицы, связи, правила, smoke-тест
 - [docs/assignment.md](docs/assignment.md) — выжимка требований ТЗ
-- [docs/handoff-auth-deploy.md](docs/handoff-auth-deploy.md) — выкатка на сервер и боевая авторизация
+- [docs/deploy.md](docs/deploy.md) — выкатка на сервер: пошаговая инструкция
+- [docs/handoff-auth-deploy.md](docs/handoff-auth-deploy.md) — история задачи: выкатка и боевая авторизация
