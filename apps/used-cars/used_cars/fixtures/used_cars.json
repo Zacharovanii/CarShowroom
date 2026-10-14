@@ -1,0 +1,368 @@
+[
+  {
+    "model": "used_cars.brand",
+    "pk": 1,
+    "fields": {
+      "name": "BMW",
+      "country": "Германия"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 2,
+    "fields": {
+      "name": "Mercedes-Benz",
+      "country": "Германия"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 3,
+    "fields": {
+      "name": "Audi",
+      "country": "Германия"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 4,
+    "fields": {
+      "name": "Volkswagen",
+      "country": "Германия"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 5,
+    "fields": {
+      "name": "Toyota",
+      "country": "Япония"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 6,
+    "fields": {
+      "name": "Lexus",
+      "country": "Япония"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 1,
+    "fields": {
+      "name": "Адаптивный круиз-контроль"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 2,
+    "fields": {
+      "name": "Камера заднего вида"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 3,
+    "fields": {
+      "name": "Панорамная крыша"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 4,
+    "fields": {
+      "name": "Подогрев сидений"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 5,
+    "fields": {
+      "name": "Кожаный салон"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 6,
+    "fields": {
+      "name": "Полный привод"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 7,
+    "fields": {
+      "name": "Проекционный дисплей"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 8,
+    "fields": {
+      "name": "Аудиосистема Harman Kardon"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 9,
+    "fields": {
+      "name": "Бесключевой доступ"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 10,
+    "fields": {
+      "name": "Пневмоподвеска"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 1,
+    "fields": {
+      "brand": 1,
+      "model": "X5 xDrive30d",
+      "year": 2019,
+      "mileage_km": 98000,
+      "price": "5450000.00",
+      "description": "Один владелец, обслуживание у официального дилера, полная сервисная история.",
+      "features": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-01T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 2,
+    "fields": {
+      "brand": 1,
+      "model": "320i M Sport",
+      "year": 2020,
+      "mileage_km": 61000,
+      "price": "3290000.00",
+      "description": "Спортивный пакет M, родная краска, комплект зимней резины в подарок.",
+      "features": [
+        2,
+        4,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-02T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 3,
+    "fields": {
+      "brand": 1,
+      "model": "530d xDrive",
+      "year": 2018,
+      "mileage_km": 124000,
+      "price": "3850000.00",
+      "description": "Максимальная комплектация, проекционный дисплей, аудиосистема Harman Kardon.",
+      "features": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "is_published": true,
+      "created_at": "2026-10-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 4,
+    "fields": {
+      "brand": 1,
+      "model": "X3 xDrive20d",
+      "year": 2021,
+      "mileage_km": 47000,
+      "price": "4690000.00",
+      "description": "Гарантия дилера до конца года, без ДТП.",
+      "features": [
+        1,
+        2,
+        4,
+        6,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-04T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 5,
+    "fields": {
+      "brand": 2,
+      "model": "E 200",
+      "year": 2019,
+      "mileage_km": 88000,
+      "price": "3390000.00",
+      "description": "Седан в кузове W213, аккуратная эксплуатация, не курили.",
+      "features": [
+        2,
+        4,
+        5
+      ],
+      "is_published": true,
+      "created_at": "2026-10-05T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 6,
+    "fields": {
+      "brand": 2,
+      "model": "GLC 300 4MATIC",
+      "year": 2020,
+      "mileage_km": 72000,
+      "price": "4950000.00",
+      "description": "Пневмоподвеска Air Body Control, панорамная крыша.",
+      "features": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        10
+      ],
+      "is_published": true,
+      "created_at": "2026-10-06T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 7,
+    "fields": {
+      "brand": 3,
+      "model": "A6 45 TFSI quattro",
+      "year": 2019,
+      "mileage_km": 93000,
+      "price": "3650000.00",
+      "description": "Матричные фары, виртуальная приборная панель.",
+      "features": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ],
+      "is_published": true,
+      "created_at": "2026-10-07T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 8,
+    "fields": {
+      "brand": 3,
+      "model": "Q5 40 TDI",
+      "year": 2018,
+      "mileage_km": 135000,
+      "price": "3150000.00",
+      "description": "Свежее поступление, проходит диагностику.",
+      "features": [
+        2,
+        4,
+        6
+      ],
+      "is_published": false,
+      "created_at": "2026-10-08T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 9,
+    "fields": {
+      "brand": 4,
+      "model": "Tiguan 2.0 TSI 4Motion",
+      "year": 2020,
+      "mileage_km": 69000,
+      "price": "2890000.00",
+      "description": "Комплектация Highline, два комплекта ключей.",
+      "features": [
+        2,
+        4,
+        6,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-09T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 10,
+    "fields": {
+      "brand": 5,
+      "model": "Camry 2.5",
+      "year": 2021,
+      "mileage_km": 54000,
+      "price": "3190000.00",
+      "description": "Комплектация «Престиж», на гарантии.",
+      "features": [
+        2,
+        4,
+        5,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-10T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 11,
+    "fields": {
+      "brand": 5,
+      "model": "RAV4 2.0 4WD",
+      "year": 2019,
+      "mileage_km": 103000,
+      "price": "2750000.00",
+      "description": "Надёжный городской кроссовер, все ТО по регламенту.",
+      "features": [
+        2,
+        4,
+        6
+      ],
+      "is_published": true,
+      "created_at": "2026-10-11T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 12,
+    "fields": {
+      "brand": 6,
+      "model": "RX 350",
+      "year": 2017,
+      "mileage_km": 148000,
+      "price": "3490000.00",
+      "description": "Объявление от клиента, ждёт осмотра.",
+      "features": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "is_published": false,
+      "created_at": "2026-10-12T10:00:00+03:00"
+    }
+  }
+]
