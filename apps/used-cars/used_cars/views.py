@@ -1,6 +1,9 @@
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Avg, Min
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import UsedCarEditForm, UsedCarForm
 from .models import Brand, UsedCar
 
 
@@ -36,6 +39,35 @@ def car_detail(request, pk):
         cars = cars.filter(is_published=True)
     car = get_object_or_404(cars, pk=pk)
     return render(request, 'used_cars/car_detail.html', {'car': car})
+
+
+def car_add(request):
+    """Объявление от посетителя: сохраняется скрытым и ждёт модерации."""
+    if request.method == 'POST':
+        form = UsedCarForm(request.POST)
+        if form.is_valid():
+            car = form.save()  # save() у ModelForm сохраняет и опции (ManyToMany)
+            messages.success(request, f'Объявление «{car}» отправлено. Оно появится на сайте после проверки менеджером.')
+            return redirect('car_list')
+    else:
+        form = UsedCarForm()
+    return render(request, 'used_cars/car_form.html', {'form': form, 'title': 'Предложить автомобиль'})
+
+
+# Править объявления может только сотрудник; гостя отправит на вход в админку
+@staff_member_required
+def car_edit(request, pk):
+    car = get_object_or_404(UsedCar, pk=pk)
+    if request.method == 'POST':
+        # instance — форма меняет существующую запись, а не создаёт новую
+        form = UsedCarEditForm(request.POST, instance=car)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Изменения сохранены.')
+            return redirect('car_detail', pk=car.pk)
+    else:
+        form = UsedCarEditForm(instance=car)
+    return render(request, 'used_cars/car_form.html', {'form': form, 'title': f'Редактирование: {car}', 'car': car})
 
 
 def about(request):

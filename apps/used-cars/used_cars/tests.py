@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from .models import UsedCar
+
 
 class PagesTests(TestCase):
     # В фикстуре 12 машин, две (pk 8 и 12) ждут модерации
@@ -24,6 +26,40 @@ class PagesTests(TestCase):
         staff = get_user_model().objects.create_user('manager', password='test-pass', is_staff=True)
         self.client.force_login(staff)
         self.assertEqual(self.client.get(reverse('car_detail', args=[8])).status_code, 200)
+
+
+class FormsTests(TestCase):
+    fixtures = ['used_cars']
+
+    car_data = {
+        'brand': 1, 'model': '118i', 'year': 2016, 'mileage_km': 150000,
+        'owners_count': 2, 'price': '1500000', 'features': [2, 4], 'description': '',
+    }
+
+    def test_add_saves_hidden_car_with_features(self):
+        response = self.client.post(reverse('car_add'), self.car_data)
+        self.assertRedirects(response, reverse('car_list'))
+        car = UsedCar.objects.get(model='118i')
+        self.assertFalse(car.is_published)
+        self.assertEqual(car.features.count(), 2)
+
+    def test_add_rejects_future_year(self):
+        response = self.client.post(reverse('car_add'), {**self.car_data, 'year': 2100})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('year', response.context['form'].errors)
+
+    def test_edit_requires_staff(self):
+        response = self.client.get(reverse('car_edit', args=[1]))
+        self.assertRedirects(response, f"{reverse('admin:login')}?next={reverse('car_edit', args=[1])}")
+
+    def test_staff_edits_car(self):
+        staff = get_user_model().objects.create_user('manager', password='test-pass', is_staff=True)
+        self.client.force_login(staff)
+        response = self.client.post(reverse('car_edit', args=[8]), {**self.car_data, 'is_published': 'on'})
+        self.assertRedirects(response, reverse('car_detail', args=[8]))
+        car = UsedCar.objects.get(pk=8)
+        self.assertTrue(car.is_published)
+        self.assertEqual(car.model, '118i')
 
 
 class AdminTests(TestCase):

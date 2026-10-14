@@ -39,6 +39,9 @@
     <div class="d-flex flex-wrap gap-2">
       <a href="tel:+70000000000" class="btn btn-primary">Позвонить в салон</a>
       <a href="{% url 'car_list' %}" class="btn btn-outline-secondary">К списку</a>
+      {% if user.is_staff %}
+      <a href="{% url 'car_edit' car.pk %}" class="btn btn-outline-warning">Редактировать</a>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="mb-2">{{ title }}</h1>
+    {% if not car %}
+    <p class="text-body-secondary mb-4">
+      Расскажите об автомобиле — менеджер проверит объявление и опубликует его.
+    </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors|join:' ' }}</div>
+    {% endif %}
+
+    {# novalidate: проверку делает сервер, ошибки выводятся под полями #}
+    <form method="post" novalidate class="card card-body">
+      {% csrf_token %}
+      <div class="row g-3">
+        {% for field in form %}
+        <div class="{% if field.name in form.half_width_fields %}col-md-6{% else %}col-12{% endif %}">
+          {% if field.name == 'features' %}
+            <div class="form-label">{{ field.label }}</div>
+            <div class="row row-cols-1 row-cols-sm-2 g-1">
+              {% for option in field %}
+              <div class="col">
+                <div class="form-check">
+                  {{ option.tag }}
+                  <label class="form-check-label" for="{{ option.id_for_label }}">{{ option.choice_label }}</label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% elif field.name == 'is_published' %}
+            <div class="form-check form-switch">
+              {{ field }}
+              <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </div>
+          {% else %}
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          {% endif %}
+
+          {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+          {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">{% if car %}Сохранить{% else %}Отправить на проверку{% endif %}</button>
+        <a href="{% if car %}{% url 'car_detail' car.pk %}{% else %}{% url 'car_list' %}{% endif %}"
+           class="btn btn-outline-secondary">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
