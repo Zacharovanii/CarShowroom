@@ -1,10 +1,20 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Avg, Min
+from django.db.models import Avg, Count, Min, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import UsedCarEditForm, UsedCarForm
 from .models import Brand, UsedCar
+
+
+# Варианты сортировки списка: значение в URL → (подпись, поля order_by)
+SORT_OPTIONS = {
+    'new': ('Сначала новые объявления', ('-created_at', '-id')),
+    'cheap': ('Сначала дешёвые', ('price',)),
+    'expensive': ('Сначала дорогие', ('-price',)),
+    'mileage': ('С меньшим пробегом', ('mileage_km',)),
+    'year': ('Сначала новее по году', ('-year',)),
+}
 
 
 def published_cars():
@@ -15,12 +25,20 @@ def published_cars():
     return UsedCar.objects.filter(is_published=True).select_related('brand')
 
 
+def brands_with_cars():
+    """Марки, у которых есть опубликованные объявления, с их числом."""
+    return (
+        Brand.objects.annotate(published_count=Count('cars', filter=Q(cars__is_published=True)))
+        .filter(published_count__gt=0)
+    )
+
+
 def home(request):
     cars = published_cars()
     context = {
         'latest_cars': cars[:3],
         'cars_count': cars.count(),
-        'brands_count': Brand.objects.filter(cars__is_published=True).distinct().count(),
+        'brands': brands_with_cars(),
         # Агрегаты считает БД: {'min_price': ..., 'avg_mileage': ...}
         **cars.aggregate(min_price=Min('price'), avg_mileage=Avg('mileage_km')),
     }
@@ -28,8 +46,32 @@ def home(request):
 
 
 def car_list(request):
-    cars = published_cars().order_by('-created_at', '-id')
-    return render(request, 'used_cars/car_list.html', {'cars': cars})
+    # Фильтры живут в адресе (?q=...&brand=...&sort=...): ссылкой можно поделиться
+    query = request.GET.get('q', '').strip()
+    brand_id = request.GET.get('brand', '')
+    sort = request.GET.get('sort', 'new')
+    if sort not in SORT_OPTIONS:
+        sort = 'new'
+
+    cars = published_cars()
+    if query:
+        # Q объединяет условия через ИЛИ: слово ищется в модели, марке и описании
+        cars = cars.filter(
+            Q(model__icontains=query) | Q(brand__name__icontains=query) | Q(description__icontains=query)
+        )
+    if brand_id.isdigit():
+        cars = cars.filter(brand_id=brand_id)
+    cars = cars.order_by(*SORT_OPTIONS[sort][1])
+
+    context = {
+        'cars': cars,
+        'query': query,
+        'brand_id': brand_id,
+        'sort': sort,
+        'brands': brands_with_cars(),
+        'sort_options': {key: label for key, (label, _) in SORT_OPTIONS.items()},
+    }
+    return render(request, 'used_cars/car_list.html', context)
 
 
 def car_detail(request, pk):

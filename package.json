@@ -13,6 +13,7 @@
     "dev:api": "npm run dev -w @carshowroom/api",
     "dev:web": "npm run dev -w @carshowroom/web",
     "dev:contracts": "npm run dev -w @carshowroom/contracts",
+    "dev:used": "uv run --directory apps/used-cars python manage.py runserver 127.0.0.1:8000",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",

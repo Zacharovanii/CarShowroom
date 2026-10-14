@@ -92,6 +92,10 @@ export default defineConfig({
       "/api": { target: "http://localhost:3000", changeOrigin: true },
       "/assets": { target: "http://localhost:3000", changeOrigin: true },
       "/media": { target: "http://localhost:3000", changeOrigin: true },
+      // Раздел «Авто с пробегом» — Django (apps/used-cars, `npm run dev:used`).
+      // Без changeOrigin: Django сверяет Origin формы с Host, и Host должен
+      // остаться адресом фронта, иначе любой POST получит 403 CSRF.
+      "/used": { target: "http://127.0.0.1:8000" },
     },
   },
 });

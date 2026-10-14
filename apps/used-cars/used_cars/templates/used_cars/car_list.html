@@ -5,6 +5,38 @@
 {% block content %}
 <h1 class="mb-4">Автомобили с пробегом</h1>
 
+{# GET-форма: фильтры попадают в адрес страницы #}
+<form method="get" class="row g-2 align-items-end mb-3" role="search">
+  <div class="col-12 col-lg-5">
+    <label for="q" class="form-label small text-body-secondary">Поиск</label>
+    <input type="search" id="q" name="q" value="{{ query }}" class="form-control"
+           placeholder="Модель, марка или слово из описания">
+  </div>
+  <div class="col-6 col-lg-2">
+    <label for="brand" class="form-label small text-body-secondary">Марка</label>
+    <select id="brand" name="brand" class="form-select">
+      <option value="">Все марки</option>
+      {% for brand in brands %}
+      <option value="{{ brand.pk }}" {% if brand_id == brand.pk|stringformat:'d' %}selected{% endif %}>
+        {{ brand.name }} ({{ brand.published_count }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-6 col-lg-3">
+    <label for="sort" class="form-label small text-body-secondary">Сортировка</label>
+    <select id="sort" name="sort" class="form-select">
+      {% for value, label in sort_options.items %}
+      <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-lg-2 d-flex gap-2">
+    <button type="submit" class="btn btn-primary flex-grow-1">Найти</button>
+    <a href="{% url 'car_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтры" aria-label="Сбросить фильтры">✕</a>
+  </div>
+</form>
+
 <p class="text-body-secondary">Найдено: {{ cars|length }}</p>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -12,7 +44,9 @@
   <div class="col">{% include 'used_cars/_car_card.html' %}</div>
   {% empty %}
   <div class="col-12">
-    <div class="alert alert-secondary">Ничего не найдено.</div>
+    <div class="alert alert-secondary">
+      Ничего не найдено. <a href="{% url 'car_list' %}" class="alert-link">Сбросить фильтры</a>
+    </div>
   </div>
   {% endfor %}
 </div>

@@ -27,7 +27,7 @@
   </div>
   <div class="col-6 col-md-3">
     <div class="border p-3 h-100">
-      <div class="fs-2 fw-bold">{{ brands_count }}</div>
+      <div class="fs-2 fw-bold">{{ brands|length }}</div>
       <div class="small text-body-secondary">марок</div>
     </div>
   </div>
@@ -43,6 +43,15 @@
       <div class="small text-body-secondary">средний пробег</div>
     </div>
   </div>
+</div>
+
+<h2 class="h3 mb-3">Марки</h2>
+<div class="d-flex flex-wrap gap-2 mb-5">
+  {% for brand in brands %}
+  <a href="{% url 'car_list' %}?brand={{ brand.pk }}" class="btn btn-outline-secondary">
+    {{ brand.name }} <span class="badge text-bg-secondary ms-1">{{ brand.published_count }}</span>
+  </a>
+  {% endfor %}
 </div>
 
 <div class="d-flex justify-content-between align-items-baseline mb-3">

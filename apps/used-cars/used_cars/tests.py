@@ -18,6 +18,16 @@ class PagesTests(TestCase):
         self.assertEqual(len(cars), 10)
         self.assertTrue(all(car.is_published for car in cars))
 
+    def test_search_and_brand_filter(self):
+        def models(**params):
+            return [car.model for car in self.client.get(reverse('car_list'), params).context['cars']]
+
+        self.assertEqual(models(q='x5'), ['X5 xDrive30d'])
+        self.assertEqual(models(q='toyota'), ['RAV4 2.0 4WD', 'Camry 2.5'])  # поиск по марке
+        # Фильтр по марке + сортировка по цене; Q5 (на модерации) не попадает
+        self.assertEqual(models(brand=3, sort='cheap'), ['A6 45 TFSI quattro'])
+        self.assertEqual(models(brand='abc', sort='bad'), models())  # мусор в адресе игнорируется
+
     def test_unpublished_detail_is_hidden_from_visitor(self):
         self.assertEqual(self.client.get(reverse('car_detail', args=[1])).status_code, 200)
         self.assertEqual(self.client.get(reverse('car_detail', args=[8])).status_code, 404)
