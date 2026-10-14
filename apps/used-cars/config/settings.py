@@ -10,22 +10,31 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+# Прод включается переменной SITE_DOMAIN — её задаёт docker/compose.prod.yml.
+# Без неё — dev: DEBUG, ключ из репозитория, Django сам раздаёт media.
+SITE_DOMAIN = os.environ.get('SITE_DOMAIN')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0&a4*%2-huh(6uw7cs=(^#rr89gz@&6*j_ola*nk2i6w&6^)0b'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+if SITE_DOMAIN:
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+    DEBUG = False
+    ALLOWED_HOSTS = [SITE_DOMAIN]
+    # HTTPS снимает Caddy, до Django запрос доходит по HTTP. По X-Forwarded-Proto
+    # Django понимает, что снаружи был HTTPS: иначе Origin формы (https://...)
+    # не совпадёт со схемой запроса и любой POST получит 403 CSRF.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    SECRET_KEY = 'django-insecure-0&a4*%2-huh(6uw7cs=(^#rr89gz@&6*j_ola*nk2i6w&6^)0b'
+    DEBUG = True
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -76,7 +85,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # На сервере база лежит в томе (DJANGO_DB_PATH), чтобы пережить пересборку
+        'NAME': os.environ.get('DJANGO_DB_PATH', BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -118,6 +128,9 @@ USE_TZ = True
 # Раздел живёт под /used/ основного сайта (в dev Vite проксирует туда /used).
 # Префикс у статики свой: /static/ на сайте занят сборкой фронта.
 STATIC_URL = '/used/static/'
+# Сюда collectstatic собирает статику для прода (CSS приложения и админки);
+# на сервере её отдаёт Caddy
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Фото объявлений: загруженные через админку и скачанные для фикстуры.
 # Папка media/ вне гита — у скачанных фото чужая лицензия (D25).
@@ -125,11 +138,12 @@ MEDIA_URL = '/used/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
+# Ошибки — в stdout контейнера (docker compose logs). По умолчанию при
+# DEBUG=False Django отправляет их только письмом админам, а почты здесь нет.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'root': {'handlers': ['console'], 'level': 'WARNING'},
 }

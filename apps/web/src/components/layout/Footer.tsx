@@ -24,14 +24,12 @@ export function Footer() {
             <Link to="/catalog" className={styles.link}>
               Тест-драйв
             </Link>
-            {/* Django-раздел (apps/used-cars) — отдельное приложение, не маршрут SPA,
-                поэтому обычная ссылка. Выкачен только в dev (прокси Vite), на сервере
-                его нет — там пункт не показывается. */}
-            {import.meta.env.DEV && (
-              <a href="/used/" className={styles.link}>
-                С пробегом
-              </a>
-            )}
+            {/* Django-раздел (apps/used-cars, D29) — отдельное приложение, не маршрут
+                SPA, поэтому обычная ссылка, а не Link. /used/ в dev проксирует Vite,
+                на сервере — Caddy. */}
+            <a href="/used/" className={styles.link}>
+              С пробегом
+            </a>
             <Link to="/" className={styles.link}>
               О салоне
             </Link>

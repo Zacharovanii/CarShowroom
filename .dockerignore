@@ -14,3 +14,10 @@ apps/api/licensed-assets
 .vscode
 docs
 docker/compose*.yml
+
+# Django-раздел: окружение, локальная база, фото и собранная статика
+apps/used-cars/.venv
+apps/used-cars/db.sqlite3
+apps/used-cars/media
+apps/used-cars/staticfiles
+**/__pycache__

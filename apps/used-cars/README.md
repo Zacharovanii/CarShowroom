@@ -29,7 +29,12 @@ uv run python manage.py runserver           # http://127.0.0.1:8000/used/
 **Вместе с основным сайтом.** Из корня репозитория `npm run dev:used` (Django на :8000)
 и `npm run dev:web` (Vite на :5173). Vite проксирует `/used` в Django, так что раздел
 открывается по адресу http://127.0.0.1:5173/used/, а в подвале сайта появляется ссылка
-«С пробегом». Ссылка есть только в dev: на сервер раздел не выкатывается.
+«С пробегом».
+
+**На сервере** раздел — сервис `used-cars` в `docker/compose.prod.yml` (gunicorn),
+Caddy отдаёт его статику и фото. Прод включается переменной `SITE_DOMAIN`:
+`DEBUG=False`, ключ из `DJANGO_SECRET_KEY`. Выкатка и наполнение — шаг 9 в
+[docs/deploy.md](../../docs/deploy.md).
 
 ### Окружение: uv вместо venv + pip
 

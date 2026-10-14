@@ -18,6 +18,20 @@
 		reverse_proxy api:3000
 	}
 
+	# Раздел «Авто с пробегом» (Django, D29). Статика (собрана в этот образ)
+	# и фото (том used-cars-media) — файлы, их отдаёт Caddy; страницы
+	# и админку — gunicorn. Порядок важен: файлы раньше общего /used/*.
+	@used-files path /used/static/* /used/media/*
+	handle @used-files {
+		root * /srv
+		file_server
+	}
+
+	@used path /used /used/*
+	handle @used {
+		reverse_proxy used-cars:8000
+	}
+
 	# Чанки, картинки и шрифты Vite: хеш в имени, кешируются навсегда.
 	handle /static/* {
 		root * /srv

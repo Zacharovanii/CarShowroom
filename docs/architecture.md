@@ -266,11 +266,14 @@ Better Auth (D7) внутри модуля `auth`, со своим `pg` Pool —
 
 ```
 браузер ──HTTPS──▶ caddy (80, 443) ──▶ api (Nest, :3000) ──▶ db (Postgres)
-                   статика SPA                          └──▶ minio (загруженные файлы)
+                   статика SPA     │                    └──▶ minio (загруженные файлы)
+                   и /used/static  └──▶ used-cars (Django, gunicorn :8000) ──▶ SQLite (том)
+                   /used/media ◀── том фото ───────────┘
 ```
 
 Caddy получает сертификат Let's Encrypt, отдаёт собранный фронт и проксирует в API
 `/api`, `/media` и `/assets`. Фронт и API на одном origin, поэтому CORS и `WEB_ORIGIN`
 на сервере не нужны. Наружу открыты только порты Caddy. Миграции применяет одноразовый
-сервис `migrate` (dbmate) до запуска API. Пошаговая инструкция —
+сервис `migrate` (dbmate) до запуска API. `/used/*` — Django-раздел (D29): страницы
+проксируются в `used-cars`, его статику и фото Caddy отдаёт сам. Пошаговая инструкция —
 [deploy.md](deploy.md).

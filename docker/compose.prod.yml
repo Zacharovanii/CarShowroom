@@ -8,6 +8,7 @@
 #   docker compose -f docker/compose.prod.yml run --rm migrate    — миграции
 #   docker compose -f docker/compose.prod.yml up -d               — поднять
 #   docker compose -f docker/compose.prod.yml run --rm api node db/seed/run.mjs --catalog-only — seed каталога
+# Django-раздел (/used/) — сервис used-cars, его наполнение — docs/deploy.md, шаг 9.
 # Миграции — до up: Better Auth при первом запросе сверяет схему, без таблиц
 # отвечает 500 на всё (и на healthcheck /api) и запоминает это до перезапуска.
 name: carshowroom
@@ -112,6 +113,24 @@ services:
       retries: 5
       start_period: 20s
 
+  # Раздел «Авто с пробегом» на Django (D29): gunicorn, своя SQLite и фото
+  # в томах. Миграции применяет сам при старте. Статику и фото отдаёт Caddy.
+  # От него ничего не зависит: упадёт — не откроется только /used/.
+  used-cars:
+    logging: *logging
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: used-cars
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?задайте в docker/.env}
+      DJANGO_DB_PATH: /app/data/db.sqlite3
+    volumes:
+      - used-cars-data:/app/data
+      - used-cars-media:/app/media
+
   caddy:
     logging: *logging
     build:
@@ -132,6 +151,8 @@ services:
       # сертификаты Let's Encrypt — без тома перевыпускались бы на каждый up
       - caddy-data:/data
       - caddy-config:/config
+      # фото Django-раздела (загруженные в админке и скачанные) — только чтение
+      - used-cars-media:/srv/used/media:ro
 
   # Миграции dbmate (чистый SQL из apps/api/db/migrations). Только по запросу:
   #   docker compose -f docker/compose.prod.yml run --rm migrate
@@ -153,3 +174,5 @@ volumes:
   minio-data:
   caddy-data:
   caddy-config:
+  used-cars-data:
+  used-cars-media:

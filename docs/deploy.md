@@ -27,6 +27,9 @@ Caddy сам получает сертификат Let's Encrypt, отдаёт �
 открыты только порты 80 и 443 Caddy; база, MinIO и API доступны лишь внутри сети
 compose. Схема — в [architecture.md](architecture.md#развёртывание).
 
+Раздел «Авто с пробегом» (`/used/`) — отдельный сервис `used-cars` на Django со своей
+SQLite (D29). Его страницы Caddy проксирует в gunicorn, а статику и фото отдаёт сам.
+
 ## 2. Что нужно заранее
 
 - **VPS** с Ubuntu 24.04, от 4 ГБ RAM; IP-адрес и пароль `root` из панели хостера.
@@ -170,6 +173,7 @@ personal access token (GitHub → Settings → Developer settings → Personal a
 openssl rand -hex 24      # для POSTGRES_PASSWORD
 openssl rand -hex 24      # для MINIO_ROOT_PASSWORD
 openssl rand -base64 32   # для BETTER_AUTH_SECRET
+openssl rand -base64 48   # для DJANGO_SECRET_KEY
 ```
 
 ```bash
@@ -187,6 +191,7 @@ chmod 600 docker/.env
 | `MINIO_ROOT_USER` | оставить `carshowroom` |
 | `MINIO_ROOT_PASSWORD` | второй `openssl rand -hex 24` (не короче 8 символов) |
 | `BETTER_AUTH_SECRET` | `openssl rand -base64 32`. Dev-секрет из `apps/api/.env` не брать — он в истории гита |
+| `DJANGO_SECRET_KEY` | `openssl rand -base64 48` — секрет Django-раздела `/used/`. Dev-ключ из `settings.py` не брать |
 | `RESEND_API_KEY` | ключ из панели Resend (API Keys) |
 | `MAIL_FROM` | `"CarShowroom <noreply@ПОЧТОВЫЙ_ДОМЕН>"` — в кавычках, домен подтверждён в Resend |
 
@@ -284,7 +289,21 @@ compose run --rm api node db/seed/run.mjs --catalog-only
 Флаг `--catalog-only` обязателен: без него в базу попадут тестовые учётки
 с публичным паролем `password123`.
 
-**5. Почистить диск** — сборка оставляет кеш на несколько гигабайт.
+**5. Раздел «Авто с пробегом»** (`/used/`). Миграции сервис `used-cars` применил сам
+при старте; осталось наполнить его и создать вход в админку Django.
+
+```bash
+compose exec used-cars python manage.py loaddata used_cars     # 24 машины, марки, опции
+compose exec used-cars python manage.py download_photos         # 45 фото с Unsplash, ~27 МБ
+compose exec used-cars python manage.py createsuperuser         # логин и пароль админки /used/admin/
+```
+
+`createsuperuser` спрашивает имя, почту (можно пустую) и пароль дважды; пароль при вводе
+не отображается. Этот пользователь — только для админки раздела, с аккаунтами основного
+сайта он не связан. `loaddata` можно повторить: он перезапишет записи фикстуры, а
+`download_photos` скачает только недостающие фото.
+
+**6. Почистить диск** — сборка оставляет кеш на несколько гигабайт.
 
 ```bash
 docker image prune -f && docker builder prune -f
@@ -339,6 +358,12 @@ docker image prune -f && docker builder prune -f
       (ответ 429). Через минуту вход снова работает. Если ограничение срабатывает сразу
       у всех посетителей, а не у одного — что-то не так с прокси (шаг 15).
 - [ ] В подвале: «Учебный проект. Не является официальным сайтом BMW.»
+- [ ] Ссылка «С пробегом» в подвале открывает `/used/`: машины с фото, поиск и фильтры
+      работают.
+- [ ] «Продать автомобиль» → отправить форму → сообщение «отправлено на проверку»
+      (не 403: значит, CSRF за прокси настроен верно).
+- [ ] `/used/admin/` — вход под пользователем из `createsuperuser`, оформление админки
+      на месте (её CSS отдаёт Caddy).
 
 ## 12. Обновление
 
@@ -358,6 +383,19 @@ docker image prune -f && docker builder prune -f
 Seed при обновлении **не запускать**. `licensed-assets` и `docker/.env`
 `git pull` не трогает. Так как кеш сборки чистится, каждая сборка снова полная.
 
+Миграции Django-раздела отдельно запускать не нужно: `used-cars` применяет их при каждом
+старте. База и фото раздела лежат в томах и пересборку переживают.
+
+**Первое обновление, в котором появился раздел `/used/`.** Перед `compose build`
+добавить в `docker/.env` секрет — без него `up` остановится с «задайте в docker/.env»:
+
+```bash
+echo "DJANGO_SECRET_KEY=$(openssl rand -base64 48)" >> docker/.env
+```
+
+Дальше — команды выше, а после `up -d` один раз шаг 9, пункт 5 (данные, фото,
+`createsuperuser`).
+
 ## 13. Логи
 
 **На сервере**, из `/opt/carshowroom`:
@@ -365,6 +403,7 @@ Seed при обновлении **не запускать**. `licensed-assets` 
 ```bash
 compose logs -f api          # следить за API, выход — Ctrl+C
 compose logs --tail 100 caddy # последние 100 строк Caddy
+compose logs -f used-cars     # Django-раздел: запросы gunicorn и ошибки
 ```
 
 Ошибки отправки писем видны в логе API строками `Resend ответил <код>: ...` — там же
@@ -393,6 +432,17 @@ docker run --rm -v carshowroom_minio-data:/data -v "$HOME":/backup alpine tar cz
 scp "deploy@IP_СЕРВЕРА:~/backup-*.gz" .
 scp "deploy@IP_СЕРВЕРА:~/minio-*.tar.gz" .
 ```
+
+Django-раздел: данные — в JSON, фото — архивом тома:
+
+```bash
+compose exec -T used-cars python manage.py dumpdata used_cars auth.user > ~/used-cars-$(date +%F).json
+docker run --rm -v carshowroom_used-cars-media:/data -v "$HOME":/backup alpine tar czf /backup/used-cars-media-$(date +%F).tar.gz -C /data .
+```
+
+Восстановление раздела — после `up -d`: архив фото распаковать в том
+`carshowroom_used-cars-media` так же, как MinIO ниже, а данные загрузить
+`compose exec -T used-cars python manage.py loaddata --format=json - < ~/used-cars-ДАТА.json`.
 
 Восстановление — на **новом** сервере, пройдя шаги 3–9 до `build` включительно,
 но **без** миграций, `up` и seed (дамп уже содержит и схему, и таблицу миграций). Файлы
@@ -425,3 +475,7 @@ compose up -d
 | Сборка падает с `no space left on device` | `docker system df` — сколько занято; `docker image prune -f && docker builder prune -f`; `sudo journalctl --vacuum-size=100M` |
 | В 3D заглушка вместо модели, вместо фото «Фото не установлено» | `ls /opt/carshowroom/apps/api/licensed-assets` — должны быть `cars` и `models`, а не вложенный `licensed-assets`; права — `chmod -R a+rX` (шаг 8) |
 | Сайт открывается, но каталог пуст или ошибка | Не выполнены миграции или seed (шаг 9, пункты 2 и 4) |
+| `/used/` отвечает 502 | Не запущен `used-cars`: `compose ps`, `compose logs --tail 100 used-cars` |
+| `/used/` отвечает 400 Bad Request | Адрес в браузере не совпадает с `SITE_DOMAIN` (Django пускает только его). Исправить `docker/.env`, `up -d` |
+| В `/used/` пусто или заглушки вместо фото | Не выполнен шаг 9, пункт 5: `loaddata used_cars`, `download_photos` |
+| Админка `/used/admin/` без оформления | Старый образ `caddy`: статика раздела собирается в него — `compose build`, `up -d` |
