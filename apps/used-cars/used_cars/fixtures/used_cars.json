@@ -125,6 +125,7 @@
       "model": "X5 xDrive30d",
       "year": 2019,
       "mileage_km": 98000,
+      "owners_count": 1,
       "price": "5450000.00",
       "description": "Один владелец, обслуживание у официального дилера, полная сервисная история.",
       "features": [
@@ -148,6 +149,7 @@
       "model": "320i M Sport",
       "year": 2020,
       "mileage_km": 61000,
+      "owners_count": 1,
       "price": "3290000.00",
       "description": "Спортивный пакет M, родная краска, комплект зимней резины в подарок.",
       "features": [
@@ -167,6 +169,7 @@
       "model": "530d xDrive",
       "year": 2018,
       "mileage_km": 124000,
+      "owners_count": 2,
       "price": "3850000.00",
       "description": "Максимальная комплектация, проекционный дисплей, аудиосистема Harman Kardon.",
       "features": [
@@ -190,6 +193,7 @@
       "model": "X3 xDrive20d",
       "year": 2021,
       "mileage_km": 47000,
+      "owners_count": 1,
       "price": "4690000.00",
       "description": "Гарантия дилера до конца года, без ДТП.",
       "features": [
@@ -211,6 +215,7 @@
       "model": "E 200",
       "year": 2019,
       "mileage_km": 88000,
+      "owners_count": 2,
       "price": "3390000.00",
       "description": "Седан в кузове W213, аккуратная эксплуатация, не курили.",
       "features": [
@@ -230,6 +235,7 @@
       "model": "GLC 300 4MATIC",
       "year": 2020,
       "mileage_km": 72000,
+      "owners_count": 1,
       "price": "4950000.00",
       "description": "Пневмоподвеска Air Body Control, панорамная крыша.",
       "features": [
@@ -252,6 +258,7 @@
       "model": "A6 45 TFSI quattro",
       "year": 2019,
       "mileage_km": 93000,
+      "owners_count": 2,
       "price": "3650000.00",
       "description": "Матричные фары, виртуальная приборная панель.",
       "features": [
@@ -273,6 +280,7 @@
       "model": "Q5 40 TDI",
       "year": 2018,
       "mileage_km": 135000,
+      "owners_count": 3,
       "price": "3150000.00",
       "description": "Свежее поступление, проходит диагностику.",
       "features": [
@@ -292,6 +300,7 @@
       "model": "Tiguan 2.0 TSI 4Motion",
       "year": 2020,
       "mileage_km": 69000,
+      "owners_count": 1,
       "price": "2890000.00",
       "description": "Комплектация Highline, два комплекта ключей.",
       "features": [
@@ -312,6 +321,7 @@
       "model": "Camry 2.5",
       "year": 2021,
       "mileage_km": 54000,
+      "owners_count": 1,
       "price": "3190000.00",
       "description": "Комплектация «Престиж», на гарантии.",
       "features": [
@@ -332,6 +342,7 @@
       "model": "RAV4 2.0 4WD",
       "year": 2019,
       "mileage_km": 103000,
+      "owners_count": 2,
       "price": "2750000.00",
       "description": "Надёжный городской кроссовер, все ТО по регламенту.",
       "features": [
@@ -351,6 +362,7 @@
       "model": "RX 350",
       "year": 2017,
       "mileage_km": 148000,
+      "owners_count": 3,
       "price": "3490000.00",
       "description": "Объявление от клиента, ждёт осмотра.",
       "features": [

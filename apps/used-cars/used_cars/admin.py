@@ -30,7 +30,9 @@ class FeatureAdmin(admin.ModelAdmin):
 
 @admin.register(UsedCar)
 class UsedCarAdmin(admin.ModelAdmin):
-    list_display = ('model', 'brand', 'year', 'mileage_km', 'price', 'is_published', 'created_at')
+    list_display = (
+        'model', 'brand', 'year', 'mileage_km', 'owners_count', 'price', 'is_published', 'created_at'
+    )
     list_display_links = ('model',)
     list_filter = ('is_published', 'brand', 'year')
     search_fields = ('model', 'description', 'brand__name')

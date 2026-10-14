@@ -43,6 +43,10 @@ class UsedCar(models.Model):
         'Год выпуска', validators=[MinValueValidator(1950), MaxValueValidator(2100)]
     )
     mileage_km = models.PositiveIntegerField('Пробег, км')
+    # Добавлено второй миграцией: default заполняет уже существующие строки
+    owners_count = models.PositiveSmallIntegerField(
+        'Владельцев по ПТС', default=1, validators=[MinValueValidator(1)]
+    )
     # Деньги — Decimal, а не float: без ошибок округления
     price = models.DecimalField('Цена, ₽', max_digits=12, decimal_places=2)
     description = models.TextField('Описание', blank=True)
