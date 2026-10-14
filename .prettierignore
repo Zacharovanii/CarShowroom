@@ -3,3 +3,5 @@ node_modules/
 package-lock.json
 # markdown в docs/ и README свёрстан руками — переносы строк осмысленные
 *.md
+# Django-раздел: шаблоны Django prettier ломает, Python он не форматирует
+apps/used-cars/

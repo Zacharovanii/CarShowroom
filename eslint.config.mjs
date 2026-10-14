@@ -3,7 +3,8 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
-  { ignores: ["**/dist/**", "**/node_modules/**"] },
+  // .venv — окружение Django-раздела (apps/used-cars), внутри JS админки Django
+  { ignores: ["**/dist/**", "**/node_modules/**", "**/.venv/**"] },
   ...tseslint.configs.recommended,
 
   // Правила React — только для фронта: в apps/api и contracts React нет
