@@ -119,6 +119,11 @@ USE_TZ = True
 # Префикс у статики свой: /static/ на сайте занят сборкой фронта.
 STATIC_URL = '/used/static/'
 
+# Фото объявлений: загруженные через админку и скачанные для фикстуры.
+# Папка media/ вне гита — у скачанных фото чужая лицензия (D25).
+MEDIA_URL = '/used/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration

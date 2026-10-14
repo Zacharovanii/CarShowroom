@@ -1,3 +1,5 @@
+import tempfile
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -6,7 +8,7 @@ from .models import UsedCar
 
 
 class PagesTests(TestCase):
-    # В фикстуре 12 машин, две (pk 8 и 12) ждут модерации
+    # В фикстуре 24 машины, две (pk 8 и 12) ждут модерации
     fixtures = ['used_cars']
 
     def test_static_pages_open(self):
@@ -15,7 +17,7 @@ class PagesTests(TestCase):
 
     def test_list_shows_only_published(self):
         cars = self.client.get(reverse('car_list')).context['cars']
-        self.assertEqual(len(cars), 10)
+        self.assertEqual(len(cars), 22)
         self.assertTrue(all(car.is_published for car in cars))
 
     def test_search_and_brand_filter(self):
@@ -23,10 +25,19 @@ class PagesTests(TestCase):
             return [car.model for car in self.client.get(reverse('car_list'), params).context['cars']]
 
         self.assertEqual(models(q='x5'), ['X5 xDrive30d'])
-        self.assertEqual(models(q='toyota'), ['RAV4 2.0 4WD', 'Camry 2.5'])  # поиск по марке
+        self.assertEqual(  # поиск по марке
+            models(q='toyota'), ['Land Cruiser 200 4.5d', 'RAV4 2.0 4WD', 'Camry 2.5 XSE']
+        )
         # Фильтр по марке + сортировка по цене; Q5 (на модерации) не попадает
-        self.assertEqual(models(brand=3, sort='cheap'), ['A6 45 TFSI quattro'])
+        self.assertEqual(models(brand=3, sort='cheap'), ['A6 2.0 TFSI quattro', 'A4 40 TFSI'])
         self.assertEqual(models(brand='abc', sort='bad'), models())  # мусор в адресе игнорируется
+
+    def test_missing_photo_files_fall_back_to_placeholder(self):
+        # Чистый клон: записи о фото есть, файлов в media/ нет
+        with tempfile.TemporaryDirectory() as empty_media, self.settings(MEDIA_ROOT=empty_media):
+            response = self.client.get(reverse('car_detail', args=[1]))
+        self.assertEqual(response.context['car'].gallery, [])
+        self.assertContains(response, 'car-placeholder.svg')
 
     def test_unpublished_detail_is_hidden_from_visitor(self):
         self.assertEqual(self.client.get(reverse('car_detail', args=[1])).status_code, 200)

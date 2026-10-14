@@ -18,7 +18,8 @@
 cd apps/used-cars
 uv sync                                     # .venv + зависимости строго по uv.lock
 uv run python manage.py migrate             # создать db.sqlite3 и таблицы
-uv run python manage.py loaddata used_cars  # тестовые данные: 6 марок, 10 опций, 12 машин
+uv run python manage.py loaddata used_cars  # тестовые данные: 11 марок, 13 опций, 24 машины
+uv run python manage.py download_photos     # фото к ним с Unsplash, ~27 МБ (необязательно)
 uv run python manage.py createsuperuser     # вход в админку
 uv run python manage.py runserver           # http://127.0.0.1:8000/used/
 ```
@@ -60,7 +61,7 @@ config/                 проект (startproject)
   urls.py               корневые маршруты: /used/admin/ и /used/ → used_cars.urls
 used_cars/              приложение (startapp)
   models.py             Brand, Feature, UsedCar
-  migrations/           0001_initial, 0002_usedcar_owners_count
+  migrations/           0001_initial, 0002_usedcar_owners_count, 0003_carphoto
   admin.py              настройка админки
   forms.py              UsedCarForm (ModelForm) и UsedCarEditForm
   views.py              представления страниц
@@ -69,6 +70,9 @@ used_cars/              приложение (startapp)
   templatetags/         фильтры rub и km: «3 290 000 ₽», «98 000 км»
   static/used_cars/     site.css (Bootstrap в цветах сайта), заглушка фото
   fixtures/             used_cars.json — тестовые данные
+  photo_sources.json    откуда скачивать фото из фикстуры (Unsplash)
+  management/commands/  download_photos — скачивает эти фото в media/
+media/                 фото объявлений (вне гита)
   tests.py              тесты страниц, форм и админки
 ```
 
@@ -76,7 +80,10 @@ used_cars/              приложение (startapp)
 
 ```
 Brand 1 ──── * UsedCar * ──── * Feature
-       ForeignKey        ManyToMany
+       ForeignKey   1   ManyToMany
+                    │
+                    * ForeignKey
+                 CarPhoto
 ```
 
 - **Brand** (марка): `name` (CharField, unique), `country` (CharField, blank).
@@ -87,6 +94,9 @@ Brand 1 ──── * UsedCar * ──── * Feature
   `owners_count` (PositiveSmallIntegerField, default=1), `price` (DecimalField 12,2: деньги
   не во float), `description` (TextField, blank), `features` (ManyToManyField, blank),
   `is_published` (BooleanField, default=False), `created_at` (DateTimeField, auto_now_add).
+- **CarPhoto** (фото объявления): `car` (ForeignKey, `on_delete=CASCADE`: фото удаляются
+  вместе с объявлением), `image` (ImageField, файл в `media/cars/`, нужен Pillow),
+  `position` (порядок; первое фото — обложка). Добавлена третьей миграцией.
 
 У каждой модели есть `__str__` и `Meta` с `verbose_name` и `ordering`.
 
@@ -125,7 +135,7 @@ uv run python manage.py sqlmigrate used_cars 0002
 
 ## Админ-панель
 
-Все три модели зарегистрированы в `admin.py`.
+Все четыре модели зарегистрированы в `admin.py`.
 
 - **UsedCar:** `list_display` (модель, марка, год, пробег, владельцы, цена, публикация,
   дата), `list_filter` (публикация, марка, год), `search_fields` (модель, описание, имя
@@ -136,8 +146,22 @@ uv run python manage.py sqlmigrate used_cars 0002
   `list_filter` по стране, `search_fields`, `ordering`.
 - **Feature:** поиск по названию.
 
-Тестовые данные (28 записей) лежат в фикстуре, чтобы чистый клон сразу показывал
+Фото добавляются прямо в карточке объявления (inline), с превью; `CarPhoto`
+зарегистрирован и отдельно.
+
+Тестовые данные (93 записи) лежат в фикстуре, чтобы чистый клон сразу показывал
 заполненный сайт. Две машины в ней ждут модерации и на сайте не видны.
+
+## Фото
+
+К машинам из фикстуры подобраны 45 фото с [Unsplash](https://unsplash.com) (бесплатная
+лицензия Unsplash), по 1–3 на машину, 2048 px по ширине. Записи о фото есть в фикстуре,
+а сами файлы в гит не входят (D25): их скачивает `manage.py download_photos` по списку
+`used_cars/photo_sources.json`, уже скачанные пропускаются. Пока файлов нет, на сайте
+вместо фото заглушка: `UsedCar.gallery` отбрасывает записи без файла.
+
+В dev фото раздаёт сам Django по `/used/media/` (`MEDIA_URL`, `MEDIA_ROOT = media/`);
+загруженные через админку файлы ложатся туда же.
 
 ## Страницы
 
@@ -165,7 +189,7 @@ uv run python manage.py sqlmigrate used_cars 0002
 
 ```bash
 uv run python manage.py check   # ошибки конфигурации
-uv run python manage.py test    # 11 тестов: страницы, поиск, формы, права, админка
+uv run python manage.py test    # 12 тестов: страницы, поиск, фото, формы, права, админка
 ```
 
 Тесты работают на временной базе: она создаётся и удаляется сама, фикстура грузится в неё.

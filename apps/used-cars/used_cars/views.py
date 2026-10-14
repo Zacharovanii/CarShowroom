@@ -20,9 +20,10 @@ SORT_OPTIONS = {
 def published_cars():
     """Опубликованные объявления — всё, что видит посетитель сайта.
 
-    select_related подтягивает марку тем же запросом: в карточке она нужна всегда.
+    select_related подтягивает марку тем же запросом, prefetch_related — фото
+    одним запросом на всю страницу, а не по запросу на карточку.
     """
-    return UsedCar.objects.filter(is_published=True).select_related('brand')
+    return UsedCar.objects.filter(is_published=True).select_related('brand').prefetch_related('photos')
 
 
 def brands_with_cars():
@@ -75,7 +76,7 @@ def car_list(request):
 
 
 def car_detail(request, pk):
-    cars = UsedCar.objects.select_related('brand').prefetch_related('features')
+    cars = UsedCar.objects.select_related('brand').prefetch_related('features', 'photos')
     # Объявление на модерации видит только сотрудник, остальным — 404
     if not request.user.is_staff:
         cars = cars.filter(is_published=True)

@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.functional import cached_property
 
 
 class Brand(models.Model):
@@ -64,3 +65,29 @@ class UsedCar(models.Model):
 
     def __str__(self):
         return f'{self.brand} {self.model}, {self.year}'
+
+    @cached_property
+    def gallery(self):
+        """Фото, файлы которых на месте.
+
+        Фото из фикстуры лежат вне гита (лицензия чужая, D25): в чистом клоне
+        записей о них нет файлов, и вместо них шаблон покажет заглушку.
+        photos.all() берёт данные из prefetch_related, если он был.
+        """
+        return [photo for photo in self.photos.all() if photo.image.storage.exists(photo.image.name)]
+
+
+class CarPhoto(models.Model):
+    """Фото объявления. Первое по position — обложка в карточке."""
+
+    car = models.ForeignKey(UsedCar, on_delete=models.CASCADE, related_name='photos', verbose_name='Автомобиль')
+    image = models.ImageField('Файл', upload_to='cars/')
+    position = models.PositiveSmallIntegerField('Порядок', default=0)
+
+    class Meta:
+        ordering = ['position', 'id']
+        verbose_name = 'фото'
+        verbose_name_plural = 'фото'
+
+    def __str__(self):
+        return f'Фото {self.position} — {self.car}'

@@ -18,7 +18,39 @@
 
 <div class="row g-4">
   <div class="col-lg-7">
+    {% with photos=car.gallery %}
+    {% if photos|length > 1 %}
+    {# Несколько фото — карусель Bootstrap со стрелками и точками #}
+    <div id="car-photos" class="carousel slide border">
+      <div class="carousel-indicators">
+        {% for photo in photos %}
+        <button type="button" data-bs-target="#car-photos" data-bs-slide-to="{{ forloop.counter0 }}"
+                {% if forloop.first %}class="active" aria-current="true"{% endif %}
+                aria-label="Фото {{ forloop.counter }}"></button>
+        {% endfor %}
+      </div>
+      <div class="carousel-inner">
+        {% for photo in photos %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <img src="{{ photo.image.url }}" class="d-block w-100 car-photo" alt="{{ car }}, фото {{ forloop.counter }}">
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#car-photos" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Предыдущее</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#car-photos" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Следующее</span>
+      </button>
+    </div>
+    {% elif photos %}
+    <img src="{{ photos.0.image.url }}" class="img-fluid w-100 car-photo border" alt="{{ car }}">
+    {% else %}
     <img src="{% static 'used_cars/car-placeholder.svg' %}" class="img-fluid w-100 car-photo border" alt="{{ car }}">
+    {% endif %}
+    {% endwith %}
   </div>
 
   <div class="col-lg-5">

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db.models import Count
+from django.utils.html import format_html
 
-from .models import Brand, Feature, UsedCar
+from .models import Brand, CarPhoto, Feature, UsedCar
 
 admin.site.site_header = 'CarShowroom — авто с пробегом'
 admin.site.site_title = 'Авто с пробегом'
@@ -28,6 +29,38 @@ class FeatureAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
+def photo_preview(photo):
+    """Миниатюра фото в списке и в карточке объявления."""
+    if not photo.image or not photo.image.storage.exists(photo.image.name):
+        return '—'
+    return format_html('<img src="{}" style="height:60px">', photo.image.url)
+
+
+class CarPhotoInline(admin.TabularInline):
+    """Фото редактируются прямо в карточке объявления."""
+
+    model = CarPhoto
+    extra = 1
+    fields = ('preview', 'image', 'position')
+    readonly_fields = ('preview',)
+
+    @admin.display(description='Превью')
+    def preview(self, obj):
+        return photo_preview(obj)
+
+
+@admin.register(CarPhoto)
+class CarPhotoAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'preview', 'position')
+    list_filter = ('car__brand',)
+    search_fields = ('car__model',)
+    list_select_related = ('car__brand',)
+
+    @admin.display(description='Превью')
+    def preview(self, obj):
+        return photo_preview(obj)
+
+
 @admin.register(UsedCar)
 class UsedCarAdmin(admin.ModelAdmin):
     list_display = (
@@ -42,6 +75,7 @@ class UsedCarAdmin(admin.ModelAdmin):
     filter_horizontal = ('features',)
     list_select_related = ('brand',)
     actions = ('publish', 'unpublish')
+    inlines = (CarPhotoInline,)
 
     @admin.action(description='Опубликовать выбранные')
     def publish(self, request, queryset):

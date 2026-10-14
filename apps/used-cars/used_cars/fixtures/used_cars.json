@@ -48,6 +48,46 @@
     }
   },
   {
+    "model": "used_cars.brand",
+    "pk": 7,
+    "fields": {
+      "name": "Porsche",
+      "country": "Германия"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 8,
+    "fields": {
+      "name": "Volvo",
+      "country": "Швеция"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 9,
+    "fields": {
+      "name": "Land Rover",
+      "country": "Великобритания"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 10,
+    "fields": {
+      "name": "Tesla",
+      "country": "США"
+    }
+  },
+  {
+    "model": "used_cars.brand",
+    "pk": 11,
+    "fields": {
+      "name": "Mazda",
+      "country": "Япония"
+    }
+  },
+  {
     "model": "used_cars.feature",
     "pk": 1,
     "fields": {
@@ -118,6 +158,27 @@
     }
   },
   {
+    "model": "used_cars.feature",
+    "pk": 11,
+    "fields": {
+      "name": "Вентиляция сидений"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 12,
+    "fields": {
+      "name": "Камеры кругового обзора"
+    }
+  },
+  {
+    "model": "used_cars.feature",
+    "pk": 13,
+    "fields": {
+      "name": "Матричные фары"
+    }
+  },
+  {
     "model": "used_cars.usedcar",
     "pk": 1,
     "fields": {
@@ -138,7 +199,25 @@
         9
       ],
       "is_published": true,
-      "created_at": "2026-10-01T10:00:00+03:00"
+      "created_at": "2026-09-20T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 1,
+    "fields": {
+      "car": 1,
+      "image": "cars/1-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 2,
+    "fields": {
+      "car": 1,
+      "image": "cars/1-2.jpg",
+      "position": 2
     }
   },
   {
@@ -158,7 +237,25 @@
         9
       ],
       "is_published": true,
-      "created_at": "2026-10-02T10:00:00+03:00"
+      "created_at": "2026-09-21T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 3,
+    "fields": {
+      "car": 2,
+      "image": "cars/2-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 4,
+    "fields": {
+      "car": 2,
+      "image": "cars/2-2.jpg",
+      "position": 2
     }
   },
   {
@@ -182,7 +279,25 @@
         8
       ],
       "is_published": true,
-      "created_at": "2026-10-03T10:00:00+03:00"
+      "created_at": "2026-09-22T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 5,
+    "fields": {
+      "car": 3,
+      "image": "cars/3-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 6,
+    "fields": {
+      "car": 3,
+      "image": "cars/3-2.jpg",
+      "position": 2
     }
   },
   {
@@ -190,21 +305,40 @@
     "pk": 4,
     "fields": {
       "brand": 1,
-      "model": "X3 xDrive20d",
+      "model": "X3 M40i",
       "year": 2021,
       "mileage_km": 47000,
       "owners_count": 1,
-      "price": "4690000.00",
-      "description": "Гарантия дилера до конца года, без ДТП.",
+      "price": "5690000.00",
+      "description": "Цвет Sunstone, гарантия дилера до конца года, без ДТП.",
       "features": [
         1,
         2,
         4,
         6,
-        9
+        9,
+        12
       ],
       "is_published": true,
-      "created_at": "2026-10-04T10:00:00+03:00"
+      "created_at": "2026-09-23T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 7,
+    "fields": {
+      "car": 4,
+      "image": "cars/4-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 8,
+    "fields": {
+      "car": 4,
+      "image": "cars/4-2.jpg",
+      "position": 2
     }
   },
   {
@@ -224,7 +358,25 @@
         5
       ],
       "is_published": true,
-      "created_at": "2026-10-05T10:00:00+03:00"
+      "created_at": "2026-09-24T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 9,
+    "fields": {
+      "car": 5,
+      "image": "cars/5-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 10,
+    "fields": {
+      "car": 5,
+      "image": "cars/5-2.jpg",
+      "position": 2
     }
   },
   {
@@ -232,12 +384,12 @@
     "pk": 6,
     "fields": {
       "brand": 2,
-      "model": "GLC 300 4MATIC",
+      "model": "GLC 300 4MATIC Coupé",
       "year": 2020,
       "mileage_km": 72000,
       "owners_count": 1,
-      "price": "4950000.00",
-      "description": "Пневмоподвеска Air Body Control, панорамная крыша.",
+      "price": "5150000.00",
+      "description": "Купе с пневмоподвеской Air Body Control и панорамной крышей.",
       "features": [
         1,
         2,
@@ -247,7 +399,25 @@
         10
       ],
       "is_published": true,
-      "created_at": "2026-10-06T10:00:00+03:00"
+      "created_at": "2026-09-25T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 11,
+    "fields": {
+      "car": 6,
+      "image": "cars/6-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 12,
+    "fields": {
+      "car": 6,
+      "image": "cars/6-2.jpg",
+      "position": 2
     }
   },
   {
@@ -255,12 +425,12 @@
     "pk": 7,
     "fields": {
       "brand": 3,
-      "model": "A6 45 TFSI quattro",
-      "year": 2019,
-      "mileage_km": 93000,
+      "model": "A6 2.0 TFSI quattro",
+      "year": 2017,
+      "mileage_km": 118000,
       "owners_count": 2,
-      "price": "3650000.00",
-      "description": "Матричные фары, виртуальная приборная панель.",
+      "price": "2450000.00",
+      "description": "Рестайлинговый кузов C7, полный привод quattro, сервисная книжка.",
       "features": [
         1,
         2,
@@ -269,7 +439,25 @@
         6
       ],
       "is_published": true,
-      "created_at": "2026-10-07T10:00:00+03:00"
+      "created_at": "2026-09-26T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 13,
+    "fields": {
+      "car": 7,
+      "image": "cars/7-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 14,
+    "fields": {
+      "car": 7,
+      "image": "cars/7-2.jpg",
+      "position": 2
     }
   },
   {
@@ -289,7 +477,25 @@
         6
       ],
       "is_published": false,
-      "created_at": "2026-10-08T10:00:00+03:00"
+      "created_at": "2026-09-27T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 15,
+    "fields": {
+      "car": 8,
+      "image": "cars/8-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 16,
+    "fields": {
+      "car": 8,
+      "image": "cars/8-2.jpg",
+      "position": 2
     }
   },
   {
@@ -297,20 +503,48 @@
     "pk": 9,
     "fields": {
       "brand": 4,
-      "model": "Tiguan 2.0 TSI 4Motion",
-      "year": 2020,
-      "mileage_km": 69000,
+      "model": "Tiguan 2.0 TSI 4Motion R-Line",
+      "year": 2021,
+      "mileage_km": 39000,
       "owners_count": 1,
-      "price": "2890000.00",
-      "description": "Комплектация Highline, два комплекта ключей.",
+      "price": "3590000.00",
+      "description": "Рестайлинг, пакет R-Line, матричные фары IQ.Light, два комплекта ключей.",
       "features": [
         2,
         4,
         6,
-        9
+        9,
+        13
       ],
       "is_published": true,
-      "created_at": "2026-10-09T10:00:00+03:00"
+      "created_at": "2026-09-28T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 17,
+    "fields": {
+      "car": 9,
+      "image": "cars/9-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 18,
+    "fields": {
+      "car": 9,
+      "image": "cars/9-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 19,
+    "fields": {
+      "car": 9,
+      "image": "cars/9-3.jpg",
+      "position": 3
     }
   },
   {
@@ -318,12 +552,12 @@
     "pk": 10,
     "fields": {
       "brand": 5,
-      "model": "Camry 2.5",
+      "model": "Camry 2.5 XSE",
       "year": 2021,
       "mileage_km": 54000,
       "owners_count": 1,
       "price": "3190000.00",
-      "description": "Комплектация «Престиж», на гарантии.",
+      "description": "Спортивная версия XSE, на гарантии.",
       "features": [
         2,
         4,
@@ -331,7 +565,25 @@
         9
       ],
       "is_published": true,
-      "created_at": "2026-10-10T10:00:00+03:00"
+      "created_at": "2026-09-29T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 20,
+    "fields": {
+      "car": 10,
+      "image": "cars/10-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 21,
+    "fields": {
+      "car": 10,
+      "image": "cars/10-2.jpg",
+      "position": 2
     }
   },
   {
@@ -351,7 +603,25 @@
         6
       ],
       "is_published": true,
-      "created_at": "2026-10-11T10:00:00+03:00"
+      "created_at": "2026-09-30T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 22,
+    "fields": {
+      "car": 11,
+      "image": "cars/11-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 23,
+    "fields": {
+      "car": 11,
+      "image": "cars/11-2.jpg",
+      "position": 2
     }
   },
   {
@@ -374,7 +644,474 @@
         6
       ],
       "is_published": false,
+      "created_at": "2026-10-01T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 24,
+    "fields": {
+      "car": 12,
+      "image": "cars/12-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 13,
+    "fields": {
+      "brand": 2,
+      "model": "C 200",
+      "year": 2018,
+      "mileage_km": 89000,
+      "owners_count": 2,
+      "price": "2590000.00",
+      "description": "Седан W205, бензиновый турбомотор, сервис у дилера.",
+      "features": [
+        2,
+        4,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-02T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 25,
+    "fields": {
+      "car": 13,
+      "image": "cars/13-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 26,
+    "fields": {
+      "car": 13,
+      "image": "cars/13-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 14,
+    "fields": {
+      "brand": 2,
+      "model": "G 63 AMG",
+      "year": 2019,
+      "mileage_km": 64000,
+      "owners_count": 1,
+      "price": "16900000.00",
+      "description": "Новый кузов W463, полная история обслуживания.",
+      "features": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        11,
+        12
+      ],
+      "is_published": true,
+      "created_at": "2026-10-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 27,
+    "fields": {
+      "car": 14,
+      "image": "cars/14-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 28,
+    "fields": {
+      "car": 14,
+      "image": "cars/14-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 15,
+    "fields": {
+      "brand": 3,
+      "model": "A4 40 TFSI",
+      "year": 2019,
+      "mileage_km": 77000,
+      "owners_count": 1,
+      "price": "2790000.00",
+      "description": "Седан B9, виртуальная приборная панель, один владелец.",
+      "features": [
+        2,
+        4,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-04T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 29,
+    "fields": {
+      "car": 15,
+      "image": "cars/15-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 30,
+    "fields": {
+      "car": 15,
+      "image": "cars/15-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 16,
+    "fields": {
+      "brand": 4,
+      "model": "Golf 1.4 TSI",
+      "year": 2019,
+      "mileage_km": 58000,
+      "owners_count": 1,
+      "price": "1890000.00",
+      "description": "Рестайлинг 7.5, экономичный, городская эксплуатация.",
+      "features": [
+        2,
+        4
+      ],
+      "is_published": true,
+      "created_at": "2026-10-05T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 31,
+    "fields": {
+      "car": 16,
+      "image": "cars/16-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 32,
+    "fields": {
+      "car": 16,
+      "image": "cars/16-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 17,
+    "fields": {
+      "brand": 5,
+      "model": "Land Cruiser 200 4.5d",
+      "year": 2018,
+      "mileage_km": 112000,
+      "owners_count": 2,
+      "price": "6900000.00",
+      "description": "Дизель V8, рестайлинг, без бездорожья, обслуживался у дилера.",
+      "features": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        12
+      ],
+      "is_published": true,
+      "created_at": "2026-10-06T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 33,
+    "fields": {
+      "car": 17,
+      "image": "cars/17-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 18,
+    "fields": {
+      "brand": 7,
+      "model": "Cayenne Turbo Coupé",
+      "year": 2020,
+      "mileage_km": 41000,
+      "owners_count": 1,
+      "price": "11900000.00",
+      "description": "Купе с бронзовыми дисками, пакет Sport Chrono.",
+      "features": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        10,
+        12
+      ],
+      "is_published": true,
+      "created_at": "2026-10-07T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 34,
+    "fields": {
+      "car": 18,
+      "image": "cars/18-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 35,
+    "fields": {
+      "car": 18,
+      "image": "cars/18-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 19,
+    "fields": {
+      "brand": 7,
+      "model": "911 Carrera S",
+      "year": 2020,
+      "mileage_km": 23000,
+      "owners_count": 1,
+      "price": "14500000.00",
+      "description": "Кузов 992, гаражное хранение, летняя эксплуатация.",
+      "features": [
+        2,
+        4,
+        5,
+        9
+      ],
+      "is_published": true,
+      "created_at": "2026-10-08T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 36,
+    "fields": {
+      "car": 19,
+      "image": "cars/19-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 20,
+    "fields": {
+      "brand": 8,
+      "model": "XC60 B5 AWD R-Design",
+      "year": 2020,
+      "mileage_km": 71000,
+      "owners_count": 1,
+      "price": "4600000.00",
+      "description": "Пакет R-Design, мягкий гибрид, обслуживание у дилера.",
+      "features": [
+        1,
+        2,
+        4,
+        6,
+        9,
+        12
+      ],
+      "is_published": true,
+      "created_at": "2026-10-09T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 37,
+    "fields": {
+      "car": 20,
+      "image": "cars/20-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 38,
+    "fields": {
+      "car": 20,
+      "image": "cars/20-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 21,
+    "fields": {
+      "brand": 9,
+      "model": "Range Rover Sport SVR",
+      "year": 2019,
+      "mileage_km": 54000,
+      "owners_count": 2,
+      "price": "8900000.00",
+      "description": "V8 5.0 с компрессором, 575 л.с., углепластиковый капот.",
+      "features": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        10,
+        12
+      ],
+      "is_published": true,
+      "created_at": "2026-10-10T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 39,
+    "fields": {
+      "car": 21,
+      "image": "cars/21-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 22,
+    "fields": {
+      "brand": 10,
+      "model": "Model 3 Long Range",
+      "year": 2021,
+      "mileage_km": 41000,
+      "owners_count": 1,
+      "price": "4100000.00",
+      "description": "Два мотора и полный привод, запас хода по WLTP 580 км.",
+      "features": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "is_published": true,
+      "created_at": "2026-10-11T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 40,
+    "fields": {
+      "car": 22,
+      "image": "cars/22-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 41,
+    "fields": {
+      "car": 22,
+      "image": "cars/22-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 23,
+    "fields": {
+      "brand": 11,
+      "model": "CX-5 2.5 AWD",
+      "year": 2020,
+      "mileage_km": 52000,
+      "owners_count": 1,
+      "price": "2950000.00",
+      "description": "Комплектация Supreme, тёмно-серый металлик.",
+      "features": [
+        2,
+        4,
+        6,
+        9
+      ],
+      "is_published": true,
       "created_at": "2026-10-12T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 42,
+    "fields": {
+      "car": 23,
+      "image": "cars/23-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 43,
+    "fields": {
+      "car": 23,
+      "image": "cars/23-2.jpg",
+      "position": 2
+    }
+  },
+  {
+    "model": "used_cars.usedcar",
+    "pk": 24,
+    "fields": {
+      "brand": 1,
+      "model": "X6 M Competition",
+      "year": 2020,
+      "mileage_km": 39000,
+      "owners_count": 1,
+      "price": "11900000.00",
+      "description": "Синий Marina Bay, 625 л.с., карбоновый пакет.",
+      "features": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        12
+      ],
+      "is_published": true,
+      "created_at": "2026-10-13T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 44,
+    "fields": {
+      "car": 24,
+      "image": "cars/24-1.jpg",
+      "position": 1
+    }
+  },
+  {
+    "model": "used_cars.carphoto",
+    "pk": 45,
+    "fields": {
+      "car": 24,
+      "image": "cars/24-2.jpg",
+      "position": 2
     }
   }
 ]

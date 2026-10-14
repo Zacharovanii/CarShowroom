@@ -1,7 +1,10 @@
 {% load static used_cars_extras %}
 {# Карточка объявления: общая для главной и списка, подключается через include #}
 <div class="card h-100">
-  <img src="{% static 'used_cars/car-placeholder.svg' %}" class="card-img-top car-photo" alt="{{ car }}">
+  {% with cover=car.gallery|first %}
+  <img src="{% if cover %}{{ cover.image.url }}{% else %}{% static 'used_cars/car-placeholder.svg' %}{% endif %}"
+       class="card-img-top car-photo" alt="{{ car }}" loading="lazy">
+  {% endwith %}
   <div class="card-body d-flex flex-column">
     <div class="small text-body-secondary text-uppercase letter-spacing">{{ car.brand }}</div>
     <h5 class="card-title mb-1">{{ car.model }}</h5>

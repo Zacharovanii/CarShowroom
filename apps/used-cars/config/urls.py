@@ -1,5 +1,7 @@
 """Корневые маршруты. Все адреса раздела начинаются с /used/ — так он
 встраивается в основной сайт (в dev Vite проксирует /used сюда)."""
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
@@ -11,3 +13,6 @@ urlpatterns = [
     # через основной сайт / принадлежит SPA и сюда не доходит
     path('', RedirectView.as_view(pattern_name='home')),
 ]
+
+# Раздача фото самим Django — только в режиме разработки (DEBUG)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
