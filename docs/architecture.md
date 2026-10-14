@@ -14,6 +14,10 @@ npm workspaces (D2), три пакета, везде TypeScript и ESM (D20):
 | `apps/api` | NestJS (D4): REST API, авторизация, раздача файлов |
 | `packages/contracts` | zod-схемы запросов и ответов, коды ошибок, общие константы |
 
+Отдельно от workspaces — `apps/used-cars`: раздел «Авто с пробегом» на Django
+со своей SQLite (D29, [README раздела](../apps/used-cars/README.md)). С остальными
+пакетами он не связан, в dev Vite проксирует ему `/used`.
+
 `apps/web` и `apps/api` зависят от `contracts` и импортируют его сборку (`dist/`),
 поэтому контракты собираются первыми (`npm run build -w @carshowroom/contracts`
 или `npm run dev:contracts` в режиме watch).

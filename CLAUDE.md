@@ -1,7 +1,7 @@
 # CarShowroom
 
 Учебный проект — сайт автосалона. Монорепо: `apps/web` (Vite + React), `apps/api` (NestJS),
-`packages/contracts` (zod-схемы API). Решения — [docs/decisions.md](docs/decisions.md),
+`packages/contracts` (zod-схемы API), `apps/used-cars` (Django-раздел «Авто с пробегом», D29). Решения — [docs/decisions.md](docs/decisions.md),
 устройство системы — [docs/architecture.md](docs/architecture.md).
 
 ## Инварианты
@@ -24,6 +24,10 @@
   `apps/api/licensed-assets/`, в гит не попадают и перекрывают заглушки, если они есть.
 - **Не усложнять.** Конфиги, флаги, слои абстракции и зависимости добавляются только
   тогда, когда без них не обойтись, а не «на будущее».
+
+Инварианты выше — для `apps/web`, `apps/api` и `contracts`. `apps/used-cars` живёт по
+своим правилам (D29): ORM и миграции Django, своя SQLite, шаблоны Django + Bootstrap,
+окружение uv (`pyproject.toml` + `uv.lock`). В Postgres сайта он не ходит.
 
 ## Коммиты
 

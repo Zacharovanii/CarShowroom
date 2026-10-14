@@ -20,6 +20,9 @@
 - **Менеджер:** записи на день, фильтры, отметка результата или отмена с причиной.
 - **Админ:** пользователи и создание менеджеров; карточки автомобилей, публикация,
   загрузка фото и 3D-моделей.
+- **Авто с пробегом** (`/used/`, только в dev): отдельный раздел на Django + Bootstrap
+  со своей SQLite и админкой Django — практическая работа по Django,
+  [apps/used-cars/README.md](apps/used-cars/README.md).
 
 ## Стек
 
@@ -37,6 +40,7 @@
 ```
 apps/web/            SPA (Vite + React)
 apps/api/            REST API (NestJS), миграции, seed, заглушки ассетов
+apps/used-cars/      раздел «Авто с пробегом» (Django, uv, SQLite)
 packages/contracts/  zod-схемы API
 docker/              compose для dev и прода, Caddyfile
 docs/                документация
@@ -145,7 +149,7 @@ D28 в [docs/decisions.md](docs/decisions.md).
 ## Документация
 
 - [docs/architecture.md](docs/architecture.md) — как устроена система: пакеты, контракт и эндпоинты, слои, файлы, авторизация, тесты, деплой
-- [docs/decisions.md](docs/decisions.md) — журнал решений (D1…D28): контекст, решение, последствия
+- [docs/decisions.md](docs/decisions.md) — журнал решений (D1…D29): контекст, решение, последствия
 - [docs/use-cases.md](docs/use-cases.md) — роли, страницы, сценарии, правила тест-драйва
 - [docs/db/README.md](docs/db/README.md) — схема БД: таблицы, связи, ограничения
 - [docs/design-system.md](docs/design-system.md) — токены, правила и компоненты интерфейса
