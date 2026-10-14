@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static used_cars_extras %}
+
+{% block title %}{{ car }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'car_list' %}">Автомобили</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ car.brand }} {{ car.model }}</li>
+  </ol>
+</nav>
+
+{% if not car.is_published %}
+<div class="alert alert-warning">Объявление на модерации — посетители сайта его не видят.</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <img src="{% static 'used_cars/car-placeholder.svg' %}" class="img-fluid w-100 car-photo border" alt="{{ car }}">
+  </div>
+
+  <div class="col-lg-5">
+    <div class="small text-body-secondary text-uppercase letter-spacing">{{ car.brand }}</div>
+    <h1 class="mb-2">{{ car.model }}</h1>
+    <p class="display-6 fw-semibold mb-4">{{ car.price|rub }}</p>
+
+    <table class="table table-sm">
+      <tbody>
+        <tr><th scope="row" class="fw-normal text-body-secondary">Год выпуска</th><td>{{ car.year }}</td></tr>
+        <tr><th scope="row" class="fw-normal text-body-secondary">Пробег</th><td>{{ car.mileage_km|km }}</td></tr>
+        <tr><th scope="row" class="fw-normal text-body-secondary">Владельцев по ПТС</th><td>{{ car.owners_count }}</td></tr>
+        <tr><th scope="row" class="fw-normal text-body-secondary">Страна марки</th><td>{{ car.brand.country|default:'—' }}</td></tr>
+        <tr><th scope="row" class="fw-normal text-body-secondary">Добавлено</th><td>{{ car.created_at|date:'j E Y' }}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex flex-wrap gap-2">
+      <a href="tel:+70000000000" class="btn btn-primary">Позвонить в салон</a>
+      <a href="{% url 'car_list' %}" class="btn btn-outline-secondary">К списку</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-2">
+  <div class="col-lg-7">
+    <h2 class="h4">Описание</h2>
+    <p>{{ car.description|default:'Продавец не добавил описание.'|linebreaksbr }}</p>
+  </div>
+  <div class="col-lg-5">
+    <h2 class="h4">Опции</h2>
+    {% for feature in car.features.all %}
+    <span class="badge text-bg-secondary fw-normal me-1 mb-1">{{ feature }}</span>
+    {% empty %}
+    <p class="text-body-secondary">Опции не указаны.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

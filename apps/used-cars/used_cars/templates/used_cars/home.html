@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load used_cars_extras %}
+
+{% block title %}Авто с пробегом{% endblock %}
+
+{% block content %}
+<section class="hero border p-4 p-md-5 mb-5">
+  <div class="col-lg-7 px-0">
+    <p class="text-uppercase small text-body-secondary letter-spacing mb-2">CarShowroom · с пробегом</p>
+    <h1 class="display-5 fw-bold">Проверенные автомобили с пробегом</h1>
+    <p class="lead text-body-secondary">
+      Каждый автомобиль проходит диагностику в нашем сервисе, история обслуживания — прозрачная.
+    </p>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'car_list' %}" class="btn btn-primary btn-lg">Смотреть автомобили</a>
+    </div>
+  </div>
+</section>
+
+<div class="row g-3 mb-5 text-center">
+  <div class="col-6 col-md-3">
+    <div class="border p-3 h-100">
+      <div class="fs-2 fw-bold">{{ cars_count }}</div>
+      <div class="small text-body-secondary">автомобилей в продаже</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="border p-3 h-100">
+      <div class="fs-2 fw-bold">{{ brands_count }}</div>
+      <div class="small text-body-secondary">марок</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="border p-3 h-100">
+      <div class="fs-2 fw-bold">{{ min_price|default:0|rub }}</div>
+      <div class="small text-body-secondary">минимальная цена</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="border p-3 h-100">
+      <div class="fs-2 fw-bold">{{ avg_mileage|default:0|km }}</div>
+      <div class="small text-body-secondary">средний пробег</div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-baseline mb-3">
+  <h2 class="h3 mb-0">Свежие поступления</h2>
+  <a href="{% url 'car_list' %}">Все автомобили →</a>
+</div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for car in latest_cars %}
+  <div class="col">{% include 'used_cars/_car_card.html' %}</div>
+  {% empty %}
+  <p class="text-body-secondary">Пока нет опубликованных объявлений.</p>
+  {% endfor %}
+</div>
+{% endblock %}

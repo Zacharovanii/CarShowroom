@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Автомобили с пробегом{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Автомобили с пробегом</h1>
+
+<p class="text-body-secondary">Найдено: {{ cars|length }}</p>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for car in cars %}
+  <div class="col">{% include 'used_cars/_car_card.html' %}</div>
+  {% empty %}
+  <div class="col-12">
+    <div class="alert alert-secondary">Ничего не найдено.</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

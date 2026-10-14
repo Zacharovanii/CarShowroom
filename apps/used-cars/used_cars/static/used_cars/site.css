@@ -1,0 +1,61 @@
+/*
+ * Bootstrap в цветах основного сайта CarShowroom: тёмная тема, синий акцент,
+ * без скруглений. Значения взяты из apps/web/src/styles/tokens.css —
+ * меняются там, сюда переносятся руками.
+ */
+[data-bs-theme="dark"] {
+  --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --bs-body-bg: #0a0b0d;
+  --bs-body-color: #eef1f5;
+  --bs-secondary-bg: #16181c;
+  --bs-tertiary-bg: #101216;
+  --bs-border-color: #2b2f36;
+  --bs-primary: #2573c9;
+  --bs-primary-rgb: 37, 115, 201;
+  --bs-link-color: #4da2ff;
+  --bs-link-color-rgb: 77, 162, 255;
+  --bs-link-hover-color: #cfe4ff;
+  --bs-link-hover-color-rgb: 207, 228, 255;
+  --bs-focus-ring-color: rgba(77, 162, 255, 0.4);
+
+  /* Проект без скруглений */
+  --bs-border-radius: 0;
+  --bs-border-radius-sm: 0;
+  --bs-border-radius-lg: 0;
+  --bs-border-radius-xl: 0;
+  --bs-border-radius-xxl: 0;
+}
+
+.btn-primary {
+  --bs-btn-bg: #2573c9;
+  --bs-btn-border-color: #2573c9;
+  --bs-btn-hover-bg: #1d5ba3;
+  --bs-btn-hover-border-color: #1d5ba3;
+  --bs-btn-active-bg: #17497f;
+  --bs-btn-active-border-color: #17497f;
+  --bs-btn-disabled-bg: #2573c9;
+  --bs-btn-disabled-border-color: #2573c9;
+}
+
+.navbar {
+  --bs-navbar-active-color: #4da2ff;
+}
+
+.card {
+  --bs-card-bg: #16181c;
+}
+
+/* Фото в карточке — одной пропорции, чтобы сетка не прыгала */
+.car-photo {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #101216;
+}
+
+.hero {
+  background: linear-gradient(120deg, #101216 40%, #0d2740);
+}
+
+.letter-spacing {
+  letter-spacing: 0.08em;
+}
